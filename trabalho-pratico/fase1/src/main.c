@@ -1,26 +1,34 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <glib.h>
-#include "../include/driver.h"
-#include "../include/user.h"
-#include "../include/ride.h"
-#include "../include/parsing.h"
 #include "../include/io.h"
 #include "../include/catalog.h"
+#include "../include/ride.h"
 
 int main(int argc, char **argv)
 {
-    CATALOG *c = create_catalog();
-    char *input = malloc(sizeof(char) * BUFSIZ);
-
-    if (fgets(input, BUFSIZ, stdin) != NULL)
+    if (argc < 2)
     {
-        int query = atoi(strsep(&input, " "));
-        handle_input(query, input, c);
+        printf("[ERRO] - Falta de argumentos.\n");
     }
 
-    // int key = 1000000;
-    // RIDE *ride = g_hash_table_lookup(c->rides, &key);
-    // printf("%s\n", ride->comment);
-    // return 0;
+    char *dataset = argv[1];
+    char *input = argv[2];
+
+    CATALOG *c = create_catalog(dataset);
+
+    FILE *file = fopen(input, "r");
+    // "../exemplos_de_queries/tests_2/input.txt"
+
+    char *line = NULL;
+    size_t len = 0;
+
+    int i;
+    for (i = 1; getline(&line, &len, file) != -1; ++i)
+    {
+        int query = atoi(strsep(&line, " "));
+        handle_input(query, line, c, i);
+    }
+
+    fclose(file);
 }

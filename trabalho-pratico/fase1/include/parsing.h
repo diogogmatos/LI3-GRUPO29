@@ -3,8 +3,8 @@
 
 #include <glib.h>
 
-GHashTable *read_users();
-GHashTable *read_drivers();
-GHashTable *read_rides();
+GHashTable *read_users(char *dataset);
+GHashTable *read_drivers(char *dataset);
+GHashTable *read_rides(char *dataset);
 
 #endif

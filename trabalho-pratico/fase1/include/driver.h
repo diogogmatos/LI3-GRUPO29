@@ -3,9 +3,9 @@
 
 typedef struct driver
 {
-    int id;
+    char *id;
     char *name;
-    char *birth_date;
+    char *birth_day;
     char gender;
     char *car_class;
     char *license_plate;

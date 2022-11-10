@@ -10,6 +10,6 @@ typedef struct catalog
     GHashTable *rides;
 } CATALOG;
 
-CATALOG *create_catalog();
+CATALOG *create_catalog(char *dataset);
 
 #endif

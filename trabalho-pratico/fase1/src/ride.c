@@ -7,9 +7,9 @@ RIDE *create_ride(char *line)
 {
     RIDE *r = malloc(sizeof(RIDE));
 
-    r->id = atoi(strsep(&line, ";"));
+    r->id = strdup(strsep(&line, ";"));
     r->date = strdup(strsep(&line, ";"));
-    r->driver = atoi(strsep(&line, ";"));
+    r->driver = strdup(strsep(&line, ";"));
     r->user = strdup(strsep(&line, ";"));
     r->city = strdup(strsep(&line, ";"));
     r->distance = atoi(strsep(&line, ";"));
