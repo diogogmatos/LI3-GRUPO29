@@ -13,7 +13,7 @@ USER *create_user(char *line)
     u->date = strdup(strsep(&line, ";"));
     u->account_creation = strdup(strsep(&line, ";"));
     u->pay_method = strdup(strsep(&line, ";"));
-    u->account_status = strdup(strsep(&line, ";"));
+    u->account_status = strdup(strsep(&line, "\n")); // o último caracter da linha é um '\n' e não um ';'
 
     return u;
 }

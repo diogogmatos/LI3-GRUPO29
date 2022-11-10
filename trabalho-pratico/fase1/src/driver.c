@@ -15,7 +15,7 @@ DRIVER *create_driver(char *line)
     d->license_plate = strdup(strsep(&line, ";"));
     d->city = strdup(strsep(&line, ";"));
     d->account_creation = strdup(strsep(&line, ";"));
-    d->account_status = strdup(strsep(&line, ";"));
+    d->account_status = strdup(strsep(&line, "\n")); // o último caracter da linha é um '\n' e não um ';'
 
     return d;
 }
