@@ -4,6 +4,6 @@
 #include <glib.h>
 #include "../include/catalog.h"
 
-void handle_input(int query, char *input, CATALOG *c);
+void handle_input(int query, char *input, CATALOG *c, int i);
 
 #endif

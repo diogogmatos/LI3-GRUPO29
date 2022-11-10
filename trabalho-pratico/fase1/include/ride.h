@@ -3,15 +3,15 @@
 
 typedef struct ride
 {
-    int id;
+    char *id;
     char *date;
-    int driver;
+    char *driver;
     char *user;
     char *city;
     int distance;
     int score_user;
     int score_driver;
-    float tip;
+    double tip;
     char *comment;
 } RIDE;
 

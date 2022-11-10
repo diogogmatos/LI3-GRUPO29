@@ -6,7 +6,7 @@ typedef struct user
     char *username;
     char *name;
     char gender;
-    char *date;
+    char *birth_date;
     char *account_creation;
     char *pay_method;
     char *account_status;

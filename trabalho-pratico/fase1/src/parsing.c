@@ -7,21 +7,25 @@
 #include "../include/ride.h"
 #include "../include/parsing.h"
 
-GHashTable *read_drivers()
+GHashTable *read_drivers(char *dataset)
 {
-    FILE *file = fopen("../Dataset_Fase1/drivers.csv", "r");
+    char *path = malloc(sizeof(char) * 50);
+    sprintf(path, "%s/drivers.csv", dataset);
+
+    FILE *file = fopen(path, "r");
+    // "../Dataset_Fase1/drivers.csv"
 
     char *line = NULL;
     size_t len = 0;
 
-    GHashTable *drivers = g_hash_table_new(g_int_hash, g_int_equal);
+    GHashTable *drivers = g_hash_table_new(g_str_hash, g_str_equal);
 
     getline(&line, &len, file);
 
     while (getline(&line, &len, file) != -1)
     {
         DRIVER *driver = create_driver(line);
-        g_hash_table_insert(drivers, &driver->id, driver);
+        g_hash_table_insert(drivers, driver->id, driver);
     }
 
     fclose(file);
@@ -29,9 +33,13 @@ GHashTable *read_drivers()
     return drivers;
 }
 
-GHashTable *read_users()
+GHashTable *read_users(char *dataset)
 {
-    FILE *file = fopen("../Dataset_Fase1/users.csv", "r");
+    char *path = malloc(sizeof(char) * 50);
+    sprintf(path, "%s/users.csv", dataset);
+
+    FILE *file = fopen(path, "r");
+    // "../Dataset_Fase1/users.csv"
 
     char *line = NULL;
     size_t len = 0;
@@ -51,21 +59,25 @@ GHashTable *read_users()
     return users;
 }
 
-GHashTable *read_rides()
+GHashTable *read_rides(char *dataset)
 {
-    FILE *file = fopen("../Dataset_Fase1/rides.csv", "r");
+    char *path = malloc(sizeof(char) * 50);
+    sprintf(path, "%s/rides.csv", dataset);
+
+    FILE *file = fopen(path, "r");
+    // "../Dataset_Fase1/rides.csv"
 
     char *line = NULL;
     size_t len = 0;
 
-    GHashTable *rides = g_hash_table_new(g_int_hash, g_int_equal);
+    GHashTable *rides = g_hash_table_new(g_str_hash, g_str_equal);
 
     getline(&line, &len, file);
 
     while (getline(&line, &len, file) != -1)
     {
         RIDE *ride = create_ride(line);
-        g_hash_table_insert(rides, &ride->id, ride);
+        g_hash_table_insert(rides, ride->id, ride);
     }
 
     fclose(file);
