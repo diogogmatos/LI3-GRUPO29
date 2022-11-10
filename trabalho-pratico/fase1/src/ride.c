@@ -16,7 +16,7 @@ RIDE *create_ride(char *line)
     r->score_user = atoi(strsep(&line, ";"));
     r->score_driver = atoi(strsep(&line, ";"));
     r->tip = atof(strsep(&line, ";"));
-    r->comment = strdup(strsep(&line, ";"));
+    r->comment = strdup(strsep(&line, "\n")); // o último caracter da linha é um '\n' e não um ';'
 
     return r;
 }
