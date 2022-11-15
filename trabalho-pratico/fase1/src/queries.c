@@ -10,6 +10,7 @@
 #include "../include/queries.h"
 #include "../include/catalog.h"
 #include "../include/stat.h"
+#include "../include/utils.h"
 
 void query_1(char *input, CATALOG *c, int i)
 {
@@ -19,35 +20,89 @@ void query_1(char *input, CATALOG *c, int i)
     {
         char *id = strsep(&input, "\n");
         DRIVER *d = g_hash_table_lookup(c->drivers, id);
-        STAT *s = create_driver_stat(d, c);
+        STAT *s = driver_stat(d, c);
 
         char *path = malloc(sizeof(char) * 50);
         sprintf(path, "../Resultados/command%d_output.txt", i);
 
         FILE *f = fopen(path, "a");
 
-        fprintf(f, "%s;%c;%d;%.3f;%d;%.3f\n", d->name, d->gender, s->age, s->avg_score, s->trips, s->money);
+        fprintf(f, "%s;%s;%d;%.3f;%d;%.3f\n", d->name, d->gender, s->age, s->avg_score, s->trips, s->money);
 
         fclose(f);
+
+        free(path);
+        free(s);
     }
     else
     {
         char *username = strsep(&input, "\n");
         USER *u = g_hash_table_lookup(c->users, username);
-        STAT *s = create_user_stat(u, c);
+        STAT *s = user_stat(u, c);
 
         char *path = malloc(sizeof(char) * 50);
         sprintf(path, "../Resultados/command%d_output.txt", i);
 
         FILE *f = fopen(path, "a");
 
-        fprintf(f, "%s;%c;%d;%.3f;%d;%.3f\n", u->name, u->gender, s->age, s->avg_score, s->trips, s->money);
+        fprintf(f, "%s;%s;%d;%.3f;%d;%.3f\n", u->name, u->gender, s->age, s->avg_score, s->trips, s->money);
 
         fclose(f);
+
+        free(path);
+        free(s);
+    }
+}
+
+gint compare_avg_score(gconstpointer a, gconstpointer b)
+{
+    STAT *s1 = (STAT*)a;
+    STAT *s2 = (STAT*)b;
+
+    if (s1->avg_score > s2->avg_score)
+        return -1;
+    else if (s1->avg_score < s2->avg_score)
+        return 1;
+    else
+    {
+        int da = convert_date(s1->most_recent_trip);
+        int db = convert_date(s2->most_recent_trip);
+
+        if (da > db)
+            return -1;
+        else if (da < db)
+            return 1;
+        else if (s1->id > s2->id)
+            return -1;
+        else
+            return 1;
     }
 }
 
 void query_2(char *input, CATALOG *c, int i)
 {
-    printf("[Query 2] - %d | input: %s\n", i, input);
+    int N = atoi(input);
+
+    GHashTable *stats = avg_score_stats(c);
+
+    GList *list = g_hash_table_get_values(stats); // retorna os valores da hash table "stats" para uma lista
+    list = g_list_sort(list, compare_avg_score);  // ordena a lista por ordem decrescente de average score, tendo em conta as situações de desempate do enunciado
+
+    char *path = malloc(sizeof(char) * 50);
+    sprintf(path, "../Resultados/command%d_output.txt", i);
+
+    FILE *f = fopen(path, "a");
+
+    int acc;
+    for (acc = 0; acc < N; ++acc)
+    {
+        STAT *s = g_list_nth_data(list, acc);
+        fprintf(f, "%s;%s;%.3f\n", s->id, s->driver_name, s->avg_score);
+    }
+
+    fclose(f);
+
+    free(path);
+    g_list_free(list);
+    g_hash_table_destroy(stats);
 }

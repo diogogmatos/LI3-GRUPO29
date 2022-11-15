@@ -10,8 +10,11 @@ typedef struct stat
 {
 	char *id;
 	char *username;
-    GHashTable *drivers;
-	GHashTable *users;
+	char *driver_name;
+	CATALOG *c;
+	GHashTable *ht;
+	char *most_recent_trip;
+	double score;
 
 	int age;
 	double avg_score;
@@ -20,9 +23,8 @@ typedef struct stat
 	int total_distance;
 } STAT;
 
-void stat_build(gpointer key, gpointer value, gpointer userdata);
-void init_stat(CATALOG *c, STAT *s);
-STAT *create_user_stat(USER *u, CATALOG *c);
-STAT *create_driver_stat(DRIVER *d, CATALOG *c);
+STAT *user_stat(USER *u, CATALOG *c);
+STAT *driver_stat(DRIVER *d, CATALOG *c);
+GHashTable *avg_score_stats(CATALOG *c);
 
 #endif

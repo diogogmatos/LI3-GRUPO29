@@ -20,3 +20,16 @@ RIDE *create_ride(char *line)
 
     return r;
 }
+
+void destroy_ride(void *v)
+{
+    RIDE *r = v;
+
+    free(r->id);
+    free(r->date);
+    free(r->driver);
+    free(r->user);
+    free(r->city);
+    free(r->comment);
+    free(r);
+}

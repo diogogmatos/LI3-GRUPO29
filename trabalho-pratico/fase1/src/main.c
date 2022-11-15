@@ -26,9 +26,18 @@ int main(int argc, char **argv)
     int i;
     for (i = 1; getline(&line, &len, file) != -1; ++i)
     {
-        int query = atoi(strsep(&line, " "));
-        handle_input(query, line, c, i);
+        int query = line[0] - '0';
+        char *args = line + 2;
+        handle_input(query, args, c, i);
     }
 
     fclose(file);
+
+    free(line);
+    g_hash_table_destroy(c->drivers);
+    g_hash_table_destroy(c->users);
+    g_hash_table_destroy(c->rides);
+    free(c);
+
+    return 0;
 }

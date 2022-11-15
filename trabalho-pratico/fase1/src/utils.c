@@ -54,10 +54,13 @@ int convert_date(char *date)
 {
     char *d = strdup(date);
 
-    int dia = atoi(strsep(&d, "/"));
-    int mes = atoi(strsep(&d, "/"));
-    int ano = atoi(strsep(&d, "\0"));
+    int dia, mes, ano;
+
+    sscanf(d, "%d/%d/%d", &dia, &mes, &ano);
+
     int r = ano * 365 + mes * 31 + dia;
+
+    free(d);
 
     return r;
 }
