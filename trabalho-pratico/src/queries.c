@@ -23,7 +23,7 @@ void query_1(char *input, CATALOG *c, int i)
         STAT *s = driver_stat(d, c);
 
         char *path = malloc(sizeof(char) * 50);
-        sprintf(path, "../Resultados/command%d_output.txt", i);
+        sprintf(path, "Resultados/command%d_output.txt", i);
 
         FILE *f = fopen(path, "a");
 
@@ -41,7 +41,7 @@ void query_1(char *input, CATALOG *c, int i)
         STAT *s = user_stat(u, c);
 
         char *path = malloc(sizeof(char) * 50);
-        sprintf(path, "../Resultados/command%d_output.txt", i);
+        sprintf(path, "Resultados/command%d_output.txt", i);
 
         FILE *f = fopen(path, "a");
 
@@ -89,7 +89,7 @@ void query_2(char *input, CATALOG *c, int i)
     list = g_list_sort(list, compare_avg_score);  // ordena a lista por ordem decrescente de average score, tendo em conta as situações de desempate do enunciado
 
     char *path = malloc(sizeof(char) * 50);
-    sprintf(path, "../Resultados/command%d_output.txt", i);
+    sprintf(path, "Resultados/command%d_output.txt", i);
 
     FILE *f = fopen(path, "a");
 
@@ -105,4 +105,18 @@ void query_2(char *input, CATALOG *c, int i)
     free(path);
     g_list_free(list);
     g_hash_table_destroy(stats);
+}
+
+void invalid_query(char *input, int i)
+{
+    char *path = malloc(sizeof(char) * 50);
+    sprintf(path, "Resultados/command%d_output.txt", i);
+
+    FILE *f = fopen(path, "a");
+
+    fprintf(f, "\n");
+
+    fclose(f);
+
+    free(path);
 }
