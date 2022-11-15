@@ -1,0 +1,20 @@
+{
+    "files.associations": {
+        "user.h": "c",
+        "*.tcc": "c",
+        "string": "c",
+        "istream": "c",
+        "streambuf": "c",
+        "io.h": "c",
+        "parsing.h": "c",
+        "stdio.h": "c",
+        "driver.h": "c",
+        "queries.h": "c",
+        "string.h": "c",
+        "ride.h": "c",
+        "catalog.h": "c",
+        "stdlib.h": "c",
+        "stat.h": "c",
+        "utils.h": "c"
+    }
+}

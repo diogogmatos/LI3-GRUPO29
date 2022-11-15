@@ -18,7 +18,7 @@ GHashTable *read_drivers(char *dataset)
     char *line = NULL;
     size_t len = 0;
 
-    GHashTable *drivers = g_hash_table_new(g_str_hash, g_str_equal);
+    GHashTable *drivers = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, destroy_driver);
 
     getline(&line, &len, file);
 
@@ -29,6 +29,8 @@ GHashTable *read_drivers(char *dataset)
     }
 
     fclose(file);
+    free(line);
+    free(path);
 
     return drivers;
 }
@@ -44,7 +46,7 @@ GHashTable *read_users(char *dataset)
     char *line = NULL;
     size_t len = 0;
 
-    GHashTable *users = g_hash_table_new(g_str_hash, g_str_equal);
+    GHashTable *users = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, destroy_user);
 
     getline(&line, &len, file);
 
@@ -55,6 +57,8 @@ GHashTable *read_users(char *dataset)
     }
 
     fclose(file);
+    free(line);
+    free(path);
 
     return users;
 }
@@ -70,7 +74,7 @@ GHashTable *read_rides(char *dataset)
     char *line = NULL;
     size_t len = 0;
 
-    GHashTable *rides = g_hash_table_new(g_str_hash, g_str_equal);
+    GHashTable *rides = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, destroy_ride);
 
     getline(&line, &len, file);
 
@@ -81,6 +85,8 @@ GHashTable *read_rides(char *dataset)
     }
 
     fclose(file);
+    free(line);
+    free(path);
 
     return rides;
 }

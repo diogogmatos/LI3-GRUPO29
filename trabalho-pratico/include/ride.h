@@ -16,5 +16,6 @@ typedef struct ride
 } RIDE;
 
 RIDE *create_ride(char *line);
+void destroy_ride(void *v);
 
 #endif

@@ -6,5 +6,6 @@
 
 void query_1(char *input, CATALOG *c, int i);
 void query_2(char *input, CATALOG *c, int i);
+void invalid_query(int i);
 
 #endif

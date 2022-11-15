@@ -6,7 +6,7 @@ typedef struct driver
     char *id;
     char *name;
     char *birth_day;
-    char gender;
+    char *gender;
     char *car_class;
     char *license_plate;
     char *city;
@@ -15,5 +15,6 @@ typedef struct driver
 } DRIVER;
 
 DRIVER *create_driver(char *line);
+void destroy_driver(void *v);
 
 #endif
