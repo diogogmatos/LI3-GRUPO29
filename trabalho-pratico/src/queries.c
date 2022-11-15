@@ -16,48 +16,64 @@ void query_1(char *input, CATALOG *c, int i)
 {
     int is_id = atoi(input);
 
-    if (is_id != 0)
+    if (is_id != 0) // driver
     {
         char *id = strsep(&input, "\n");
         DRIVER *d = g_hash_table_lookup(c->drivers, id);
-        STAT *s = driver_stat(d, c);
 
         char *path = malloc(sizeof(char) * 50);
         sprintf(path, "Resultados/command%d_output.txt", i);
 
         FILE *f = fopen(path, "a");
 
-        fprintf(f, "%s;%s;%d;%.3f;%d;%.3f\n", d->name, d->gender, s->age, s->avg_score, s->trips, s->money);
+        if (!strcmp(d->account_status, "active")) // se a conta for ativa executa normalmente
+        {
+            STAT *s = driver_stat(d, c);
+
+            fprintf(f, "%s;%s;%d;%.3f;%d;%.3f\n", d->name, d->gender, s->age, s->avg_score, s->trips, s->money);
+
+            free(s);
+        }
+        else // caso contrário deixa o ficheiro vazio
+        {
+            fprintf(f, "\0");
+        }
 
         fclose(f);
-
         free(path);
-        free(s);
     }
-    else
+    else // user
     {
         char *username = strsep(&input, "\n");
         USER *u = g_hash_table_lookup(c->users, username);
-        STAT *s = user_stat(u, c);
 
         char *path = malloc(sizeof(char) * 50);
         sprintf(path, "Resultados/command%d_output.txt", i);
 
         FILE *f = fopen(path, "a");
 
-        fprintf(f, "%s;%s;%d;%.3f;%d;%.3f\n", u->name, u->gender, s->age, s->avg_score, s->trips, s->money);
+        if (!strcmp(u->account_status, "active"))
+        {
+            STAT *s = user_stat(u, c);
+
+            fprintf(f, "%s;%s;%d;%.3f;%d;%.3f\n", u->name, u->gender, s->age, s->avg_score, s->trips, s->money);
+
+            free(s);
+        }
+        else
+        {
+            fprintf(f, "\0");
+        }
 
         fclose(f);
-
         free(path);
-        free(s);
     }
 }
 
 gint compare_avg_score(gconstpointer a, gconstpointer b)
 {
-    STAT *s1 = (STAT*)a;
-    STAT *s2 = (STAT*)b;
+    STAT *s1 = (STAT *)a;
+    STAT *s2 = (STAT *)b;
 
     if (s1->avg_score > s2->avg_score)
         return -1;
@@ -107,7 +123,7 @@ void query_2(char *input, CATALOG *c, int i)
     g_hash_table_destroy(stats);
 }
 
-void invalid_query(char *input, int i)
+void invalid_query(int i)
 {
     char *path = malloc(sizeof(char) * 50);
     sprintf(path, "Resultados/command%d_output.txt", i);

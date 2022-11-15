@@ -83,39 +83,43 @@ void avg_score_build(gpointer key, gpointer value, gpointer userdata)
 {
 	RIDE *r = value;
 	STAT *s = userdata;
-	GHashTable *ht = s->ht; // hash table "ht" que vai guardando os drivers e as suas estatísticas à medida que percorre as rides
 
-	STAT *driver = malloc(sizeof(STAT));					   // STAT que vai guardar as estatísticas do driver pedidas na query
+	GHashTable *ht = s->ht;									   // hash table "ht" que vai guardando os drivers e as suas estatísticas à medida que percorre as rides
 	DRIVER *d = g_hash_table_lookup(s->c->drivers, r->driver); // procura o driver na hash table de drivers para obter o seu nome
 
-	driver->id = r->driver;
-	driver->driver_name = d->name;
-	driver->c = s->c; // o catálogo de hash tables terá de ser usado na função "compare_avg_score" que apenas recebe dois valores de "ht"
-
-	STAT *dl = g_hash_table_lookup(ht, r->driver); // procura o driver na "ht"
-
-	if (dl == NULL) // se o driver não estiver na "ht"
+	if (!strcmp(d->account_status, "active")) // apenas executa se o driver for ativo
 	{
-		driver->score = r->score_driver;
-		driver->most_recent_trip = r->date;
-		driver->trips = 1;
-	}
-	else // se o driver já estiver na "ht"
-	{
-		driver->score = dl->score + r->score_driver;
-		driver->trips = dl->trips + 1;
+		STAT *driver = malloc(sizeof(STAT)); // STAT que vai guardar as estatísticas do driver pedidas na query
 
-		/* compara as datas da ride atual com a mais recente da "ht" de modo a ficar com a data da trip mais recente
-		 * de cada driver, que é usada em "compare_avg_score" */
-		if (convert_date(r->date) > convert_date(dl->most_recent_trip))
+		driver->id = r->driver;
+		driver->driver_name = d->name;
+		driver->c = s->c; // o catálogo de hash tables terá de ser usado na função "compare_avg_score" que apenas recebe dois valores de "ht"
+
+		STAT *dl = g_hash_table_lookup(ht, r->driver); // procura o driver na "ht"
+
+		if (dl == NULL) // se o driver não estiver na "ht"
+		{
+			driver->score = r->score_driver;
 			driver->most_recent_trip = r->date;
-		else
-			driver->most_recent_trip = dl->most_recent_trip;
+			driver->trips = 1;
+		}
+		else // se o driver já estiver na "ht"
+		{
+			driver->score = dl->score + r->score_driver;
+			driver->trips = dl->trips + 1;
+
+			/* compara as datas da ride atual com a mais recente da "ht" de modo a ficar com a data da trip mais recente
+			 * de cada driver, que é usada em "compare_avg_score" */
+			if (convert_date(r->date) > convert_date(dl->most_recent_trip))
+				driver->most_recent_trip = r->date;
+			else
+				driver->most_recent_trip = dl->most_recent_trip;
+		}
+
+		driver->avg_score = driver->score / driver->trips;
+
+		g_hash_table_insert(ht, driver->id, driver);
 	}
-
-	driver->avg_score = driver->score / driver->trips;
-
-	g_hash_table_insert(ht, driver->id, driver);
 }
 
 GHashTable *avg_score_stats(CATALOG *c)
