@@ -34,10 +34,6 @@ void query_1(char *input, CATALOG *c, int i)
 
             free(s);
         }
-        else // caso contrário deixa o ficheiro vazio
-        {
-            fprintf(f, "\0");
-        }
 
         fclose(f);
         free(path);
@@ -59,10 +55,6 @@ void query_1(char *input, CATALOG *c, int i)
             fprintf(f, "%s;%s;%d;%.3f;%d;%.3f\n", u->name, u->gender, s->age, s->avg_score, s->trips, s->money);
 
             free(s);
-        }
-        else
-        {
-            fprintf(f, "\0");
         }
 
         fclose(f);
@@ -129,9 +121,6 @@ void invalid_query(int i)
     sprintf(path, "Resultados/command%d_output.txt", i);
 
     FILE *f = fopen(path, "a");
-
-    fprintf(f, "\n");
-
     fclose(f);
 
     free(path);
