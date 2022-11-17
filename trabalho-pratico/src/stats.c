@@ -26,9 +26,11 @@ void stat_build(gpointer key, gpointer value, gpointer userdata)
 
 	if (!strcmp(r->driver, s->id))
 	{
+		DRIVER *d = g_hash_table_lookup(s->c->drivers, r->driver);
+
 		s->avg_score += r->score_driver;
 		s->trips += 1;
-		s->money += r->tip;
+		s->money += r->tip + get_price(d) + get_tax(d) * r->distance;
 		s->total_distance += r->distance;
 	}
 }
@@ -67,8 +69,6 @@ STAT *driver_stat(DRIVER *d, CATALOG *c)
 	g_hash_table_foreach(c->rides, stat_build, s);
 
 	s->avg_score /= s->trips;
-
-	s->money += get_price(d) * s->trips + get_tax(d) * s->total_distance;
 
 	return s;
 }
