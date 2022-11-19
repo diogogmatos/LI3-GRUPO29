@@ -73,7 +73,7 @@ STAT *driver_stat(DRIVER *d, CATALOG *c)
 	return s;
 }
 
-void destroy_avg_score(void *v)
+void destroy_stat(void *v)
 {
 	STAT *s = v;
 	free(s);
@@ -124,7 +124,7 @@ void avg_score_build(gpointer key, gpointer value, gpointer userdata)
 
 GHashTable *avg_score_stats(CATALOG *c)
 {
-	GHashTable *ht = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, destroy_avg_score);
+	GHashTable *ht = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, destroy_stat);
 
 	STAT *s = malloc(sizeof(STAT)); // STAT que serve como transportadora de dados necessários para a função avg_score_build
 
@@ -132,6 +132,59 @@ GHashTable *avg_score_stats(CATALOG *c)
 	s->ht = ht; // hash table "ht" vai guardar os drivers e as suas estatísticas
 
 	g_hash_table_foreach(c->rides, avg_score_build, s); // atualiza a hash table "ht" com os drivers e as suas estatísticas
+
+	free(s);
+
+	return ht;
+}
+
+void tot_dist_build(gpointer key, gpointer value, gpointer userdata)
+{
+	RIDE *r = value;
+	STAT *s = userdata;
+
+	GHashTable *ht = s->ht;
+	USER *u = g_hash_table_lookup(s->c->users, r->user);
+
+	if (!strcmp(u->account_status, "active"))
+	{
+		STAT *user =malloc(sizeof(STAT));
+
+		user->username = r->user;
+		user->user_name = u->name;
+		user->c = s->c;
+
+		STAT *ul = g_hash_table_lookup(ht, r->user);
+
+		if (ul == NULL)
+		{
+			user->most_recent_trip = r->date;
+			user->total_distance = r->distance;
+		}
+		else
+		{
+			user->total_distance = ul->total_distance + r->distance; 
+
+			if (convert_date(r->date) > convert_date(ul->most_recent_trip))
+				user->most_recent_trip = r->date;
+			else
+				user->most_recent_trip = ul->most_recent_trip;
+		}
+
+		g_hash_table_insert(ht, user->username, user);
+	}
+}
+
+GHashTable *tot_dist_stats(CATALOG *c)
+{
+	GHashTable *ht = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, destroy_stat); 
+
+	STAT *s = malloc(sizeof(STAT));
+
+	s->c = c;
+	s->ht = ht;
+
+	g_hash_table_foreach(c->rides, tot_dist_build, s);
 
 	free(s);
 

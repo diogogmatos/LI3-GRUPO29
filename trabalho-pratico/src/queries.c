@@ -115,6 +115,58 @@ void query_2(char *input, CATALOG *c, int i)
     g_hash_table_destroy(stats);
 }
 
+gint compare_tot_dist(gconstpointer a, gconstpointer b)
+{
+    STAT *s1 = (STAT *)a;
+    STAT *s2 = (STAT *)b;
+
+    if (s1->total_distance > s2->total_distance)
+        return -1;
+    else if (s1->total_distance < s2->total_distance)
+        return 1;
+    else
+    {
+        int da = convert_date(s1->most_recent_trip);
+        int db = convert_date(s2->most_recent_trip);
+
+        if (da > db)
+            return -1;
+        else if (da < db)
+            return 1;
+        else if (s1->id > s2->id)
+            return -1;
+        else
+            return 1;
+    }
+}
+
+void query_3(char *input, CATALOG *c, int i)
+{
+    int N = atoi(input);
+
+    GHashTable *stats = tot_dist_stats(c);
+
+    GList *list = g_hash_table_get_values(stats);
+    list = g_list_sort(list, compare_tot_dist);
+
+    char *path = malloc(sizeof(char) * 50);
+    sprintf(path, "Resultados/command%d_output.txt", i);
+    FILE *f = fopen(path, "a");
+
+    int acc;
+    for (acc = 0; acc < N; ++acc)
+    {
+        STAT *s = g_list_nth_data(list, acc);
+        fprintf(f, "%s;%s;%d\n", s->username, s->user_name, s->total_distance);
+    }
+
+    fclose(f);
+
+    free(path);
+    g_list_free(list);
+    g_hash_table_destroy(stats);
+}
+
 void invalid_query(int i)
 {
     char *path = malloc(sizeof(char) * 50);
