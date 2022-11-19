@@ -29,5 +29,6 @@ typedef struct stat
 STAT *user_stat(USER *u, CATALOG *c);
 STAT *driver_stat(DRIVER *d, CATALOG *c);
 GHashTable *avg_score_stats(CATALOG *c);
+GHashTable *tot_dist_stats(CATALOG *c);
 
 #endif
