@@ -34,10 +34,6 @@ void query_1(char *input, CATALOG *c, int i)
 
             free(s);
         }
-        else // caso contrário deixa o ficheiro vazio
-        {
-            fprintf(f, "\0");
-        }
 
         fclose(f);
         free(path);
@@ -59,10 +55,6 @@ void query_1(char *input, CATALOG *c, int i)
             fprintf(f, "%s;%s;%d;%.3f;%d;%.3f\n", u->name, u->gender, s->age, s->avg_score, s->trips, s->money);
 
             free(s);
-        }
-        else
-        {
-            fprintf(f, "\0");
         }
 
         fclose(f);
@@ -123,15 +115,38 @@ void query_2(char *input, CATALOG *c, int i)
     g_hash_table_destroy(stats);
 }
 
+gint compare_tot_dist(gconstpointer a, gconstpointer b)
+{
+    STAT *s1 = (STAT *)a;
+    STAT *s2 = (STAT *)b;
+
+    if (s1->total_distance > s2->total_distance)
+        return -1;
+    else if (s1->total_distance < s2->total_distance)
+        return 1;
+    else
+    {
+        int da = convert_date(s1->most_recent_trip);
+        int db = convert_date(s2->most_recent_trip);
+
+        if (da > db)
+            return -1;
+        else if (da < db)
+            return 1;
+        else if (s1->id > s2->id)
+            return -1;
+        else
+            return 1;
+    }
+}
+
+
 void invalid_query(int i)
 {
     char *path = malloc(sizeof(char) * 50);
     sprintf(path, "Resultados/command%d_output.txt", i);
 
     FILE *f = fopen(path, "a");
-
-    fprintf(f, "\n");
-
     fclose(f);
 
     free(path);
