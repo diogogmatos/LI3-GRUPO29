@@ -15,6 +15,9 @@ void handle_input(int query, char *input, CATALOG *c, int i)
     case 2:
         query_2(input, c, i);
         return;
+    case 3:
+        query_3(input, c, i);
+        return;
     default:
         printf("[Query Inexistente] - %d | input: %s\n", query, input);
         invalid_query(i);
