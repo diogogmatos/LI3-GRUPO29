@@ -1,6 +1,9 @@
 #ifndef user_h
 #define user_h
 
+/* Struct USER
+ * Responsável por guardar os dados de um utilizador.
+ */
 typedef struct user
 {
     char *username;

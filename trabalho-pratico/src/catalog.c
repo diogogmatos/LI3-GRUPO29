@@ -5,6 +5,10 @@
 #include "../include/catalog.h"
 #include "../include/parsing.h"
 
+/* Função `create_catalog()`
+ * Responsável por inicializar a struct CATALOG com os 3 módulos de dados (drivers, users e rides),
+ * chamando as funções read_<módulo>() que fazem o parsing dos dados dos drivers, users e rides, respetivamente.
+ */
 CATALOG *create_catalog(char *dataset)
 {
     CATALOG *c = malloc(sizeof(CATALOG));

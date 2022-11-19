@@ -9,6 +9,12 @@
 #include "../include/utils.h"
 #include "../include/stat.h"
 
+/* Função `stat_build()`
+ * Função que é chamada para todos os valores da tabela hash das viagens.
+ * Utilizada como auxiliar de `user_stat()`e `driver_stat()`, é responsável por atualizar os dados da
+ * STAT `s` à medida que a tabela hash é percorrida, verificando se o utilizador/condutor da linha atual é
+ * o que está a ser analisado.
+ */
 void stat_build(gpointer key, gpointer value, gpointer userdata)
 {
 	RIDE *r = value;
@@ -35,6 +41,9 @@ void stat_build(gpointer key, gpointer value, gpointer userdata)
 	}
 }
 
+/* Função `user_stat()`
+ * Responsável por criar as estatístias de um utilizador.
+ */
 STAT *user_stat(USER *u, CATALOG *c)
 {
 	STAT *s = malloc(sizeof(STAT));
@@ -54,6 +63,9 @@ STAT *user_stat(USER *u, CATALOG *c)
 	return s;
 }
 
+/* Função `driver_stat()`
+ * Responsável por criar as estatísticas de um condutor.
+ */
 STAT *driver_stat(DRIVER *d, CATALOG *c)
 {
 	STAT *s = malloc(sizeof(STAT));
@@ -79,6 +91,13 @@ void destroy_stat(void *v)
 	free(s);
 }
 
+/* Função `avg_score_build()`
+ * Função que é chamada para todos os valores da tabela hash das viagens.
+ * Utilizada como auxiliar de `avg_score_stats()`, é responsável por incializar a tabela hash `ht`
+ * de forma a que, no fim da execução, esta contenha a avaliação média de todos os condutores, ativos, existentes.
+ * Para além disso a table hash irá conter também o id, nome, nº de viagens e viagem mais recente de cada condutor. Dados
+ * que são necessários para a ordenação das estatísticas e para a impressão dos resultados.
+ */
 void avg_score_build(gpointer key, gpointer value, gpointer userdata)
 {
 	RIDE *r = value;
@@ -122,6 +141,11 @@ void avg_score_build(gpointer key, gpointer value, gpointer userdata)
 	}
 }
 
+/* Função `avg_score_stats()`
+ * Responsável por criar as estatísticas de avaliação média para todos os condutores ativos.
+ * Cria uma tabela hash `ht` que guarda estas estatísticas.
+ * No fim da execução, liberta a memória alocada para `s`.
+ */
 GHashTable *avg_score_stats(CATALOG *c)
 {
 	GHashTable *ht = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, destroy_stat);
@@ -138,6 +162,13 @@ GHashTable *avg_score_stats(CATALOG *c)
 	return ht;
 }
 
+/* Função `tot_dist_build()`
+ * Função que é chamada para todos os valores da tabela hash das viagens.
+ * Utilizada como auxiliar de `tot_dist_stats()`, é responsável por incializar a tabela hash `ht`
+ * de forma a que, no fim da execução, esta contenha a distância total para todos os condutores, ativos, existentes.
+ * Para além disso a table hash irá conter também o username, nome e viagem mais recente de cada utilizador. Dados
+ * que são necessários para a ordenação das estatísticas e para a impressão dos resultados.
+ */
 void tot_dist_build(gpointer key, gpointer value, gpointer userdata)
 {
 	RIDE *r = value;
@@ -148,7 +179,7 @@ void tot_dist_build(gpointer key, gpointer value, gpointer userdata)
 
 	if (!strcmp(u->account_status, "active"))
 	{
-		STAT *user =malloc(sizeof(STAT));
+		STAT *user = malloc(sizeof(STAT));
 
 		user->username = r->user;
 		user->user_name = u->name;
@@ -163,7 +194,7 @@ void tot_dist_build(gpointer key, gpointer value, gpointer userdata)
 		}
 		else
 		{
-			user->total_distance = ul->total_distance + r->distance; 
+			user->total_distance = ul->total_distance + r->distance;
 
 			if (convert_date(r->date) > convert_date(ul->most_recent_trip))
 				user->most_recent_trip = r->date;
@@ -175,9 +206,14 @@ void tot_dist_build(gpointer key, gpointer value, gpointer userdata)
 	}
 }
 
+/* Função `tot_dist_stats()`
+ * Responsável por criar as estatísticas de distância total para todos os utilizadores ativos.
+ * Cria uma tabela hash `ht` que guarda estas estatísticas.
+ * No fim da execução, liberta a memória alocada para `s`.
+ */
 GHashTable *tot_dist_stats(CATALOG *c)
 {
-	GHashTable *ht = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, destroy_stat); 
+	GHashTable *ht = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, destroy_stat);
 
 	STAT *s = malloc(sizeof(STAT));
 

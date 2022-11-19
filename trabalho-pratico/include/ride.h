@@ -1,6 +1,9 @@
 #ifndef ride_h
 #define ride_h
 
+/* Struct RIDE
+ * Responsável por guardar os dados de uma viagem.
+ */
 typedef struct ride
 {
     char *id;

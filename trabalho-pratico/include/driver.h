@@ -1,6 +1,9 @@
 #ifndef driver_h
 #define driver_h
 
+/* Struct DRIVER
+ * Responsável por guardar os dados de um condutor.
+ */
 typedef struct driver
 {
     char *id;

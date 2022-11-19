@@ -5,6 +5,13 @@
 #include "../include/catalog.h"
 #include "../include/ride.h"
 
+/* Função `main()`
+ * Recebe 2 argumentos, o primeiro é o caminho para o dataset a ser utilizado e o segundo é o
+ * caminho para o ficheiro de input a ser executado. Cria o catálogo de dados, lê o ficheiro de input
+ * linha a linha e chama a função `handle_input()` para lidar com cada uma das queries.
+ * No fim da execução, liberta a memória alocada para o catálogo de dados e para a string `line` usada
+ * em `getline()`.
+ */
 int main(int argc, char **argv)
 {
     if (argc < 2)

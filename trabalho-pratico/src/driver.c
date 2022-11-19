@@ -3,6 +3,10 @@
 #include <string.h>
 #include "../include/driver.h"
 
+/* Função `create_driver()`
+ * Responsável por inicializar uma struct DRIVER com todas as informações de um condutor,
+ * contidas numa linha do ficheiro drivers.csv.
+ */
 DRIVER *create_driver(char *line)
 {
     DRIVER *d = malloc(sizeof(DRIVER));
@@ -20,6 +24,10 @@ DRIVER *create_driver(char *line)
     return d;
 }
 
+/* Função `destroy_driver()`
+ * Responsável por libertar a memória alocada em `create_driver()` para todos os dados que são inicializados usando
+ * a função `strdup()`, que efetua um malloc. Liberta também a memória alocada para a struct em si (`free(d)`).
+ */
 void destroy_driver(void *v)
 {
     DRIVER *d = v;

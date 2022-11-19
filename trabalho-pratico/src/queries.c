@@ -12,6 +12,12 @@
 #include "../include/stat.h"
 #include "../include/utils.h"
 
+/* Função `query_1()`
+ * Responsável por interpretar, criar e imprimir as estatísticas pedidas na query 1.
+ * Para condutores, chama a função `driver_stat()` e para utilizadores, a função `user_stat()`, que
+ * criam a struct STAT com as estatísticas pedidas.
+ * No fim da execução, liberta a memória alocada.
+ */
 void query_1(char *input, CATALOG *c, int i)
 {
     int is_id = atoi(input);
@@ -87,6 +93,13 @@ gint compare_avg_score(gconstpointer a, gconstpointer b)
     }
 }
 
+/* Função `query_2()`
+ * Responsável por interpretar, criar e imprimir as estatísticas pedidas na query 2.
+ * Chama a função `avg_score_stats()` para criar a tabela hash com as estatísticas pedidas.
+ * Coloca os valores da tabela hash `stats` numa lista `l` e ordena a lista de acordo com
+ * as instruções dadas no enunciado, com ajuda da função `compare_avg_score()`.
+ * No fim da execução, liberta a memória alocada (incluindo a lista e a tabela hash).
+ */
 void query_2(char *input, CATALOG *c, int i)
 {
     int N = atoi(input);
@@ -133,9 +146,7 @@ gint compare_tot_dist(gconstpointer a, gconstpointer b)
             return -1;
         else if (da < db)
             return 1;
-
-        else if(strcmp(s1->username, s2->username) > 0)
-
+        else if (strcmp(s1->username, s2->username) > 0)
             return -1;
         else
             return 1;
@@ -169,6 +180,9 @@ void query_3(char *input, CATALOG *c, int i)
     g_hash_table_destroy(stats);
 }
 
+/* Função `invalid_query()`
+ * Responsável por criar um ficheiro .txt de output vazio para uma query inválida.
+ */
 void invalid_query(int i)
 {
     char *path = malloc(sizeof(char) * 50);
