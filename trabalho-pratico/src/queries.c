@@ -133,7 +133,9 @@ gint compare_tot_dist(gconstpointer a, gconstpointer b)
             return -1;
         else if (da < db)
             return 1;
+
         else if(strcmp(s1->username, s2->username) > 0)
+
             return -1;
         else
             return 1;
