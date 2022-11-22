@@ -3,7 +3,9 @@
 #include <string.h>
 #include <glib.h>
 #include "../include/catalog.h"
-#include "../include/parsing.h"
+#include "../include/driver.h"
+#include "../include/user.h"
+#include "../include/ride.h"
 
 /* Função `create_catalog()`
  * Responsável por inicializar a struct CATALOG com os 3 módulos de dados (drivers, users e rides),

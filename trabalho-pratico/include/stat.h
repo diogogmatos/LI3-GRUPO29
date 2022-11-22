@@ -6,36 +6,32 @@
 #include "../include/catalog.h"
 #include <glib.h>
 
-/* Struct STAT
- * Usada nas funções de estatísticas para guardar os dados necessários para a sua execução:
- * Dados de utilizadores, condutores e dados auxiliares.
- */
-typedef struct stat
-{
-	int age;	  // q1
-	double money; // q1
+typedef struct stat STAT;
 
-	double score;	   // q2
-	char *driver_name; // q2
+// FUNÇÕES GET
 
-	char *user_name;	// q3
-	int total_distance; // q3
+int get_stat_age(STAT *s);
+double get_stat_money(STAT *s);
+double get_stat_score(STAT *s);
+char *get_stat_driver_name(STAT *s);
+char *get_stat_user_name(STAT *s);
+int get_stat_total_distance(STAT *s);
+char *get_stat_id(STAT *s);
+double get_stat_avg_score(STAT *s);
+int get_stat_trips(STAT *s);
+char *get_stat_username(STAT *s);
+char *get_stat_most_recent_trip(STAT *s);
 
-	char *id;				// q1, q2
-	double avg_score;		// q1, q2
-	int trips;				// q1, q2
+// FUNÇÕES DESTROY
 
-	char *username;			// q1, q3
+void destroy_stat_avg_score(void *v);
+void destroy_stat_tot_dist(void *v);
 
-	char *most_recent_trip; // q2, q3
-	GHashTable *ht;			// q2, q3
-
-	CATALOG *c;				// q1, q2, q3
-} STAT;
+// FUNÇÕES DE CRIAÇÃO DE ESTATÍSTICAS
 
 STAT *user_stat(USER *u, CATALOG *c);
 STAT *driver_stat(DRIVER *d, CATALOG *c);
-GHashTable *avg_score_stats(CATALOG *c);
-GHashTable *tot_dist_stats(CATALOG *c);
+void avg_score_stats(GHashTable *ht, CATALOG *c);
+void tot_dist_stats(GHashTable *ht, CATALOG *c);
 
 #endif

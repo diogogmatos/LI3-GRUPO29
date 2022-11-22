@@ -1,21 +1,27 @@
 #ifndef user_h
 #define user_h
 
-/* Struct USER
- * Responsável por guardar os dados de um utilizador.
- */
-typedef struct user
-{
-    char *username;
-    char *name;
-    char *gender;
-    char *birth_date;
-    char *account_creation;
-    char *pay_method;
-    char *account_status;
-} USER;
+#include <glib.h>
+
+typedef struct user USER;
+
+// FUNÇÕES GET
+
+char *get_user_username(USER *u);
+char *get_user_name(USER *u);
+char *get_user_gender(USER *u);
+char *get_user_birth_date(USER *u);
+char *get_user_account_creation(USER *u);
+char *get_user_pay_method(USER *u);
+char *get_user_account_status(USER *u);
+
+// FUNÇÕES CREATE / DESTROY
 
 USER *create_user(char *line);
 void destroy_user(void *v);
+
+// PARSING
+
+GHashTable *read_users(char *dataset);
 
 #endif
