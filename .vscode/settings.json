@@ -6,7 +6,6 @@
         "istream": "c",
         "streambuf": "c",
         "io.h": "c",
-        "parsing.h": "c",
         "stdio.h": "c",
         "driver.h": "c",
         "queries.h": "c",
@@ -15,6 +14,7 @@
         "catalog.h": "c",
         "stdlib.h": "c",
         "stat.h": "c",
-        "utils.h": "c"
+        "utils.h": "c",
+        "glib.h": "c"
     }
 }

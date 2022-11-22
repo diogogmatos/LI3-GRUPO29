@@ -1,21 +1,30 @@
 #ifndef ride_h
 #define ride_h
 
-typedef struct ride
-{
-    char *id;
-    char *date;
-    char *driver;
-    char *user;
-    char *city;
-    int distance;
-    int score_user;
-    int score_driver;
-    double tip;
-    char *comment;
-} RIDE;
+#include <glib.h>
+
+typedef struct ride RIDE;
+
+// FUNÇÕES GET
+
+char *get_ride_id(RIDE *r);
+char *get_ride_date(RIDE *r);
+char *get_ride_driver(RIDE *r);
+char *get_ride_user(RIDE *r);
+char *get_ride_city(RIDE *r);
+int get_ride_distance(RIDE *r);
+int get_ride_score_user(RIDE *r);
+int get_ride_score_driver(RIDE *r);
+double get_ride_tip(RIDE *r);
+char *get_ride_comment(RIDE *r);
+
+// FUNÇÕES CREATE / DESTROY
 
 RIDE *create_ride(char *line);
 void destroy_ride(void *v);
+
+// PARSING
+
+GHashTable *read_rides(char *dataset);
 
 #endif

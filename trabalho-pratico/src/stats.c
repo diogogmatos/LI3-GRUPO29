@@ -9,38 +9,177 @@
 #include "../include/utils.h"
 #include "../include/stat.h"
 
+/* Struct STAT
+ * Usada nas funções de estatísticas para guardar os dados necessários para a sua execução:
+ * Dados de utilizadores, condutores e dados auxiliares.
+ */
+struct stat
+{
+	int age;	  // q1
+	double money; // q1
+
+	double score;	   // q2
+	char *driver_name; // q2
+
+	char *user_name;	// q3
+	int total_distance; // q3
+
+	char *id;		  // q1, q2
+	double avg_score; // q1, q2
+	int trips;		  // q1, q2
+
+	char *username; // q1, q3
+
+	char *most_recent_trip; // q2, q3
+	GHashTable *ht;			// q2, q3
+
+	CATALOG *c; // q1, q2, q3
+};
+
+// FUNÇÕES GET
+
+int get_stat_age(STAT *s)
+{
+	return s->age;
+}
+
+double get_stat_money(STAT *s)
+{
+	return s->money;
+}
+
+double get_stat_score(STAT *s)
+{
+	return s->score;
+}
+
+char *get_stat_driver_name(STAT *s)
+{
+	return strdup(s->driver_name);
+}
+
+char *get_stat_user_name(STAT *s)
+{
+	return strdup(s->user_name);
+}
+
+int get_stat_total_distance(STAT *s)
+{
+	return s->total_distance;
+}
+
+char *get_stat_id(STAT *s)
+{
+	return strdup(s->id);
+}
+
+double get_stat_avg_score(STAT *s)
+{
+	return s->avg_score;
+}
+
+int get_stat_trips(STAT *s)
+{
+	return s->trips;
+}
+
+char *get_stat_username(STAT *s)
+{
+	return strdup(s->username);
+}
+
+char *get_stat_most_recent_trip(STAT *s)
+{
+	return strdup(s->most_recent_trip);
+}
+
+// FUNÇÕES DESTROY
+
+/* Função `destroy_stat_avg_score()`
+ * Responsável por libertar a memória alocada para cada struct STAT na criação da tabela hash de estatísticas
+ * de avaliação média, na query 2.
+ */
+void destroy_stat_avg_score(void *v)
+{
+	STAT *s = v;
+
+	free(s->driver_name);
+	free(s->id);
+	free(s->most_recent_trip);
+	free(s);
+}
+
+/* Função `destroy_stat_tot_dist()`
+ * Responsável por libertar a memória alocada para cada struct STAT na criação da tabela hash de estatísticas
+ * de distância total, na query 3.
+ */
+void destroy_stat_tot_dist(void *v)
+{
+	STAT *s = v;
+
+	free(s->user_name);
+	free(s->username);
+	free(s->most_recent_trip);
+	free(s);
+}
+
+// FUNÇÕES DE CRIAÇÃO DE ESTATÍSTICAS
+
+/* Função `stat_build()`
+ * Função que é chamada para todos os valores da tabela hash das viagens.
+ * Utilizada como auxiliar de `user_stat()`e `driver_stat()`, é responsável por atualizar os dados da
+ * STAT `s` à medida que a tabela hash é percorrida, verificando se o utilizador/condutor da linha atual é
+ * o que está a ser analisado.
+ */
 void stat_build(gpointer key, gpointer value, gpointer userdata)
 {
 	RIDE *r = value;
 	STAT *s = userdata;
 
-	if (!strcmp(r->user, s->username))
-	{
-		DRIVER *d = g_hash_table_lookup(s->c->drivers, r->driver);
+	char *user = get_ride_user(r);
+	char *driver = get_ride_driver(r);
 
-		s->avg_score += r->score_user;
+	int score_user = get_ride_score_user(r);
+	int score_driver = get_ride_score_driver(r);
+	double tip = get_ride_tip(r);
+	int distance = get_ride_distance(r);
+
+	if (!strcmp(user, s->username))
+	{
+		DRIVER *d = g_hash_table_lookup(s->c->drivers, driver);
+
+		s->avg_score += score_user;
 		s->trips += 1;
-		s->money += r->tip + get_price(d) + get_tax(d) * r->distance;
-		s->total_distance += r->distance;
+		s->money += tip + get_price(d) + get_tax(d) * distance;
+		s->total_distance += distance;
 	}
 
-	if (!strcmp(r->driver, s->id))
+	if (!strcmp(driver, s->id))
 	{
-		s->avg_score += r->score_driver;
+		DRIVER *d = g_hash_table_lookup(s->c->drivers, driver);
+
+		s->avg_score += score_driver;
 		s->trips += 1;
-		s->money += r->tip;
-		s->total_distance += r->distance;
+		s->money += tip + get_price(d) + get_tax(d) * distance;
+		s->total_distance += distance;
 	}
+
+	free(user);
+	free(driver);
 }
 
+/* Função `user_stat()`
+ * Responsável por criar as estatístias de um utilizador.
+ */
 STAT *user_stat(USER *u, CATALOG *c)
 {
 	STAT *s = malloc(sizeof(STAT));
+	char *birth_date = get_user_birth_date(u);
 
-	s->username = u->username;
-	s->id = "\0";
+	s->username = get_user_username(u);
+	s->id = " ";
 	s->c = c;
-	s->age = get_age(u->birth_date);
+	s->age = get_age(birth_date);
 	s->trips = 0;
 	s->avg_score = 0;
 	s->money = 0;
@@ -49,17 +188,24 @@ STAT *user_stat(USER *u, CATALOG *c)
 
 	s->avg_score /= s->trips;
 
+	free(birth_date);
+	free(s->username);
+
 	return s;
 }
 
+/* Função `driver_stat()`
+ * Responsável por criar as estatísticas de um condutor.
+ */
 STAT *driver_stat(DRIVER *d, CATALOG *c)
 {
 	STAT *s = malloc(sizeof(STAT));
+	char *birth_day = get_driver_birth_day(d);
 
-	s->id = d->id;
-	s->username = "\0";
+	s->id = get_driver_id(d);
+	s->username = " ";
 	s->c = c;
-	s->age = get_age(d->birth_day);
+	s->age = get_age(birth_day);
 	s->trips = 0;
 	s->avg_score = 0;
 	s->money = 0;
@@ -68,64 +214,87 @@ STAT *driver_stat(DRIVER *d, CATALOG *c)
 
 	s->avg_score /= s->trips;
 
-	s->money += get_price(d) * s->trips + get_tax(d) * s->total_distance;
+	free(birth_day);
+	free(s->id);
 
 	return s;
 }
 
-void destroy_avg_score(void *v)
-{
-	STAT *s = v;
-	free(s);
-}
-
+/* Função `avg_score_build()`
+ * Função que é chamada para todos os valores da tabela hash das viagens.
+ * Utilizada como auxiliar de `avg_score_stats()`, é responsável por incializar a tabela hash `ht`
+ * de forma a que, no fim da execução, esta contenha a avaliação média de todos os condutores, ativos, existentes.
+ * Para além disso a table hash irá conter também o id, nome, nº de viagens e viagem mais recente de cada condutor. Dados
+ * que são necessários para a ordenação das estatísticas e para a impressão dos resultados.
+ */
 void avg_score_build(gpointer key, gpointer value, gpointer userdata)
 {
 	RIDE *r = value;
 	STAT *s = userdata;
 
-	GHashTable *ht = s->ht;									   // hash table "ht" que vai guardando os drivers e as suas estatísticas à medida que percorre as rides
-	DRIVER *d = g_hash_table_lookup(s->c->drivers, r->driver); // procura o driver na hash table de drivers para obter o seu nome
+	char *driver_id = get_ride_driver(r);
 
-	if (!strcmp(d->account_status, "active")) // apenas executa se o driver for ativo
+	DRIVER *d = g_hash_table_lookup(s->c->drivers, driver_id);
+
+	char *account_status = get_driver_account_status(d);
+
+	if (!strcmp(account_status, "active"))
 	{
-		STAT *driver = malloc(sizeof(STAT)); // STAT que vai guardar as estatísticas do driver pedidas na query
+		GHashTable *ht = s->ht;
 
-		driver->id = r->driver;
-		driver->driver_name = d->name;
-		driver->c = s->c; // o catálogo de hash tables terá de ser usado na função "compare_avg_score" que apenas recebe dois valores de "ht"
+		STAT *dl = g_hash_table_lookup(ht, driver_id);
 
-		STAT *dl = g_hash_table_lookup(ht, r->driver); // procura o driver na "ht"
+		int score_driver = get_ride_score_driver(r);
+		char *date = get_ride_date(r);
 
-		if (dl == NULL) // se o driver não estiver na "ht"
+		if (dl == NULL)
 		{
-			driver->score = r->score_driver;
-			driver->most_recent_trip = r->date;
+			STAT *driver = malloc(sizeof(STAT));
+
+			driver->id = driver_id;
+			driver->driver_name = get_driver_name(d);
+			driver->c = s->c;
+
+			driver->score = score_driver;
+			driver->most_recent_trip = date;
 			driver->trips = 1;
+			driver->avg_score = score_driver;
+
+			g_hash_table_insert(ht, driver->id, driver);
 		}
-		else // se o driver já estiver na "ht"
+		else
 		{
-			driver->score = dl->score + r->score_driver;
-			driver->trips = dl->trips + 1;
+			dl->score += score_driver;
+			dl->trips += 1;
 
-			/* compara as datas da ride atual com a mais recente da "ht" de modo a ficar com a data da trip mais recente
-			 * de cada driver, que é usada em "compare_avg_score" */
-			if (convert_date(r->date) > convert_date(dl->most_recent_trip))
-				driver->most_recent_trip = r->date;
+			if (convert_date(date) > convert_date(dl->most_recent_trip))
+			{
+				free(dl->most_recent_trip);
+				dl->most_recent_trip = date;
+			}
 			else
-				driver->most_recent_trip = dl->most_recent_trip;
+				free(date);
+
+			dl->avg_score = dl->score / dl->trips;
+
+			free(driver_id);
 		}
-
-		driver->avg_score = driver->score / driver->trips;
-
-		g_hash_table_insert(ht, driver->id, driver);
 	}
+	else
+	{
+		free(driver_id);
+	}
+
+	free(account_status);
 }
 
-GHashTable *avg_score_stats(CATALOG *c)
+/* Função `avg_score_stats()`
+ * Responsável por criar as estatísticas de avaliação média para todos os condutores ativos.
+ * Cria uma tabela hash `ht` que guarda estas estatísticas.
+ * No fim da execução, liberta a memória alocada para `s`.
+ */
+void avg_score_stats(GHashTable *ht, CATALOG *c)
 {
-	GHashTable *ht = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, destroy_avg_score);
-
 	STAT *s = malloc(sizeof(STAT)); // STAT que serve como transportadora de dados necessários para a função avg_score_build
 
 	s->c = c;	// hash table de drivers
@@ -134,6 +303,84 @@ GHashTable *avg_score_stats(CATALOG *c)
 	g_hash_table_foreach(c->rides, avg_score_build, s); // atualiza a hash table "ht" com os drivers e as suas estatísticas
 
 	free(s);
+}
 
-	return ht;
+/* Função `tot_dist_build()`
+ * Função que é chamada para todos os valores da tabela hash das viagens.
+ * Utilizada como auxiliar de `tot_dist_stats()`, é responsável por incializar a tabela hash `ht`
+ * de forma a que, no fim da execução, esta contenha a distância total para todos os condutores, ativos, existentes.
+ * Para além disso a table hash irá conter também o username, nome e viagem mais recente de cada utilizador. Dados
+ * que são necessários para a ordenação das estatísticas e para a impressão dos resultados.
+ */
+void tot_dist_build(gpointer key, gpointer value, gpointer userdata)
+{
+	RIDE *r = value;
+	STAT *s = userdata;
+
+	char *username = get_ride_user(r);
+
+	USER *u = g_hash_table_lookup(s->c->users, username);
+
+	char *account_status = get_user_account_status(u);
+
+	if (!strcmp(account_status, "active"))
+	{
+		GHashTable *ht = s->ht;
+
+		STAT *ul = g_hash_table_lookup(ht, username);
+
+		char *date = get_ride_date(r);
+		int distance = get_ride_distance(r);
+
+		if (ul == NULL)
+		{
+			STAT *user = malloc(sizeof(STAT));
+
+			user->username = username;
+			user->user_name = get_user_name(u);
+			user->c = s->c;
+
+			user->most_recent_trip = date;
+			user->total_distance = distance;
+
+			g_hash_table_insert(ht, user->username, user);
+		}
+		else
+		{
+			ul->total_distance += distance;
+
+			if (convert_date(date) > convert_date(ul->most_recent_trip))
+			{
+				free(ul->most_recent_trip);
+				ul->most_recent_trip = date;
+			}
+			else
+				free(date);
+
+			free(username);
+		}
+	}
+	else
+	{
+		free(username);
+	}
+
+	free(account_status);
+}
+
+/* Função `tot_dist_stats()`
+ * Responsável por criar as estatísticas de distância total para todos os utilizadores ativos.
+ * Cria uma tabela hash `ht` que guarda estas estatísticas.
+ * No fim da execução, liberta a memória alocada para `s`.
+ */
+void tot_dist_stats(GHashTable *ht, CATALOG *c)
+{
+	STAT *s = malloc(sizeof(STAT));
+
+	s->c = c;
+	s->ht = ht;
+
+	g_hash_table_foreach(c->rides, tot_dist_build, s);
+
+	free(s);
 }

@@ -6,25 +6,32 @@
 #include "../include/catalog.h"
 #include <glib.h>
 
-typedef struct stat
-{
-	char *id;
-	char *username;
-	char *driver_name;
-	CATALOG *c;
-	GHashTable *ht;
-	char *most_recent_trip;
-	double score;
+typedef struct stat STAT;
 
-	int age;
-	double avg_score;
-	int trips;
-	double money;
-	int total_distance;
-} STAT;
+// FUNÇÕES GET
+
+int get_stat_age(STAT *s);
+double get_stat_money(STAT *s);
+double get_stat_score(STAT *s);
+char *get_stat_driver_name(STAT *s);
+char *get_stat_user_name(STAT *s);
+int get_stat_total_distance(STAT *s);
+char *get_stat_id(STAT *s);
+double get_stat_avg_score(STAT *s);
+int get_stat_trips(STAT *s);
+char *get_stat_username(STAT *s);
+char *get_stat_most_recent_trip(STAT *s);
+
+// FUNÇÕES DESTROY
+
+void destroy_stat_avg_score(void *v);
+void destroy_stat_tot_dist(void *v);
+
+// FUNÇÕES DE CRIAÇÃO DE ESTATÍSTICAS
 
 STAT *user_stat(USER *u, CATALOG *c);
 STAT *driver_stat(DRIVER *d, CATALOG *c);
-GHashTable *avg_score_stats(CATALOG *c);
+void avg_score_stats(GHashTable *ht, CATALOG *c);
+void tot_dist_stats(GHashTable *ht, CATALOG *c);
 
 #endif
