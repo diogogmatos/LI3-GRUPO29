@@ -19,19 +19,14 @@
  * criam a struct STAT com as estatísticas pedidas.
  * No fim da execução, liberta a memória alocada.
  */
-void query_1(char *input, CATALOG *c, int i)
+void query_1(int is_id, char *value, char *path, CATALOG *c)
 {
-    int is_id = atoi(input);
-
     if (is_id != 0) // driver
     {
-        char *id = strsep(&input, "\n");
+        char *id = value;
         DRIVER *d = g_hash_table_lookup(c->drivers, id);
 
-        char *path = malloc(sizeof(char) * 32);
-        sprintf(path, "Resultados/command%d_output.txt", i);
-
-        FILE *f = fopen(path, "a");
+        FILE *f = fopen(path, "w");
 
         char *account_status = get_driver_account_status(d);
 
@@ -56,17 +51,13 @@ void query_1(char *input, CATALOG *c, int i)
 
         fclose(f);
         free(account_status);
-        free(path);
     }
     else // user
     {
-        char *username = strsep(&input, "\n");
+        char *username = value;
         USER *u = g_hash_table_lookup(c->users, username);
 
-        char *path = malloc(sizeof(char) * 32);
-        sprintf(path, "Resultados/command%d_output.txt", i);
-
-        FILE *f = fopen(path, "a");
+        FILE *f = fopen(path, "w");
 
         char *account_status = get_user_account_status(u);
 
@@ -91,7 +82,6 @@ void query_1(char *input, CATALOG *c, int i)
 
         fclose(f);
         free(account_status);
-        free(path);
     }
 }
 
@@ -152,20 +142,15 @@ gint compare_avg_score(gconstpointer a, gconstpointer b)
  * as instruções dadas no enunciado, com ajuda da função `compare_avg_score()`.
  * No fim da execução, liberta a memória alocada (incluindo a lista e a tabela hash).
  */
-void query_2(char *input, CATALOG *c, int i)
+void query_2(int N, char *path, CATALOG *c)
 {
-    int N = atoi(input);
-
     GHashTable *ht = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, destroy_stat_avg_score);
     avg_score_stats(ht, c);
 
     GList *list = g_hash_table_get_values(ht);   // retorna os valores da hash table "ht" para uma lista
     list = g_list_sort(list, compare_avg_score); // ordena a lista por ordem decrescente de average score, tendo em conta as situações de desempate do enunciado
 
-    char *path = malloc(sizeof(char) * 32);
-    sprintf(path, "Resultados/command%d_output.txt", i);
-
-    FILE *f = fopen(path, "a");
+    FILE *f = fopen(path, "w");
 
     int acc;
     for (acc = 0; acc < N; ++acc)
@@ -184,7 +169,6 @@ void query_2(char *input, CATALOG *c, int i)
 
     fclose(f);
 
-    free(path);
     g_list_free(list);
     g_hash_table_destroy(ht);
 }
@@ -246,20 +230,15 @@ gint compare_tot_dist(gconstpointer a, gconstpointer b)
  * as instruções dadas no enunciado, com ajuda da função `compare_tot_dist()`.
  * No fim da execução, liberta a memória alocada (incluindo a lista e a tabela hash).
  */
-void query_3(char *input, CATALOG *c, int i)
+void query_3(int N, char *path, CATALOG *c)
 {
-    int N = atoi(input);
-
     GHashTable *ht = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, destroy_stat_tot_dist);
     tot_dist_stats(ht, c);
 
     GList *list = g_hash_table_get_values(ht);
     list = g_list_sort(list, compare_tot_dist);
 
-    char *path = malloc(sizeof(char) * 32);
-    sprintf(path, "Resultados/command%d_output.txt", i);
-
-    FILE *f = fopen(path, "a");
+    FILE *f = fopen(path, "w");
 
     int acc;
     for (acc = 0; acc < N; ++acc)
@@ -278,7 +257,6 @@ void query_3(char *input, CATALOG *c, int i)
 
     fclose(f);
 
-    free(path);
     g_list_free(list);
     g_hash_table_destroy(ht);
 }
@@ -288,13 +266,8 @@ void query_3(char *input, CATALOG *c, int i)
 /* Função `invalid_query()`
  * Responsável por criar um ficheiro .txt de output vazio para uma query inválida.
  */
-void invalid_query(int i)
+void invalid_query(char *path)
 {
-    char *path = malloc(sizeof(char) * 32);
-    sprintf(path, "Resultados/command%d_output.txt", i);
-
-    FILE *f = fopen(path, "a");
+    FILE *f = fopen(path, "w");
     fclose(f);
-
-    free(path);
 }
