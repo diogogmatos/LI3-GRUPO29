@@ -6,6 +6,30 @@
 
 #define TODAY "09/10/2022" // Data usada para calcular a idade dos users
 
+// PATHS
+
+/* Função `get_results_path()`
+ * Responsável por obter o caminho para o ficheiro de resultados de um comando `i`.
+ */
+char *get_results_path(int i)
+{
+    char *path = malloc(sizeof(char) * 32);
+    sprintf(path, "Resultados/command%d_output.txt", i);
+
+    return path;
+}
+
+/* Função `get_dataset_path()`
+ * Responsável por obter o caminho para o ficheiro de dados do tipo `type`.
+ */
+char *get_dataset_path(char *dataset, char *type)
+{
+    char *path = malloc(sizeof(char) * 50);
+    sprintf(path, "%s/%s.csv", dataset, type);
+
+    return path;
+}
+
 // CLASSES
 
 /* Função `get_price()`
