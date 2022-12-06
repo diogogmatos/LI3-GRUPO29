@@ -2,7 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include "../include/user.h"
+
 #include <glib.h>
+#include "../include/utils.h"
 
 /* Struct USER
  * Responsável por guardar os dados de um utilizador.
@@ -103,8 +105,7 @@ void destroy_user(void *v)
  */
 GHashTable *read_users(char *dataset)
 {
-    char *path = malloc(sizeof(char) * 50);
-    sprintf(path, "%s/users.csv", dataset);
+    char *path = get_dataset_path(dataset, "users");
 
     FILE *file = fopen(path, "r");
     // "../Dataset_Fase1/users.csv"
