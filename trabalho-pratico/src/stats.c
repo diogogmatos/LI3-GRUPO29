@@ -146,7 +146,7 @@ void stat_build(gpointer key, gpointer value, gpointer userdata)
 
 	if (!strcmp(user, s->username))
 	{
-		DRIVER *d = g_hash_table_lookup(s->c->drivers, driver);
+		DRIVER *d = g_hash_table_lookup(get_catalog_drivers(s->c), driver);
 
 		s->avg_score += score_user;
 		s->trips += 1;
@@ -156,7 +156,7 @@ void stat_build(gpointer key, gpointer value, gpointer userdata)
 
 	if (!strcmp(driver, s->id))
 	{
-		DRIVER *d = g_hash_table_lookup(s->c->drivers, driver);
+		DRIVER *d = g_hash_table_lookup(get_catalog_drivers(s->c), driver);
 
 		s->avg_score += score_driver;
 		s->trips += 1;
@@ -184,7 +184,7 @@ STAT *user_stat(USER *u, CATALOG *c)
 	s->avg_score = 0;
 	s->money = 0;
 
-	g_hash_table_foreach(c->rides, stat_build, s);
+	g_hash_table_foreach(get_catalog_rides(c), stat_build, s);
 
 	s->avg_score /= s->trips;
 
@@ -210,7 +210,7 @@ STAT *driver_stat(DRIVER *d, CATALOG *c)
 	s->avg_score = 0;
 	s->money = 0;
 
-	g_hash_table_foreach(c->rides, stat_build, s);
+	g_hash_table_foreach(get_catalog_rides(c), stat_build, s);
 
 	s->avg_score /= s->trips;
 
@@ -234,7 +234,7 @@ void avg_score_build(gpointer key, gpointer value, gpointer userdata)
 
 	char *driver_id = get_ride_driver(r);
 
-	DRIVER *d = g_hash_table_lookup(s->c->drivers, driver_id);
+	DRIVER *d = g_hash_table_lookup(get_catalog_drivers(s->c), driver_id);
 
 	char *account_status = get_driver_account_status(d);
 
@@ -300,7 +300,7 @@ void avg_score_stats(GHashTable *ht, CATALOG *c)
 	s->c = c;	// hash table de drivers
 	s->ht = ht; // hash table "ht" vai guardar os drivers e as suas estatísticas
 
-	g_hash_table_foreach(c->rides, avg_score_build, s); // atualiza a hash table "ht" com os drivers e as suas estatísticas
+	g_hash_table_foreach(get_catalog_rides(c), avg_score_build, s); // atualiza a hash table "ht" com os drivers e as suas estatísticas
 
 	free(s);
 }
@@ -319,7 +319,7 @@ void tot_dist_build(gpointer key, gpointer value, gpointer userdata)
 
 	char *username = get_ride_user(r);
 
-	USER *u = g_hash_table_lookup(s->c->users, username);
+	USER *u = g_hash_table_lookup(get_catalog_users(s->c), username);
 
 	char *account_status = get_user_account_status(u);
 
@@ -380,7 +380,7 @@ void tot_dist_stats(GHashTable *ht, CATALOG *c)
 	s->c = c;
 	s->ht = ht;
 
-	g_hash_table_foreach(c->rides, tot_dist_build, s);
+	g_hash_table_foreach(get_catalog_rides(c), tot_dist_build, s);
 
 	free(s);
 }

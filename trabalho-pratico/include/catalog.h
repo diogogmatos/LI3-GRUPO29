@@ -3,17 +3,17 @@
 
 #include <glib.h>
 
-/* Struct CATALOG
- * Responsável por guardar os apontadores para as 3 hash table de dados (drivers, users e rides),
- * de modo a facilitar o acesso a cada uma delas em diversos casos.
- */
-typedef struct catalog
-{
-    GHashTable *drivers;
-    GHashTable *users;
-    GHashTable *rides;
-} CATALOG;
+typedef struct catalog CATALOG;
+
+// FUNÇÕES GET
+
+GHashTable *get_catalog_drivers(CATALOG *c);
+GHashTable *get_catalog_users(CATALOG *c);
+GHashTable *get_catalog_rides(CATALOG *c);
+
+// FUNÇÕES CREATE / DESTROY
 
 CATALOG *create_catalog(char *dataset);
+void destroy_catalog(void *v);
 
 #endif
