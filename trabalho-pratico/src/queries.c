@@ -24,7 +24,7 @@ void query_1(int is_id, char *value, char *path, CATALOG *c)
     if (is_id != 0) // driver
     {
         char *id = value;
-        DRIVER *d = g_hash_table_lookup(c->drivers, id);
+        DRIVER *d = g_hash_table_lookup(get_catalog_drivers(c), id);
 
         FILE *f = fopen(path, "w");
 
@@ -55,7 +55,7 @@ void query_1(int is_id, char *value, char *path, CATALOG *c)
     else // user
     {
         char *username = value;
-        USER *u = g_hash_table_lookup(c->users, username);
+        USER *u = g_hash_table_lookup(get_catalog_users(c), username);
 
         FILE *f = fopen(path, "w");
 

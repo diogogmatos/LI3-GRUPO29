@@ -41,10 +41,7 @@ int main(int argc, char **argv)
     fclose(file);
 
     free(line);
-    g_hash_table_destroy(c->drivers);
-    g_hash_table_destroy(c->users);
-    g_hash_table_destroy(c->rides);
-    free(c);
+    destroy_catalog(c);
 
     return 0;
 }
