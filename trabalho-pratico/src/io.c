@@ -4,6 +4,7 @@
 #include "../include/io.h"
 #include "../include/queries.h"
 #include "../include/catalog.h"
+#include "../include/utils.h"
 
 /* Função `handle_input()`
  * Responsável por receber um inteiro `query` com o nº da query a ser executada e uma string `input` com o input dado
@@ -14,20 +15,48 @@ void handle_input(int query, char *input, CATALOG *c, int i)
     switch (query)
     {
     case 1:
-        query_1(input, c, i);
+    {
+        int is_id = atoi(input);
+        char *value = strsep(&input, "\n");
+        char *path = get_results_path(i);
+
+        query_1(is_id, value, path, c);
         printf("Output %d - [OK]\n", i);
+
+        free(path);
         return;
+    }
     case 2:
-        query_2(input, c, i);
+    {
+        int N = atoi(input);
+        char *path = get_results_path(i);
+
+        query_2(N, path, c);
         printf("Output %d - [OK]\n", i);
+
+        free(path);
         return;
+    }
     case 3:
-        query_3(input, c, i);
+    {
+        int N = atoi(input);
+        char *path = get_results_path(i);
+
+        query_3(N, path, c);
         printf("Output %d - [OK]\n", i);
+
+        free(path);
         return;
+    }
     default:
-        invalid_query(i);
+    {
+        char *path = get_results_path(i);
+
+        invalid_query(path);
         printf("Output %d - [ERRO: Query Inexistente %d]\n", i, query);
+
+        free(path);
         return;
+    }
     }
 }

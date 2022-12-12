@@ -2,7 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include "../include/ride.h"
+
 #include <glib.h>
+#include "../include/utils.h"
 
 /* Struct RIDE
  * Responsável por guardar os dados de uma viagem.
@@ -123,8 +125,7 @@ void destroy_ride(void *v)
  */
 GHashTable *read_rides(char *dataset)
 {
-    char *path = malloc(sizeof(char) * 50);
-    sprintf(path, "%s/rides.csv", dataset);
+    char *path = get_dataset_path(dataset, "rides");
 
     FILE *file = fopen(path, "r");
     // "../Dataset_Fase1/rides.csv"

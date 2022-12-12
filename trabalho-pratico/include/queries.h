@@ -4,9 +4,9 @@
 #include <glib.h>
 #include "../include/catalog.h"
 
-void query_1(char *input, CATALOG *c, int i);
-void query_2(char *input, CATALOG *c, int i);
-void query_3(char *input, CATALOG *c, int i);
-void invalid_query(int i);
+void query_1(int is_id, char *value, char *path, CATALOG *c);
+void query_2(int N, char *path, CATALOG *c);
+void query_3(int N, char *path, CATALOG *c);
+void invalid_query(char *path);
 
 #endif

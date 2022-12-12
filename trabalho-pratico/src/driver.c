@@ -2,7 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include "../include/driver.h"
+
 #include <glib.h>
+#include "../include/utils.h"
 
 /* Struct DRIVER
  * Responsável por guardar os dados de um condutor.
@@ -119,8 +121,7 @@ void destroy_driver(void *v)
  */
 GHashTable *read_drivers(char *dataset)
 {
-    char *path = malloc(sizeof(char) * 50);
-    sprintf(path, "%s/drivers.csv", dataset);
+    char *path = get_dataset_path(dataset, "drivers");
 
     FILE *file = fopen(path, "r");
     // "../Dataset_Fase1/drivers.csv"
