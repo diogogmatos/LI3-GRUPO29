@@ -5,6 +5,8 @@
 
 #include <glib.h>
 #include "../include/utils.h"
+#include "../include/catalog.h"
+#include "../include/stat.h"
 
 /* Struct RIDE
  * Responsável por guardar os dados de uma viagem.
@@ -122,8 +124,11 @@ void destroy_ride(void *v)
  * Responsável por fazer o parsing do ficheiro rides.csv. Para cada linha do ficheiro, cria uma struct RIDE
  * com os dados da linha e adiciona-a à hash table `rides`. No fim da execução, liberta a memória alocada e retorna
  * a hash table criada, isto é, um apontador para mesma.
+ * 
+ * Usada também para inicializar as funções `create_driver_stat()` e `create_user_stat()` de criação das hash tables de
+ * estatísticas para os users e para os drivers, em cada linha.
  */
-GHashTable *read_rides(char *dataset)
+GHashTable *read_rides(char *dataset, GHashTable *user_stats, GHashTable *driver_stats, GHashTable *drivers, GHashTable *users)
 {
     char *path = get_dataset_path(dataset, "rides");
 
@@ -139,8 +144,15 @@ GHashTable *read_rides(char *dataset)
 
     while (getline(&line, &len, file) != -1)
     {
+        // PARSING DE DADOS
+
         RIDE *ride = create_ride(line);
         g_hash_table_insert(rides, ride->id, ride);
+
+        // CRIAÇÃO DE ESTATÍSTICAS
+
+        create_driver_stat(ride, driver_stats, drivers);
+        create_user_stat(ride, user_stats, drivers, users);
     }
 
     fclose(file);

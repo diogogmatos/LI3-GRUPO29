@@ -32,10 +32,10 @@ void query_1(int is_id, char *value, char *path, CATALOG *c)
 
         if (!strcmp(account_status, "active")) // se a conta for ativa executa normalmente
         {
-            STAT *s = driver_stat(d, c);
+            STAT *s = g_hash_table_lookup(get_catalog_driver_stats(c), id);
 
-            char *name = get_driver_name(d);
-            char *gender = get_driver_gender(d);
+            char *name = get_stat_driver_name(s);
+            char *gender = get_stat_gender(s);
 
             int age = get_stat_age(s);
             double avg_score = get_stat_avg_score(s);
@@ -46,7 +46,6 @@ void query_1(int is_id, char *value, char *path, CATALOG *c)
 
             free(name);
             free(gender);
-            free(s);
         }
 
         fclose(f);
@@ -63,10 +62,10 @@ void query_1(int is_id, char *value, char *path, CATALOG *c)
 
         if (!strcmp(account_status, "active"))
         {
-            STAT *s = user_stat(u, c);
+            STAT *s = g_hash_table_lookup(get_catalog_user_stats(c), username);
 
-            char *name = get_user_name(u);
-            char *gender = get_user_gender(u);
+            char *name = get_stat_user_name(s);
+            char *gender = get_stat_gender(s);
 
             int age = get_stat_age(s);
             double avg_score = get_stat_avg_score(s);
@@ -77,7 +76,6 @@ void query_1(int is_id, char *value, char *path, CATALOG *c)
 
             free(name);
             free(gender);
-            free(s);
         }
 
         fclose(f);
@@ -144,11 +142,8 @@ gint compare_avg_score(gconstpointer a, gconstpointer b)
  */
 void query_2(int N, char *path, CATALOG *c)
 {
-    GHashTable *ht = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, destroy_stat_avg_score);
-    avg_score_stats(ht, c);
-
-    GList *list = g_hash_table_get_values(ht);   // retorna os valores da hash table "ht" para uma lista
-    list = g_list_sort(list, compare_avg_score); // ordena a lista por ordem decrescente de average score, tendo em conta as situações de desempate do enunciado
+    GList *list = g_hash_table_get_values(get_catalog_driver_stats(c)); // retorna os valores da hash table "ht" para uma lista
+    list = g_list_sort(list, compare_avg_score);                        // ordena a lista por ordem decrescente de average score, tendo em conta as situações de desempate do enunciado
 
     FILE *f = fopen(path, "w");
 
@@ -159,6 +154,7 @@ void query_2(int N, char *path, CATALOG *c)
 
         char *id = get_stat_id(stat);
         char *driver_name = get_stat_driver_name(stat);
+
         double avg_score = get_stat_avg_score(stat);
 
         fprintf(f, "%s;%s;%.3f\n", id, driver_name, avg_score);
@@ -170,7 +166,6 @@ void query_2(int N, char *path, CATALOG *c)
     fclose(f);
 
     g_list_free(list);
-    g_hash_table_destroy(ht);
 }
 
 // QUERY 3
@@ -197,7 +192,7 @@ gint compare_tot_dist(gconstpointer a, gconstpointer b)
     {
         char *date1 = get_stat_most_recent_trip(s1);
         char *date2 = get_stat_most_recent_trip(s2);
-        
+
         int da = convert_date(date1);
         int db = convert_date(date2);
 
@@ -232,10 +227,7 @@ gint compare_tot_dist(gconstpointer a, gconstpointer b)
  */
 void query_3(int N, char *path, CATALOG *c)
 {
-    GHashTable *ht = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, destroy_stat_tot_dist);
-    tot_dist_stats(ht, c);
-
-    GList *list = g_hash_table_get_values(ht);
+    GList *list = g_hash_table_get_values(get_catalog_user_stats(c));
     list = g_list_sort(list, compare_tot_dist);
 
     FILE *f = fopen(path, "w");
@@ -258,7 +250,6 @@ void query_3(int N, char *path, CATALOG *c)
     fclose(f);
 
     g_list_free(list);
-    g_hash_table_destroy(ht);
 }
 
 // QUERY INVÁLIDA

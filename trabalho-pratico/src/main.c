@@ -4,6 +4,7 @@
 #include "../include/io.h"
 #include "../include/catalog.h"
 #include "../include/ride.h"
+#include "../include/stat.h"
 
 /* Função `main()`
  * Recebe 2 argumentos, o primeiro é o caminho para o dataset a ser utilizado e o segundo é o

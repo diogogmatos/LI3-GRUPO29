@@ -25,6 +25,6 @@ void destroy_ride(void *v);
 
 // PARSING
 
-GHashTable *read_rides(char *dataset);
+GHashTable *read_rides(char *dataset, GHashTable *user_stats, GHashTable *driver_stats, GHashTable *drivers, GHashTable *users);
 
 #endif
