@@ -9,6 +9,8 @@ OUTPUT = Resultados
 INPUT = exemplos_de_queries/tests_2/input.txt
 DATASET = Dataset_Fase1
 
+# -fsanitize=leak
+
 $(TARGET): $(OBJS)                                        # Compiling the program
 	@$(CC) $(CFLAGS) $^ $(LIBS) -o $@ ; echo "[COMPILED] $@"
 	@if [ ! -e $(OUTPUT) ]; then\
