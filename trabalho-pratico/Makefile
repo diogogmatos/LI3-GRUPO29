@@ -15,8 +15,6 @@ $(TARGET): $(OBJS)                                        # Compiling the progra
 	@$(CC) $(CFLAGS) $^ $(LIBS) -o $@ ; echo "[COMPILED] $@"
 	@if [ ! -e $(OUTPUT) ]; then\
 		mkdir -p $(OUTPUT) ; echo "[CREATED] $(OUTPUT)/";\
-	else\
-		rm -f $(RESULTS) ; echo "[CLEANED] $(RESULTS)";\
 	fi
 
 %.o: %.c                                                  #Linking object files

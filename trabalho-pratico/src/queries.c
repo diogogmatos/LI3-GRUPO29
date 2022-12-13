@@ -264,8 +264,6 @@ void query_4(char *city, char *path, CATALOG *c)
 
     fprintf(f, "%.3f\n", avg_cost);
 
-    free(city);
-
     fclose(f);
 }
 
