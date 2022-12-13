@@ -20,6 +20,7 @@ struct catalog
 
     GHashTable *driver_stats;
     GHashTable *user_stats;
+    GHashTable *city_stats;
 };
 
 // FUNÇÕES GET
@@ -49,6 +50,11 @@ GHashTable *get_catalog_user_stats(CATALOG *c)
     return c->user_stats;
 }
 
+GHashTable *get_catalog_city_stats(CATALOG *c)
+{
+    return c->city_stats;
+}
+
 // FUNÇÕES CREATE / DESTROY
 
 /* Função `create_catalog()`
@@ -64,7 +70,9 @@ CATALOG *create_catalog(char *dataset)
     
     GHashTable *driver_stats = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, destroy_driver_stat);
     GHashTable *user_stats = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, destroy_user_stat);
-    GHashTable *rides = read_rides(dataset, user_stats, driver_stats, drivers, users);
+    GHashTable *city_stats = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, destroy_city_stat);
+    
+    GHashTable *rides = read_rides(dataset, user_stats, driver_stats, city_stats, drivers, users);
 
     c->drivers = drivers;
     c->users = users;
@@ -72,6 +80,7 @@ CATALOG *create_catalog(char *dataset)
 
     c->driver_stats = driver_stats;
     c->user_stats = user_stats;
+    c->city_stats = city_stats;
 
     return c;
 }
@@ -85,5 +94,6 @@ void destroy_catalog(void *v)
     g_hash_table_destroy(c->rides);
     g_hash_table_destroy(c->driver_stats);
     g_hash_table_destroy(c->user_stats);
+    g_hash_table_destroy(c->city_stats);
     free(c);
 }

@@ -13,6 +13,7 @@ GHashTable *get_catalog_rides(CATALOG *c);
 
 GHashTable *get_catalog_driver_stats(CATALOG *c);
 GHashTable *get_catalog_user_stats(CATALOG *c);
+GHashTable *get_catalog_city_stats(CATALOG *c);
 
 // FUNÇÕES CREATE / DESTROY
 

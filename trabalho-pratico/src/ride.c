@@ -128,7 +128,7 @@ void destroy_ride(void *v)
  * Usada também para inicializar as funções `create_driver_stat()` e `create_user_stat()` de criação das hash tables de
  * estatísticas para os users e para os drivers, em cada linha.
  */
-GHashTable *read_rides(char *dataset, GHashTable *user_stats, GHashTable *driver_stats, GHashTable *drivers, GHashTable *users)
+GHashTable *read_rides(char *dataset, GHashTable *user_stats, GHashTable *driver_stats, GHashTable *city_stats, GHashTable *drivers, GHashTable *users)
 {
     char *path = get_dataset_path(dataset, "rides");
 
@@ -153,6 +153,7 @@ GHashTable *read_rides(char *dataset, GHashTable *user_stats, GHashTable *driver
 
         create_driver_stat(ride, driver_stats, drivers);
         create_user_stat(ride, user_stats, drivers, users);
+        create_city_stat(ride, city_stats, drivers);
     }
 
     fclose(file);
