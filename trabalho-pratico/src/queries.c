@@ -28,7 +28,7 @@ void query_1(int is_id, char *value, char *path, CATALOG *c)
 
         FILE *f = fopen(path, "w");
 
-        if(d == NULL)
+        if (d == NULL)
         {
             fclose(f);
             return;
@@ -64,7 +64,7 @@ void query_1(int is_id, char *value, char *path, CATALOG *c)
 
         FILE *f = fopen(path, "w");
 
-        if(u == NULL)
+        if (u == NULL)
         {
             fclose(f);
             return;
@@ -133,10 +133,8 @@ gint compare_avg_score(gconstpointer a, gconstpointer b)
             r = -1;
         else if (da < db)
             r = 1;
-        else if (strcmp(id1, id2) > 0)
-            r = -1;
         else
-            r = 1;
+            r = strcmp(id1, id2);
 
         free(id1);
         free(id2);
@@ -218,10 +216,8 @@ gint compare_tot_dist(gconstpointer a, gconstpointer b)
             r = -1;
         else if (da < db)
             r = 1;
-        else if (strcmp(username1, username2) > 0)
-            r = -1;
         else
-            r = 1;
+            r = strcmp(username1, username2);
 
         free(username1);
         free(username2);
@@ -307,9 +303,9 @@ gint compare_avg_score_city(gconstpointer a, gconstpointer b)
         char *id2 = get_stat_id(s2);
 
         if (strcmp(id1, id2) > 0)
-            r = 1;
-        else
             r = -1;
+        else
+            r = 1;
 
         free(id1);
         free(id2);
@@ -320,37 +316,33 @@ gint compare_avg_score_city(gconstpointer a, gconstpointer b)
 
 void query_7(int N, char *city, char *path, CATALOG *c)
 {
-    GList *list = g_hash_table_get_values(get_catalog_driver_stats(c));
+    GHashTable *query7_stats = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, destroy_query7_stat);
+    create_query7_stats(query7_stats, city, c);
+
+    GList *list = g_hash_table_get_values(query7_stats);
     list = g_list_sort(list, compare_avg_score_city);
 
     FILE *f = fopen(path, "w");
 
-    int acc, i;
-    for (i = 0, acc = 0; acc < N; ++i)
+    int acc;
+    for (acc = 0; acc < N; ++acc)
     {
-        STAT *stat = g_list_nth_data(list, i);
-        char *stat_city = get_stat_city(stat);
-        
-        if (!strcmp(stat_city, city))
-        {
-            ++acc;
-            
-            char *id = get_stat_id(stat);
-            char *driver_name = get_stat_driver_name(stat);
-            double avg_score = get_stat_avg_score(stat);
+        STAT *stat = g_list_nth_data(list, acc);
 
-            fprintf(f, "%s;%s;%.3f\n", id, driver_name, avg_score);
+        char *id = get_stat_id(stat);
+        char *driver_name = get_stat_driver_name(stat);
+        double avg_score = get_stat_avg_score(stat);
 
-            free(id);
-            free(driver_name);
-        }
+        fprintf(f, "%s;%s;%.3f\n", id, driver_name, avg_score);
 
-        free(stat_city);
+        free(id);
+        free(driver_name);
     }
 
     fclose(f);
 
     g_list_free(list);
+    g_hash_table_destroy(query7_stats);
 }
 
 // QUERY INVÁLIDA

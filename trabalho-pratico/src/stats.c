@@ -145,6 +145,15 @@ void destroy_city_stat(void *v)
 	free(s);
 }
 
+void destroy_query7_stat(void *v)
+{
+	STAT *s = v;
+
+	free(s->id);
+	free(s->driver_name);
+	free(s);
+}
+
 // FUNÇÕES DE CRIAÇÃO DE ESTATÍSTICAS
 
 void create_user_stat(RIDE *r, GHashTable *u_stats, GHashTable *drivers, GHashTable *users)
@@ -315,6 +324,58 @@ void create_city_stat(RIDE *r, GHashTable *c_stats, GHashTable *drivers)
 	}
 
 	free(driver);
+}
+
+void create_query7_stat(gpointer key, gpointer value, gpointer userdata)
+{
+	RIDE *r = value;
+	STAT *s = userdata;
+
+	char *city = get_ride_city(r);
+
+	if (!strcmp(city, s->city))
+	{
+		char *id = get_ride_driver(r);
+		STAT *dl = g_hash_table_lookup(s->ht, id);
+
+		if (dl == NULL)
+		{
+			STAT *driver_stat = malloc(sizeof(STAT));
+			DRIVER *d = g_hash_table_lookup(get_catalog_drivers(s->c), id);
+
+			driver_stat->id = id;
+			driver_stat->driver_name = get_driver_name(d);
+
+			driver_stat->trips = 1;
+			driver_stat->score = get_ride_score_driver(r);
+			driver_stat->avg_score = driver_stat->score;
+
+			g_hash_table_insert(s->ht, driver_stat->id, driver_stat);
+		}
+		else
+		{
+			dl->trips += 1;
+			dl->score += get_ride_score_driver(r);
+			dl->avg_score = dl->score / dl->trips;
+
+			free(id);
+		}
+	}
+
+	free(city);
+}
+
+void create_query7_stats(GHashTable *query7_stats, char *city, CATALOG *c)
+{
+	STAT *s = malloc(sizeof(STAT));
+
+	s->ht = query7_stats;
+	s->city = city;
+	s->c = c;
+	
+	g_hash_table_foreach(get_catalog_rides(c), create_query7_stat, s);
+
+	free(s);
 }
 
 /* -- OLD -- */
