@@ -25,6 +25,9 @@ struct stat
 	char *user_name;	// q3
 	int total_distance; // q3
 
+	char *city;		 // q4
+	double avg_cost; // q4
+
 	char *id;		  // q1, q2
 	double avg_score; // q1, q2
 	int trips;		  // q1, q2
@@ -74,6 +77,16 @@ int get_stat_total_distance(STAT *s)
 	return s->total_distance;
 }
 
+char *get_stat_city(STAT *s)
+{
+	return strdup(s->city);
+}
+
+double get_stat_avg_cost(STAT *s)
+{
+	return s->avg_cost;
+}
+
 char *get_stat_id(STAT *s)
 {
 	return strdup(s->id);
@@ -119,7 +132,16 @@ void destroy_driver_stat(void *v)
 	free(s->id);
 	free(s->driver_name);
 	free(s->gender);
+	free(s->city);
 	free(s->most_recent_trip);
+	free(s);
+}
+
+void destroy_city_stat(void *v)
+{
+	STAT *s = v;
+
+	free(s->city);
 	free(s);
 }
 
@@ -221,6 +243,7 @@ void create_driver_stat(RIDE *r, GHashTable *d_stats, GHashTable *drivers)
 			driver_stat->driver_name = get_driver_name(d);
 			driver_stat->gender = get_driver_gender(d);
 			driver_stat->age = get_age(birth_date);
+			driver_stat->city = get_ride_city(r);
 
 			driver_stat->score = score_driver;
 			driver_stat->avg_score = score_driver;
@@ -258,6 +281,40 @@ void create_driver_stat(RIDE *r, GHashTable *d_stats, GHashTable *drivers)
 		free(driver);
 
 	free(account_status);
+}
+
+void create_city_stat(RIDE *r, GHashTable *c_stats, GHashTable *drivers)
+{
+	char *city = get_ride_city(r);
+	STAT *cl = g_hash_table_lookup(c_stats, city);
+
+	char *driver = get_ride_driver(r);
+	DRIVER *d = g_hash_table_lookup(drivers, driver);
+
+	int distance = get_ride_distance(r);
+
+	if (cl == NULL)
+	{
+		STAT *city_stat = malloc(sizeof(STAT));
+
+		city_stat->city = city;
+		city_stat->trips = 1;
+		city_stat->money = get_price(d) + get_tax(d) * distance;
+		city_stat->avg_cost = city_stat->money;
+
+		g_hash_table_insert(c_stats, city_stat->city, city_stat);
+	}
+	else
+	{
+		cl->trips += 1;
+		cl->money += get_price(d) + get_tax(d) * distance;
+
+		cl->avg_cost = cl->money / cl->trips;
+
+		free(city);
+	}
+
+	free(driver);
 }
 
 /* -- OLD -- */

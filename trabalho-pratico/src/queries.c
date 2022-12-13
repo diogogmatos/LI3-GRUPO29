@@ -28,6 +28,12 @@ void query_1(int is_id, char *value, char *path, CATALOG *c)
 
         FILE *f = fopen(path, "w");
 
+        if(d == NULL)
+        {
+            fclose(f);
+            return;
+        }
+
         char *account_status = get_driver_account_status(d);
 
         if (!strcmp(account_status, "active")) // se a conta for ativa executa normalmente
@@ -57,6 +63,12 @@ void query_1(int is_id, char *value, char *path, CATALOG *c)
         USER *u = g_hash_table_lookup(get_catalog_users(c), username);
 
         FILE *f = fopen(path, "w");
+
+        if(u == NULL)
+        {
+            fclose(f);
+            return;
+        }
 
         char *account_status = get_user_account_status(u);
 
@@ -245,6 +257,95 @@ void query_3(int N, char *path, CATALOG *c)
 
         free(username);
         free(user_name);
+    }
+
+    fclose(f);
+
+    g_list_free(list);
+}
+
+// QUERY 4
+
+void query_4(char *city, char *path, CATALOG *c)
+{
+    STAT *s = g_hash_table_lookup(get_catalog_city_stats(c), city);
+
+    FILE *f = fopen(path, "w");
+
+    if (s == NULL)
+    {
+        fclose(f);
+        return;
+    }
+
+    double avg_cost = get_stat_avg_cost(s);
+
+    fprintf(f, "%.3f\n", avg_cost);
+
+    fclose(f);
+}
+
+// QUERY 7
+
+gint compare_avg_score_city(gconstpointer a, gconstpointer b)
+{
+    STAT *s1 = (STAT *)a;
+    STAT *s2 = (STAT *)b;
+
+    int r;
+
+    double avg_score1 = get_stat_avg_score(s1);
+    double avg_score2 = get_stat_avg_score(s2);
+
+    if (avg_score1 > avg_score2)
+        r = -1;
+    else if (avg_score1 < avg_score2)
+        r = 1;
+    else
+    {
+        char *id1 = get_stat_id(s1);
+        char *id2 = get_stat_id(s2);
+
+        if (strcmp(id1, id2) > 0)
+            r = 1;
+        else
+            r = -1;
+
+        free(id1);
+        free(id2);
+    }
+
+    return r;
+}
+
+void query_7(int N, char *city, char *path, CATALOG *c)
+{
+    GList *list = g_hash_table_get_values(get_catalog_driver_stats(c));
+    list = g_list_sort(list, compare_avg_score_city);
+
+    FILE *f = fopen(path, "w");
+
+    int acc, i;
+    for (i = 0, acc = 0; acc < N; ++i)
+    {
+        STAT *stat = g_list_nth_data(list, i);
+        char *stat_city = get_stat_city(stat);
+        
+        if (!strcmp(stat_city, city))
+        {
+            ++acc;
+            
+            char *id = get_stat_id(stat);
+            char *driver_name = get_stat_driver_name(stat);
+            double avg_score = get_stat_avg_score(stat);
+
+            fprintf(f, "%s;%s;%.3f\n", id, driver_name, avg_score);
+
+            free(id);
+            free(driver_name);
+        }
+
+        free(stat_city);
     }
 
     fclose(f);
