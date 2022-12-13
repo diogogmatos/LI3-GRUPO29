@@ -28,6 +28,12 @@ void query_1(int is_id, char *value, char *path, CATALOG *c)
 
         FILE *f = fopen(path, "w");
 
+        if(d == NULL)
+        {
+            fclose(f);
+            return;
+        }
+
         char *account_status = get_driver_account_status(d);
 
         if (!strcmp(account_status, "active")) // se a conta for ativa executa normalmente
@@ -57,6 +63,12 @@ void query_1(int is_id, char *value, char *path, CATALOG *c)
         USER *u = g_hash_table_lookup(get_catalog_users(c), username);
 
         FILE *f = fopen(path, "w");
+
+        if(u == NULL)
+        {
+            fclose(f);
+            return;
+        }
 
         char *account_status = get_user_account_status(u);
 
@@ -259,6 +271,12 @@ void query_4(char *city, char *path, CATALOG *c)
     STAT *s = g_hash_table_lookup(get_catalog_city_stats(c), city);
 
     FILE *f = fopen(path, "w");
+
+    if (s == NULL)
+    {
+        fclose(f);
+        return;
+    }
 
     double avg_cost = get_stat_avg_cost(s);
 
