@@ -59,18 +59,18 @@ void handle_input(int query, char *input, CATALOG *c, int i)
         free(path);
         return;
     }
-    case 7:
-    {
-        int N = atoi(strsep(&input, " "));
-        char *city = strsep(&input, "\n");
-        char *path = get_results_path(i);
+    // case 7:
+    // {
+    //     int N = atoi(strsep(&input, " "));
+    //     char *city = strsep(&input, "\n");
+    //     char *path = get_results_path(i);
 
-        query_7(N, city, path, c);
-        printf("Output %d - [OK]\n", i);
+    //     query_7(N, city, path, c);
+    //     printf("Output %d - [OK]\n", i);
 
-        free(path);
-        return;
-    }
+    //     free(path);
+    //     return;
+    // }
     default:
     {
         char *path = get_results_path(i);
