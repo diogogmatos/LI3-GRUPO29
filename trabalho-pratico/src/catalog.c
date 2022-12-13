@@ -65,14 +65,14 @@ CATALOG *create_catalog(char *dataset)
 {
     CATALOG *c = malloc(sizeof(CATALOG));
 
-    GHashTable *drivers = read_drivers(dataset);
-    GHashTable *users = read_users(dataset);
-    
-    GHashTable *driver_stats = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, destroy_driver_stat);
-    GHashTable *user_stats = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, destroy_user_stat);
-    GHashTable *city_stats = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, destroy_city_stat);
-    
-    GHashTable *rides = read_rides(dataset, user_stats, driver_stats, city_stats, drivers, users);
+    GHashTable *drivers = read_drivers(dataset); // dados de condutores
+    GHashTable *users = read_users(dataset);     // dados de utilizadores
+
+    GHashTable *driver_stats = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, destroy_driver_stat); // estatísticas de condutores
+    GHashTable *user_stats = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, destroy_user_stat);     // estatísticas de utilizadores
+    GHashTable *city_stats = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, destroy_city_stat);     // estatísticas da query 4
+
+    GHashTable *rides = read_rides(dataset, user_stats, driver_stats, city_stats, drivers, users); // dados de viagens
 
     c->drivers = drivers;
     c->users = users;

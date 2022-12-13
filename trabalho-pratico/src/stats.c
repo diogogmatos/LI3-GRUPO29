@@ -16,28 +16,26 @@
 struct stat
 {
 	int age;	  // q1
-	double money; // q1
 	char *gender; // q1
-
-	double score;	   // q2
-	char *driver_name; // q2
 
 	char *user_name;	// q3
 	int total_distance; // q3
 
-	char *city;		 // q4
 	double avg_cost; // q4
+	char *city;		 // q4, q7
 
 	char *id;		  // q1, q2
-	double avg_score; // q1, q2
-	int trips;		  // q1, q2
-
-	char *username; // q1, q3
+	char *username;	  // q1, q3
+	double money;	  // q1, q4
+	double avg_score; // q1, q2, q7
+	int trips;		  // q1, q2, q4, q7
 
 	char *most_recent_trip; // q2, q3
-	GHashTable *ht;			// q2, q3
+	double score;			// q2, q7
+	char *driver_name;		// q2, q7
+	GHashTable *ht;			// q2, q3, q7
 
-	CATALOG *c; // q1, q2, q3
+	CATALOG *c; // q1, q2, q3, q4, q7
 };
 
 // FUNÇÕES GET
@@ -155,6 +153,8 @@ void destroy_query7_stat(void *v)
 }
 
 // FUNÇÕES DE CRIAÇÃO DE ESTATÍSTICAS
+
+// - calculadas durante o parsing do ficheiro de rides:
 
 void create_user_stat(RIDE *r, GHashTable *u_stats, GHashTable *drivers, GHashTable *users)
 {
@@ -326,6 +326,8 @@ void create_city_stat(RIDE *r, GHashTable *c_stats, GHashTable *drivers)
 	free(driver);
 }
 
+// - calculadas percorrendo a tabela das viagens mais uma vez:
+
 void create_query7_stat(gpointer key, gpointer value, gpointer userdata)
 {
 	RIDE *r = value;
@@ -333,12 +335,12 @@ void create_query7_stat(gpointer key, gpointer value, gpointer userdata)
 
 	char *city = get_ride_city(r);
 
-	if (!strcmp(city, s->city))
+	if (!strcmp(city, s->city)) // Apenas considerados os valores de viagens efetuadas na cidade pretendida
 	{
 		char *id = get_ride_driver(r);
 		STAT *dl = g_hash_table_lookup(s->ht, id);
 
-		if (dl == NULL)
+		if (dl == NULL) // Se o condutor ainda não está na tabela hash, inicializamos os dados e adicionamos à tabela
 		{
 			STAT *driver_stat = malloc(sizeof(STAT));
 			DRIVER *d = g_hash_table_lookup(get_catalog_drivers(s->c), id);
@@ -352,7 +354,7 @@ void create_query7_stat(gpointer key, gpointer value, gpointer userdata)
 
 			g_hash_table_insert(s->ht, driver_stat->id, driver_stat);
 		}
-		else
+		else // Se o condutor já está na tabela hash, atualizamos os dados
 		{
 			dl->trips += 1;
 			dl->score += get_ride_score_driver(r);
@@ -367,20 +369,18 @@ void create_query7_stat(gpointer key, gpointer value, gpointer userdata)
 
 void create_query7_stats(GHashTable *query7_stats, char *city, CATALOG *c)
 {
-	STAT *s = malloc(sizeof(STAT));
+	STAT *s = malloc(sizeof(STAT)); // Usada para passar valores à função `create_query7_stat()`
 
 	s->ht = query7_stats;
 	s->city = city;
 	s->c = c;
-	
+
 	g_hash_table_foreach(get_catalog_rides(c), create_query7_stat, s);
 
 	free(s);
 }
 
-/* -- OLD -- */
-
-// FUNÇÕES DE CRIAÇÃO DE ESTATÍSTICAS
+/* -- OLD FUNCTIONS -- */
 
 // /* Função `stat_build()`
 //  * Função que é chamada para todos os valores da tabela hash das viagens.
