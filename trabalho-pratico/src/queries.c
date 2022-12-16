@@ -158,10 +158,9 @@ void query_2(int N, char *path, CATALOG *c)
     FILE *f = fopen(path, "w");
 
     int acc;
-    for (acc = 0; acc < N; ++acc)
+    STAT *stat;
+    for (acc = 0, stat = g_list_nth_data(list, acc); acc < N && stat != NULL; ++acc, stat = g_list_nth_data(list, acc))
     {
-        STAT *stat = g_list_nth_data(list, acc);
-
         char *id = get_stat_id(stat);
         char *driver_name = get_stat_driver_name(stat);
 
@@ -241,10 +240,9 @@ void query_3(int N, char *path, CATALOG *c)
     FILE *f = fopen(path, "w");
 
     int acc;
-    for (acc = 0; acc < N; ++acc)
+    STAT *stat;
+    for (acc = 0, stat = g_list_nth_data(list, acc); acc < N && stat != NULL; ++acc, stat = g_list_nth_data(list, acc))
     {
-        STAT *stat = g_list_nth_data(list, acc);
-
         char *username = get_stat_username(stat);
         char *user_name = get_stat_user_name(stat);
         int tot_dist = get_stat_total_distance(stat);
@@ -325,10 +323,9 @@ void query_7(int N, char *city, char *path, CATALOG *c)
     FILE *f = fopen(path, "w");
 
     int acc;
-    for (acc = 0; acc < N; ++acc)
+    STAT *stat;
+    for (acc = 0, stat = g_list_nth_data(list, acc); acc < N && stat != NULL; ++acc, stat = g_list_nth_data(list, acc)) 
     {
-        STAT *stat = g_list_nth_data(list, acc);
-
         char *id = get_stat_id(stat);
         char *driver_name = get_stat_driver_name(stat);
         double avg_score = get_stat_avg_score(stat);
