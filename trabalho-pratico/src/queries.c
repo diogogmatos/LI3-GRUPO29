@@ -281,6 +281,20 @@ void query_4(char *city, char *path, CATALOG *c)
     fclose(f);
 }
 
+// QUERY 5
+
+void query_5(char *date_a, char *date_b, char *path, CATALOG *c)
+{
+    FILE *f = fopen(path, "w");
+
+    double avg_cost = create_query5_stat(date_a, date_b, c);
+
+    fprintf(f, "%.3f\n", avg_cost);
+
+    fclose(f);
+}
+
+
 // QUERY 7
 
 gint compare_avg_score_city(gconstpointer a, gconstpointer b)
