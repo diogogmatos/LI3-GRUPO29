@@ -283,7 +283,7 @@ void query_4(char *city, char *path, CATALOG *c)
 
 // QUERY 5
 
-void query_5(char *date_a, char *date_b, char *path, CATALOG *c)
+void query_5(int date_a, int date_b, char *path, CATALOG *c)
 {
     FILE *f = fopen(path, "w");
 
