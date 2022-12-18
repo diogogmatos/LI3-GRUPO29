@@ -123,3 +123,20 @@ int get_age(char *date)
 
     return r;
 }
+
+int compare_dates(char *date1, char *date2)
+{
+    int dia1, mes1, ano1, dia2, mes2, ano2, r;
+
+    sscanf(date1, "%d/%d/%d", &dia1, &mes1, &ano1);
+    sscanf(date2, "%d/%d/%d", &dia2, &mes2, &ano2);
+
+    if ((ano1 > ano2) || (ano1 == ano2 && mes1 > mes2) || (ano1 == ano2 && mes1 == mes2 && dia1 > dia2))
+        r = 1;
+    else if (ano1 == ano2 && mes1 == mes2 && dia1 == dia2)
+        r = 0;
+    else
+        r = -1;
+
+    return r;
+}

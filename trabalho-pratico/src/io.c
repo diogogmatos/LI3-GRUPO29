@@ -61,8 +61,8 @@ void handle_input(int query, char *input, CATALOG *c, int i)
     }
     case 5:
     {
-        int date_a = convert_date(strsep(&input, "\n"));
-        int date_b = convert_date(strsep(&input, "\n"));
+        char *date_a = strsep(&input, " ");
+        char *date_b = strsep(&input, "\n");
         char *path = get_results_path(i);
 
         query_5(date_a, date_b, path, c);

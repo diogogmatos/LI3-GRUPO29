@@ -38,7 +38,7 @@ void destroy_query7_stat(void *v);
 void create_user_stat(RIDE *r, GHashTable *u_stats, GHashTable *drivers, GHashTable *users);
 void create_driver_stat(RIDE *r, GHashTable *d_stats, GHashTable *drivers);
 void create_city_stat(RIDE *r, GHashTable *c_stats, GHashTable *drivers);
-double create_query5_stat(int date_a, int date_b, CATALOG *c);
+double create_query5_stat(char *date_a, char *date_b, CATALOG *c);
 void create_query7_stats(GHashTable *query7_stats, char *city, CATALOG *c);
 
 #endif

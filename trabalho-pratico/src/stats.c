@@ -30,9 +30,9 @@ struct stat
 	double avg_score; // q1, q2, q7
 	int trips;		  // q1, q2, q4, q7
 
-    int date;        // q5
-	int date_a;     // q5
-	int date_b;     // q5
+    char *date;        // q5
+	char *date_a;     // q5
+	char *date_b;     // q5
 
 	char *most_recent_trip; // q2, q3
 	double score;			// q2, q7
@@ -89,19 +89,19 @@ double get_stat_avg_cost(STAT *s)
 	return s->avg_cost;
 }
 
-int get_stat_date(STAT *s)
+char *get_stat_date(STAT *s)
 {
-	return s->date;
+	return strdup(s->date);
 }
 
-int get_stat_date_a(STAT *s)
+char *get_stat_date_a(STAT *s)
 {
-	return s->date_a;
+	return strdup(s->date_a);
 }
 
-int get_stat_date_b(STAT *s)
+char *get_stat_date_b(STAT *s)
 {
-	return s->date_b;
+	return strdup(s->date_b);
 }
 
 char *get_stat_id(STAT *s)
@@ -357,9 +357,9 @@ void build_query5_stat(gpointer key, gpointer value, gpointer userdata)
 	RIDE *r = value;
 	STAT *s = userdata;
 
-	int date = convert_date(get_ride_date(r));
+	char *date = get_ride_date(r);
 
-	if (date >= s->date_a && date <= s->date_b) // Apenas considerados os valores de viagens efetuadas entre as datas referidas
+	if ((compare_dates(s->date_a, date) <= 0) && (compare_dates(date, s->date_b) <= 0)) // Apenas considerados os valores de viagens efetuadas entre as datas referidas
 	{
 		char *id = get_ride_driver(r);
 		DRIVER *d = g_hash_table_lookup(get_catalog_drivers(s->c), id);
@@ -368,26 +368,35 @@ void build_query5_stat(gpointer key, gpointer value, gpointer userdata)
 
         s->money += get_price(d) + get_tax(d) * distance;
 		s->trips += 1;
-		s->avg_cost = s->money / s->trips;
-	}
 
+		free(id);
+	}
+    free(date);
 }
 
-double create_query5_stat(int date_a, int date_b, CATALOG *c)
+double create_query5_stat(char *date_a, char *date_b, CATALOG *c)
 {
 	STAT *s = malloc(sizeof(STAT)); 
+	double r, money, trips;
 
 	s->date_a = date_a;
 	s->date_b = date_b;
 	s->c = c;
+
 	s->money = 0;
 	s->trips = 0;
 
 	g_hash_table_foreach(get_catalog_rides(c), build_query5_stat, s);
 
-	return s->avg_cost;
+	money = s->money;
+	trips = s->trips;
+	r = money / trips;
 
+	free(s);
+
+	return r;
 }
+
 // - calculadas percorrendo a tabela das viagens mais uma vez:
 
 void create_query7_stat(gpointer key, gpointer value, gpointer userdata)

@@ -283,11 +283,11 @@ void query_4(char *city, char *path, CATALOG *c)
 
 // QUERY 5
 
-void query_5(int date_a, int date_b, char *path, CATALOG *c)
+void query_5(char *date_a, char *date_b, char *path, CATALOG *c)
 {
-    FILE *f = fopen(path, "w");
-
     double avg_cost = create_query5_stat(date_a, date_b, c);
+
+    FILE *f = fopen(path, "w");
 
     fprintf(f, "%.3f\n", avg_cost);
 
