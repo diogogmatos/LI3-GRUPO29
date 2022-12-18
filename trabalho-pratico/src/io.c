@@ -59,6 +59,18 @@ void handle_input(int query, char *input, CATALOG *c, int i)
         free(path);
         return;
     }
+    case 5:
+    {
+        char *date_a = strsep(&input, " ");
+        char *date_b = strsep(&input, "\n");
+        char *path = get_results_path(i);
+
+        query_5(date_a, date_b, path, c);
+        printf("Output %d - [OK]\n", i);
+
+        free(path);
+        return;
+    }
     case 7:
     {
         int N = atoi(strsep(&input, " "));

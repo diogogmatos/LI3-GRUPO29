@@ -30,6 +30,10 @@ struct stat
 	double avg_score; // q1, q2, q7
 	int trips;		  // q1, q2, q4, q7
 
+    char *date;        // q5
+	char *date_a;     // q5
+	char *date_b;     // q5
+
 	char *most_recent_trip; // q2, q3
 	double score;			// q2, q7
 	char *driver_name;		// q2, q7
@@ -83,6 +87,21 @@ char *get_stat_city(STAT *s)
 double get_stat_avg_cost(STAT *s)
 {
 	return s->avg_cost;
+}
+
+char *get_stat_date(STAT *s)
+{
+	return strdup(s->date);
+}
+
+char *get_stat_date_a(STAT *s)
+{
+	return strdup(s->date_a);
+}
+
+char *get_stat_date_b(STAT *s)
+{
+	return strdup(s->date_b);
 }
 
 char *get_stat_id(STAT *s)
@@ -143,6 +162,13 @@ void destroy_city_stat(void *v)
 	free(s);
 }
 
+void destroy_query5_stat(void *v)
+{
+	STAT *s = v;
+
+	free(s->id);
+	free(s);
+}
 void destroy_query7_stat(void *v)
 {
 	STAT *s = v;
@@ -324,6 +350,51 @@ void create_city_stat(RIDE *r, GHashTable *c_stats, GHashTable *drivers)
 	}
 
 	free(driver);
+}
+
+void build_query5_stat(gpointer key, gpointer value, gpointer userdata)
+{
+	RIDE *r = value;
+	STAT *s = userdata;
+
+	char *date = get_ride_date(r);
+
+	if ((compare_dates(s->date_a, date) <= 0) && (compare_dates(date, s->date_b) <= 0)) // Apenas considerados os valores de viagens efetuadas entre as datas referidas
+	{
+		char *id = get_ride_driver(r);
+		DRIVER *d = g_hash_table_lookup(get_catalog_drivers(s->c), id);
+
+		int distance = get_ride_distance(r);
+
+        s->money += get_price(d) + get_tax(d) * distance;
+		s->trips += 1;
+
+		free(id);
+	}
+    free(date);
+}
+
+double create_query5_stat(char *date_a, char *date_b, CATALOG *c)
+{
+	STAT *s = malloc(sizeof(STAT)); 
+	double r, money, trips;
+
+	s->date_a = date_a;
+	s->date_b = date_b;
+	s->c = c;
+
+	s->money = 0;
+	s->trips = 0;
+
+	g_hash_table_foreach(get_catalog_rides(c), build_query5_stat, s);
+
+	money = s->money;
+	trips = s->trips;
+	r = money / trips;
+
+	free(s);
+
+	return r;
 }
 
 // - calculadas percorrendo a tabela das viagens mais uma vez:
