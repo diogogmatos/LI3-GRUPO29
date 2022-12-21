@@ -15,7 +15,7 @@
  */
 struct stat
 {
-	int age;	  // q1
+	int age;	  // q1,q8
 	char *gender; // q1
 
 	char *user_name;	// q3
@@ -25,6 +25,7 @@ struct stat
 	char *city;		 // q4, q7
 
 	char *id;		  // q1, q2
+	char *ride_id;    // q8
 	char *username;	  // q1, q3
 	double money;	  // q1, q4
 	double avg_score; // q1, q2, q7
@@ -33,6 +34,9 @@ struct stat
     char *date;        // q5
 	char *date_a;     // q5
 	char *date_b;     // q5
+
+	int acc_age_u;    // q8
+	int acc_age_d;    // q8
 
 	char *most_recent_trip; // q2, q3
 	double score;			// q2, q7
@@ -104,9 +108,24 @@ char *get_stat_date_b(STAT *s)
 	return strdup(s->date_b);
 }
 
+int get_stat_acc_age_d(STAT *s)
+{
+	return s->acc_age_d;
+}
+
+int get_stat_acc_age_u(STAT *s)
+{
+	return s->acc_age_u;
+}
+
 char *get_stat_id(STAT *s)
 {
 	return strdup(s->id);
+}
+
+char *get_stat_ride_id(STAT *s)
+{
+	return strdup(s->ride_id);
 }
 
 double get_stat_avg_score(STAT *s)
@@ -162,19 +181,22 @@ void destroy_city_stat(void *v)
 	free(s);
 }
 
-void destroy_query5_stat(void *v)
-{
-	STAT *s = v;
-
-	free(s->id);
-	free(s);
-}
 void destroy_query7_stat(void *v)
 {
 	STAT *s = v;
 
 	free(s->id);
 	free(s->driver_name);
+	free(s);
+}
+
+void destroy_query8_stat(void *v)
+{
+	STAT *s = v;
+
+	free(s->id);
+	free(s->username);
+	free(s->ride_id);
 	free(s);
 }
 
@@ -447,6 +469,57 @@ void create_query7_stats(GHashTable *query7_stats, char *city, CATALOG *c)
 	s->c = c;
 
 	g_hash_table_foreach(get_catalog_rides(c), create_query7_stat, s);
+
+	free(s);
+}
+
+void create_query8_stat(gpointer key, gpointer value, gpointer userdata)
+{
+	RIDE *r = value;
+	STAT *s = userdata;
+
+	char *id = get_ride_driver(r);
+	DRIVER *d = g_hash_table_lookup(get_catalog_drivers(s->c), id);
+
+	char *username = get_ride_user(r);
+	USER *u = g_hash_table_lookup(get_catalog_users(s->c), username);
+
+    char *genderd = get_driver_gender(d);
+	char *genderu = get_user_gender(u);
+	char *dated_s = get_driver_account_creation(d);
+	char *dateu_s = get_user_account_creation(u);
+	int dated = get_age(dated_s);
+	int dateu = get_age(dateu_s);
+
+	if (!strcmp(genderd, s->gender) && !strcmp(genderu, s->gender) && dated >= s->age && dateu >= s->age) 
+	{
+		STAT *ride_stat = malloc(sizeof(STAT));
+
+		ride_stat->ride_id = get_ride_id(r);
+		ride_stat->id = id;
+		ride_stat->username = username;
+		ride_stat->acc_age_d = dated;
+		ride_stat->acc_age_u = dateu;
+
+		g_hash_table_insert(s->ht, ride_stat->ride_id, ride_stat);
+	}
+
+	free(genderd);
+	free(genderu);
+    free(dated_s);
+	free(dateu_s);
+}
+
+void create_query8_stats(GHashTable *query8_stats, char *gender, int X, CATALOG *c)
+{
+	STAT *s = malloc(sizeof(STAT)); 
+
+    s->ht = query8_stats;
+	s->gender = gender;
+	s->age = X;
+	s->c = c;
+
+	g_hash_table_foreach(get_catalog_rides(c), create_query8_stat, s);
 
 	free(s);
 }

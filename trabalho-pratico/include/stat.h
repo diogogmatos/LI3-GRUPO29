@@ -3,6 +3,7 @@
 
 #include "../include/user.h"
 #include "../include/driver.h"
+#include "../include/ride.h"
 #include "../include/catalog.h"
 #include <glib.h>
 
@@ -22,6 +23,9 @@ double get_stat_avg_cost(STAT *s);
 char *get_stat_id(STAT *s);
 double get_stat_avg_score(STAT *s);
 int get_stat_trips(STAT *s);
+int get_stat_acc_age_d(STAT *s);
+int get_stat_acc_age_u(STAT *s);
+char *get_stat_ride_id(STAT *s);
 char *get_stat_username(STAT *s);
 char *get_stat_most_recent_trip(STAT *s);
 
@@ -30,8 +34,8 @@ char *get_stat_most_recent_trip(STAT *s);
 void destroy_user_stat(void *v);
 void destroy_driver_stat(void *v);
 void destroy_city_stat(void *v);
-void destroy_query5_stat(void *v);
 void destroy_query7_stat(void *v);
+void destroy_query8_stat(void *v);
 
 // FUNÇÕES DE CRIAÇÃO DE ESTATÍSTICAS
 
@@ -40,5 +44,6 @@ void create_driver_stat(RIDE *r, GHashTable *d_stats, GHashTable *drivers);
 void create_city_stat(RIDE *r, GHashTable *c_stats, GHashTable *drivers);
 double create_query5_stat(char *date_a, char *date_b, CATALOG *c);
 void create_query7_stats(GHashTable *query7_stats, char *city, CATALOG *c);
+void create_query8_stats(GHashTable *query8_stats, char *gender, int X, CATALOG *c);
 
 #endif

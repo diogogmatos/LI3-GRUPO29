@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #define TODAY "09/10/2022" // Data usada para calcular a idade dos users
 
@@ -98,15 +99,29 @@ double get_tax(DRIVER *d)
 
 /* Função `convert_date()`
  * Responsável por converter uma data no formato DD/MM/YYYY para um inteiro que representa o número total de
- * dias que essa data contém. Usada em `get_age()` para calcular idades e nas funções de estatísticas para comparar datas.
+ * dias entre essa data e o dia de "hoje". Usada em `get_age()` para calcular idades e nas funções de estatísticas para comparar datas.
  */
 int convert_date(char *date)
 {
-    int dia, mes, ano;
+    int dia1, mes1, ano1, dia2, mes2, ano2;
 
-    sscanf(date, "%d/%d/%d", &dia, &mes, &ano);
+    sscanf(TODAY, "%d/%d/%d", &dia1, &mes1, &ano1);
+    sscanf(date, "%d/%d/%d", &dia2, &mes2, &ano2);
 
-    int r = ano * 365 + mes * 31 + dia;
+    struct tm date1 = {0}, date2 = {0};
+    date1.tm_year = ano1 - 1900;
+    date1.tm_mon = mes1 - 1;
+    date1.tm_mday = dia1;
+    date2.tm_year = ano2 - 1900;
+    date2.tm_mon = mes2 - 1;
+    date2.tm_mday = dia2;
+
+    time_t t1 = mktime(&date1);
+    time_t t2 = mktime(&date2);
+
+    double diff = difftime (t1, t2);
+
+    int r = diff / (60 * 60 * 24);
 
     return r;
 }
@@ -116,10 +131,9 @@ int convert_date(char *date)
  */
 int get_age(char *date)
 {
-    int t = convert_date(TODAY);
     int d = convert_date(date);
 
-    int r = (t - d) / 365;
+    int r = d / 365;
 
     return r;
 }
