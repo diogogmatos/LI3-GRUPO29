@@ -27,18 +27,6 @@ char *get_stat_most_recent_trip(STAT *s);
 
 // FUNÇÕES DESTROY
 
-void destroy_user_stat(void *v);
-void destroy_driver_stat(void *v);
-void destroy_city_stat(void *v);
-void destroy_query5_stat(void *v);
-void destroy_query7_stat(void *v);
-
 // FUNÇÕES DE CRIAÇÃO DE ESTATÍSTICAS
-
-void create_user_stat(RIDE *r, GHashTable *u_stats, GHashTable *drivers, GHashTable *users);
-void create_driver_stat(RIDE *r, GHashTable *d_stats, GHashTable *drivers);
-void create_city_stat(RIDE *r, GHashTable *c_stats, GHashTable *drivers);
-double create_query5_stat(char *date_a, char *date_b, CATALOG *c);
-void create_query7_stats(GHashTable *query7_stats, char *city, CATALOG *c);
 
 #endif

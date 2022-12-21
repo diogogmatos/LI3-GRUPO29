@@ -7,6 +7,9 @@
 #include "../include/user.h"
 #include "../include/ride.h"
 #include "../include/stat.h"
+#include "../include/user_stats.h"
+#include "../include/driver_stats.h"
+#include "../include/city_stats.h"
 
 /* Struct CATALOG
  * Responsável por guardar os apontadores para as 3 hash table de dados (drivers, users e rides),

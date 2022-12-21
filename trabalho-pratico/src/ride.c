@@ -6,7 +6,9 @@
 #include <glib.h>
 #include "../include/utils.h"
 #include "../include/catalog.h"
-#include "../include/stat.h"
+#include "../include/driver_stats.h"
+#include "../include/user_stats.h"
+#include "../include/city_stats.h"
 
 /* Struct RIDE
  * Responsável por guardar os dados de uma viagem.
