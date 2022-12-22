@@ -367,23 +367,33 @@ gint compare_query8_dates(gconstpointer a, gconstpointer b)
 
     int r;
 
-    int date1_d = get_stat_acc_age_d(s1);
-    int date1_u = get_stat_acc_age_u(s1);
-    int date2_d = get_stat_acc_age_d(s2);
-    int date2_u = get_stat_acc_age_u(s2);
-    char *id1 = get_stat_ride_id(s1);
-    char *id2 = get_stat_ride_id(s2);
+    int age1_d = get_stat_acc_age_d(s1);
+    int age2_d = get_stat_acc_age_d(s2);
 
-    if (date1_d > date2_d)
+    if (age1_d > age2_d)
         r = -1;
-    else if (date1_d < date2_d)
+    else if (age1_d < age2_d)
         r = 1;
-    else if (date1_u > date2_u)
-        r = -1;
-    else if (date1_u < date2_u)
-        r = 1;
-    else 
-        r = strcmp(id1,id2);
+    else
+    {
+        int age1_u = get_stat_acc_age_u(s1);
+        int age2_u = get_stat_acc_age_u(s2);
+
+        if (age1_u > age2_u)
+            r = -1;
+        else if (age1_u < age2_u)
+            r = 1;
+        else
+        {
+            char *id1 = get_stat_ride_id(s1);
+            char *id2 = get_stat_ride_id(s2);
+
+            r = strcmp(id1, id2);
+
+            free(id1);
+            free(id2);
+        }
+    }
 
     return r;
 }

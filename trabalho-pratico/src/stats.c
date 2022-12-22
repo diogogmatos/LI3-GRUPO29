@@ -484,30 +484,53 @@ void create_query8_stat(gpointer key, gpointer value, gpointer userdata)
 	char *username = get_ride_user(r);
 	USER *u = g_hash_table_lookup(get_catalog_users(s->c), username);
 
-    char *genderd = get_driver_gender(d);
-	char *genderu = get_user_gender(u);
-	char *dated_s = get_driver_account_creation(d);
-	char *dateu_s = get_user_account_creation(u);
-	int dated = get_age(dated_s);
-	int dateu = get_age(dateu_s);
+	char *account_status_d = get_driver_account_status(d);
+	char *account_status_u = get_user_account_status(u);
 
-	if (!strcmp(genderd, s->gender) && !strcmp(genderu, s->gender) && dated >= s->age && dateu >= s->age) 
+	if (!strcmp(account_status_d, "active") && !strcmp(account_status_u, "active"))
 	{
-		STAT *ride_stat = malloc(sizeof(STAT));
+		char *genderd = get_driver_gender(d);
+		char *genderu = get_user_gender(u);
+		char *dated_s = get_driver_account_creation(d);
+		char *dateu_s = get_user_account_creation(u);
 
-		ride_stat->ride_id = get_ride_id(r);
-		ride_stat->id = id;
-		ride_stat->username = username;
-		ride_stat->acc_age_d = dated;
-		ride_stat->acc_age_u = dateu;
+		int aged = convert_date(dated_s);
+		int ageu = convert_date(dateu_s);
 
-		g_hash_table_insert(s->ht, ride_stat->ride_id, ride_stat);
+		double aged_y = aged / 365.2425;
+		double ageu_y = ageu / 365.2425;
+
+		if (!strcmp(genderd, s->gender) && !strcmp(genderu, s->gender) && aged_y >= s->age && ageu_y >= s->age)
+		{
+			STAT *ride_stat = malloc(sizeof(STAT));
+
+			ride_stat->ride_id = get_ride_id(r);
+			ride_stat->id = id;
+			ride_stat->username = username;
+			ride_stat->acc_age_d = aged;
+			ride_stat->acc_age_u = ageu;
+
+			g_hash_table_insert(s->ht, ride_stat->ride_id, ride_stat);
+		}
+		else
+		{
+			free(id);
+			free(username);
+		}
+
+		free(genderd);
+		free(genderu);
+		free(dated_s);
+		free(dateu_s);
+	}
+	else
+	{
+		free(id);
+		free(username);
 	}
 
-	free(genderd);
-	free(genderu);
-    free(dated_s);
-	free(dateu_s);
+	free(account_status_d);
+	free(account_status_u);
 }
 
 void create_query8_stats(GHashTable *query8_stats, char *gender, int X, CATALOG *c)

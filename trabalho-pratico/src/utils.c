@@ -97,33 +97,84 @@ double get_tax(DRIVER *d)
 
 // DATAS
 
+// is leap year in Gregorian
+long IsLeapG(long yr)
+{
+    if (((((yr % 400) == 0) || ((yr % 100) != 0)) && ((yr % 4) == 0)))
+    {
+        return (1);
+    }
+    else
+    {
+        return (0);
+    }
+}
+
+// Day of the Year
+long rbdug(long d, long m, long y)
+{
+    long a, r[13];
+    r[1] = 0;
+    r[2] = 31;
+    r[3] = 59;
+    r[4] = 90;
+    r[5] = 120;
+    r[6] = 151;
+    r[7] = 181;
+    r[8] = 212;
+    r[9] = 243;
+    r[10] = 273;
+    r[11] = 304;
+    r[12] = 334;
+    a = r[m] + d;
+    if ((IsLeapG(y) == 1) && (m > 2))
+        a += 1;
+    return (a);
+}
+
+long Godn(long yy1, long yy2)
+{
+    long jj, bb;
+    bb = 0;
+    for (jj = yy1; jj < yy2; jj++)
+    {
+        bb += 365;
+        if (IsLeapG(jj) == 1)
+            bb += 1;
+    }
+    return (bb);
+}
+
+long DatDif(long d1, long m1, long y1, long d2, long m2, long y2)
+{
+    long suma;
+    suma = rbdug(d2, m2, y2) - rbdug(d1, m1, y1);
+    if (y1 != y2)
+    {
+        if (y1 < y2)
+        {
+            suma += Godn(y1, y2);
+        }
+        else
+        {
+            suma -= Godn(y2, y1);
+        }
+    }
+    return (suma);
+}
+
 /* Função `convert_date()`
  * Responsável por converter uma data no formato DD/MM/YYYY para um inteiro que representa o número total de
  * dias entre essa data e o dia de "hoje". Usada em `get_age()` para calcular idades e nas funções de estatísticas para comparar datas.
  */
 int convert_date(char *date)
 {
-    int dia1, mes1, ano1, dia2, mes2, ano2;
+    long d1, m1, y1, d2, m2, y2;
 
-    sscanf(TODAY, "%d/%d/%d", &dia1, &mes1, &ano1);
-    sscanf(date, "%d/%d/%d", &dia2, &mes2, &ano2);
+    sscanf(date, "%ld/%ld/%ld", &d1, &m1, &y1);
+    sscanf(TODAY, "%ld/%ld/%ld", &d2, &m2, &y2);
 
-    struct tm date1 = {0}, date2 = {0};
-    date1.tm_year = ano1 - 1900;
-    date1.tm_mon = mes1 - 1;
-    date1.tm_mday = dia1;
-    date2.tm_year = ano2 - 1900;
-    date2.tm_mon = mes2 - 1;
-    date2.tm_mday = dia2;
-
-    time_t t1 = mktime(&date1);
-    time_t t2 = mktime(&date2);
-
-    double diff = difftime (t1, t2);
-
-    int r = diff / (60 * 60 * 24);
-
-    return r;
+    return DatDif(d1, m1, y1, d2, m2, y2);
 }
 
 /* Função `get_age()`
@@ -133,10 +184,11 @@ int get_age(char *date)
 {
     int d = convert_date(date);
 
-    int r = d / 365;
+    int r = d / 365.2425;
 
     return r;
 }
+
 
 int compare_dates(char *date1, char *date2)
 {
