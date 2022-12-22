@@ -83,6 +83,18 @@ void handle_input(int query, char *input, CATALOG *c, int i)
         free(path);
         return;
     }
+    case 8:
+    {
+        char *gender = strsep(&input, " ");
+        int X = atoi(strsep(&input, "\n"));
+        char *path = get_results_path(i);
+
+        query_8(gender, X, path, c);
+        printf("Output %d - [OK]\n", i);
+
+        free(path);
+        return;
+    }
     default:
     {
         char *path = get_results_path(i);

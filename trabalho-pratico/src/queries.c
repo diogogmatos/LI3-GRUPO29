@@ -292,7 +292,6 @@ void query_5(char *date_a, char *date_b, char *path, CATALOG *c)
     fclose(f);
 }
 
-
 // QUERY 7
 
 gint compare_avg_score_city(gconstpointer a, gconstpointer b)
@@ -354,6 +353,81 @@ void query_7(int N, char *city, char *path, CATALOG *c)
 
     g_list_free(list);
     g_hash_table_destroy(query7_stats);
+}
+
+// QUERY 8
+
+gint compare_query8_dates(gconstpointer a, gconstpointer b)
+{
+    STAT *s1 = (STAT *)a;
+    STAT *s2 = (STAT *)b;
+
+    int r;
+
+    int age1_d = get_stat_acc_age_d(s1);
+    int age2_d = get_stat_acc_age_d(s2);
+
+    if (age1_d > age2_d)
+        r = -1;
+    else if (age1_d < age2_d)
+        r = 1;
+    else
+    {
+        int age1_u = get_stat_acc_age_u(s1);
+        int age2_u = get_stat_acc_age_u(s2);
+
+        if (age1_u > age2_u)
+            r = -1;
+        else if (age1_u < age2_u)
+            r = 1;
+        else
+        {
+            char *id1 = get_stat_ride_id(s1);
+            char *id2 = get_stat_ride_id(s2);
+
+            r = strcmp(id1, id2);
+
+            free(id1);
+            free(id2);
+        }
+    }
+
+    return r;
+}
+
+void query_8(char *gender, int X, char *path, CATALOG *c)
+{
+    GHashTable *query8_stats = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, destroy_query8_stat);
+    create_query8_stats(query8_stats, gender, X, c);
+    
+    GList *list = g_hash_table_get_values(query8_stats);
+    list = g_list_sort(list, compare_query8_dates); 
+
+    FILE *f = fopen(path, "w");
+
+    guint N = g_list_length(list);
+
+    int acc;
+    STAT *stat;
+    for (acc = 0, stat = g_list_nth_data(list, acc); acc < N; ++acc, stat = g_list_nth_data(list, acc)) 
+    {
+        char *id = get_stat_id(stat);
+        char *driver_name = get_driver_name(g_hash_table_lookup(get_catalog_drivers(c), id));
+        char *username = get_stat_username(stat);
+        char *user_name = get_user_name(g_hash_table_lookup(get_catalog_users(c), username));
+
+        fprintf(f, "%s;%s;%s;%s\n", id, driver_name, username, user_name);
+
+        free(id);
+        free(driver_name);
+        free(username);
+        free(user_name); 
+    }
+
+    fclose(f);
+
+    g_list_free(list);
+    g_hash_table_destroy(query8_stats);
 }
 
 // QUERY INVÁLIDA
