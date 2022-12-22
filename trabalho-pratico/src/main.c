@@ -4,7 +4,6 @@
 #include "../include/io.h"
 #include "../include/catalog.h"
 #include "../include/ride.h"
-#include "../include/stat.h"
 #include "../include/utils.h"
 
 /* Função `main()`

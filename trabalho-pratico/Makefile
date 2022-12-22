@@ -9,6 +9,9 @@ OUTPUT = Resultados
 INPUT = exemplos_de_queries/tests_2/input.txt
 DATASET = Dataset_Fase1
 
+INPUT_BIG = exemplos_de_queries/large-outputs/largedataset.txt
+DATASET_BIG = data-large
+
 # -fsanitize=leak
 
 $(TARGET): $(OBJS)                                        # Compiling the program
@@ -33,6 +36,20 @@ run: $(TARGET)                                            # Run the program
 		echo "[ERROR] $(INPUT) not found!";\
 	fi
 	./programa-principal "$(DATASET)" "$(INPUT)"
+
+run_big: $(TARGET)
+	@if [ ! -e $(OUTPUT) ]; then\
+		mkdir -p $(OUTPUT) ; echo "[CREATED] $(OUTPUT)/";\
+	else\
+		rm -f $(RESULTS) ; echo "[CLEANED] $(RESULTS)";\
+	fi
+	@if [ ! -e $(DATASET) ]; then\
+		echo "[ERROR] $(DATASET)/ not found!";\
+	fi
+	@if [ ! -e $(INPUT) ]; then\
+		echo "[ERROR] $(INPUT) not found!";\
+	fi
+	./programa-principal "$(DATASET_BIG)" "$(INPUT_BIG)"
 
 clean:                                                    # Clean the output files
 	@rm -f $(TARGET) $(OBJS) $(RESULTS) ; echo "[CLEANED]"

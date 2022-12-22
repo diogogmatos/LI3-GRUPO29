@@ -6,7 +6,6 @@
 #include "../include/driver.h"
 #include "../include/user.h"
 #include "../include/ride.h"
-#include "../include/stat.h"
 #include "../include/user_stats.h"
 #include "../include/driver_stats.h"
 #include "../include/city_stats.h"

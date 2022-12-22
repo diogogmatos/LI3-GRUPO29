@@ -8,13 +8,13 @@
 #include "../include/io.h"
 #include "../include/queries.h"
 #include "../include/catalog.h"
-#include "../include/stat.h"
 #include "../include/utils.h"
 #include "../include/user_stats.h"
 #include "../include/driver_stats.h"
 #include "../include/city_stats.h"
 #include "../include/query5_stats.h"
 #include "../include/query7_stats.h"
+#include "../include/query8_stats.h"
 
 // QUERY 1
 
@@ -364,13 +364,13 @@ void query_7(int N, char *city, char *path, CATALOG *c)
 
 gint compare_query8_dates(gconstpointer a, gconstpointer b)
 {
-    STAT *s1 = (STAT *)a;
-    STAT *s2 = (STAT *)b;
+    QUERY8_STAT *s1 = (QUERY8_STAT *)a;
+    QUERY8_STAT *s2 = (QUERY8_STAT *)b;
 
     int r;
 
-    int age1_d = get_stat_acc_age_d(s1);
-    int age2_d = get_stat_acc_age_d(s2);
+    int age1_d = get_query8_stat_acc_age_d(s1);
+    int age2_d = get_query8_stat_acc_age_d(s2);
 
     if (age1_d > age2_d)
         r = -1;
@@ -378,8 +378,8 @@ gint compare_query8_dates(gconstpointer a, gconstpointer b)
         r = 1;
     else
     {
-        int age1_u = get_stat_acc_age_u(s1);
-        int age2_u = get_stat_acc_age_u(s2);
+        int age1_u = get_query8_stat_acc_age_u(s1);
+        int age2_u = get_query8_stat_acc_age_u(s2);
 
         if (age1_u > age2_u)
             r = -1;
@@ -387,8 +387,8 @@ gint compare_query8_dates(gconstpointer a, gconstpointer b)
             r = 1;
         else
         {
-            char *id1 = get_stat_ride_id(s1);
-            char *id2 = get_stat_ride_id(s2);
+            char *id1 = get_query8_stat_ride_id(s1);
+            char *id2 = get_query8_stat_ride_id(s2);
 
             r = strcmp(id1, id2);
 
@@ -410,15 +410,15 @@ void query_8(char *gender, int X, char *path, CATALOG *c)
 
     FILE *f = fopen(path, "w");
 
-    guint N = g_list_length(list);
+    int N = g_list_length(list);
 
     int acc;
-    STAT *stat;
+    QUERY8_STAT *stat;
     for (acc = 0, stat = g_list_nth_data(list, acc); acc < N; ++acc, stat = g_list_nth_data(list, acc)) 
     {
-        char *id = get_stat_id(stat);
+        char *id = get_query8_stat_id(stat);
         char *driver_name = get_driver_name(g_hash_table_lookup(get_catalog_drivers(c), id));
-        char *username = get_stat_username(stat);
+        char *username = get_query8_stat_username(stat);
         char *user_name = get_user_name(g_hash_table_lookup(get_catalog_users(c), username));
 
         fprintf(f, "%s;%s;%s;%s\n", id, driver_name, username, user_name);
