@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <sys/resource.h>
 
 #define TODAY "09/10/2022" // Data usada para calcular a idade dos users
 
@@ -205,4 +206,18 @@ int compare_dates(char *date1, char *date2)
         r = -1;
 
     return r;
+}
+
+// OUTROS
+
+void display_stats()
+{
+    // Get the current memory usage
+    struct rusage usage;
+    getrusage(RUSAGE_SELF, &usage);
+    printf("\nMemory usage: %ld megabytes\n", usage.ru_maxrss / 1000);
+
+    // Get the current CPU time
+    clock_t clock_time = clock();
+    printf("CPU time: %ld seconds\n", clock_time / CLOCKS_PER_SEC);
 }

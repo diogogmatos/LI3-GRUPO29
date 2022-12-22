@@ -11,5 +11,6 @@ double get_tax(DRIVER *d);
 int convert_date(char *date);
 int get_age(char *date);
 int compare_dates(char *date1, char *date2);
+void display_stats();
 
 #endif

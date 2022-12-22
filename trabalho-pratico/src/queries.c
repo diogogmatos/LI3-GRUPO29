@@ -8,8 +8,13 @@
 #include "../include/io.h"
 #include "../include/queries.h"
 #include "../include/catalog.h"
-#include "../include/stat.h"
 #include "../include/utils.h"
+#include "../include/user_stats.h"
+#include "../include/driver_stats.h"
+#include "../include/city_stats.h"
+#include "../include/query5_stats.h"
+#include "../include/query7_stats.h"
+#include "../include/query8_stats.h"
 
 // QUERY 1
 
@@ -38,15 +43,15 @@ void query_1(int is_id, char *value, char *path, CATALOG *c)
 
         if (!strcmp(account_status, "active")) // se a conta for ativa executa normalmente
         {
-            STAT *s = g_hash_table_lookup(get_catalog_driver_stats(c), id);
+            DRIVER_STAT *s = g_hash_table_lookup(get_catalog_driver_stats(c), id);
 
-            char *name = get_stat_driver_name(s);
-            char *gender = get_stat_gender(s);
+            char *name = get_driver_stat_driver_name(s);
+            char *gender = get_driver_stat_gender(s);
 
-            int age = get_stat_age(s);
-            double avg_score = get_stat_avg_score(s);
-            int trips = get_stat_trips(s);
-            double money = get_stat_money(s);
+            int age = get_driver_stat_age(s);
+            double avg_score = get_driver_stat_avg_score(s);
+            int trips = get_driver_stat_trips(s);
+            double money = get_driver_stat_money(s);
 
             fprintf(f, "%s;%s;%d;%.3f;%d;%.3f\n", name, gender, age, avg_score, trips, money);
 
@@ -74,15 +79,15 @@ void query_1(int is_id, char *value, char *path, CATALOG *c)
 
         if (!strcmp(account_status, "active"))
         {
-            STAT *s = g_hash_table_lookup(get_catalog_user_stats(c), username);
+            USER_STAT *s = g_hash_table_lookup(get_catalog_user_stats(c), username);
 
-            char *name = get_stat_user_name(s);
-            char *gender = get_stat_gender(s);
+            char *name = get_user_stat_user_name(s);
+            char *gender = get_user_stat_gender(s);
 
-            int age = get_stat_age(s);
-            double avg_score = get_stat_avg_score(s);
-            int trips = get_stat_trips(s);
-            double money = get_stat_money(s);
+            int age = get_user_stat_age(s);
+            double avg_score = get_user_stat_avg_score(s);
+            int trips = get_user_stat_trips(s);
+            double money = get_user_stat_money(s);
 
             fprintf(f, "%s;%s;%d;%.3f;%d;%.3f\n", name, gender, age, avg_score, trips, money);
 
@@ -103,13 +108,13 @@ void query_1(int is_id, char *value, char *path, CATALOG *c)
  */
 gint compare_avg_score(gconstpointer a, gconstpointer b)
 {
-    STAT *s1 = (STAT *)a;
-    STAT *s2 = (STAT *)b;
+    DRIVER_STAT *s1 = (DRIVER_STAT *)a;
+    DRIVER_STAT *s2 = (DRIVER_STAT *)b;
 
     int r;
 
-    double avg_score1 = get_stat_avg_score(s1);
-    double avg_score2 = get_stat_avg_score(s2);
+    double avg_score1 = get_driver_stat_avg_score(s1);
+    double avg_score2 = get_driver_stat_avg_score(s2);
 
     if (avg_score1 > avg_score2)
         r = -1;
@@ -117,8 +122,8 @@ gint compare_avg_score(gconstpointer a, gconstpointer b)
         r = 1;
     else
     {
-        char *date1 = get_stat_most_recent_trip(s1);
-        char *date2 = get_stat_most_recent_trip(s2);
+        char *date1 = get_driver_stat_most_recent_trip(s1);
+        char *date2 = get_driver_stat_most_recent_trip(s2);
 
         int da = convert_date(date1);
         int db = convert_date(date2);
@@ -126,8 +131,8 @@ gint compare_avg_score(gconstpointer a, gconstpointer b)
         free(date1);
         free(date2);
 
-        char *id1 = get_stat_id(s1);
-        char *id2 = get_stat_id(s2);
+        char *id1 = get_driver_stat_id(s1);
+        char *id2 = get_driver_stat_id(s2);
 
         if (da > db)
             r = -1;
@@ -158,13 +163,13 @@ void query_2(int N, char *path, CATALOG *c)
     FILE *f = fopen(path, "w");
 
     int acc;
-    STAT *stat;
+    DRIVER_STAT *stat;
     for (acc = 0, stat = g_list_nth_data(list, acc); acc < N && stat != NULL; ++acc, stat = g_list_nth_data(list, acc))
     {
-        char *id = get_stat_id(stat);
-        char *driver_name = get_stat_driver_name(stat);
+        char *id = get_driver_stat_id(stat);
+        char *driver_name = get_driver_stat_driver_name(stat);
 
-        double avg_score = get_stat_avg_score(stat);
+        double avg_score = get_driver_stat_avg_score(stat);
 
         fprintf(f, "%s;%s;%.3f\n", id, driver_name, avg_score);
 
@@ -185,13 +190,13 @@ void query_2(int N, char *path, CATALOG *c)
  */
 gint compare_tot_dist(gconstpointer a, gconstpointer b)
 {
-    STAT *s1 = (STAT *)a;
-    STAT *s2 = (STAT *)b;
+    USER_STAT *s1 = (USER_STAT *)a;
+    USER_STAT *s2 = (USER_STAT *)b;
 
     int r;
 
-    int distance1 = get_stat_total_distance(s1);
-    int distance2 = get_stat_total_distance(s2);
+    int distance1 = get_user_stat_total_distance(s1);
+    int distance2 = get_user_stat_total_distance(s2);
 
     if (distance1 > distance2)
         r = -1;
@@ -199,8 +204,8 @@ gint compare_tot_dist(gconstpointer a, gconstpointer b)
         r = 1;
     else
     {
-        char *date1 = get_stat_most_recent_trip(s1);
-        char *date2 = get_stat_most_recent_trip(s2);
+        char *date1 = get_user_stat_most_recent_trip(s1);
+        char *date2 = get_user_stat_most_recent_trip(s2);
 
         int da = convert_date(date1);
         int db = convert_date(date2);
@@ -208,8 +213,8 @@ gint compare_tot_dist(gconstpointer a, gconstpointer b)
         free(date1);
         free(date2);
 
-        char *username1 = get_stat_username(s1);
-        char *username2 = get_stat_username(s2);
+        char *username1 = get_user_stat_username(s1);
+        char *username2 = get_user_stat_username(s2);
 
         if (da > db)
             r = -1;
@@ -240,12 +245,12 @@ void query_3(int N, char *path, CATALOG *c)
     FILE *f = fopen(path, "w");
 
     int acc;
-    STAT *stat;
+    USER_STAT *stat;
     for (acc = 0, stat = g_list_nth_data(list, acc); acc < N && stat != NULL; ++acc, stat = g_list_nth_data(list, acc))
     {
-        char *username = get_stat_username(stat);
-        char *user_name = get_stat_user_name(stat);
-        int tot_dist = get_stat_total_distance(stat);
+        char *username = get_user_stat_username(stat);
+        char *user_name = get_user_stat_user_name(stat);
+        int tot_dist = get_user_stat_total_distance(stat);
 
         fprintf(f, "%s;%s;%d\n", username, user_name, tot_dist);
 
@@ -262,7 +267,7 @@ void query_3(int N, char *path, CATALOG *c)
 
 void query_4(char *city, char *path, CATALOG *c)
 {
-    STAT *s = g_hash_table_lookup(get_catalog_city_stats(c), city);
+    CITY_STAT *s = g_hash_table_lookup(get_catalog_city_stats(c), city);
 
     FILE *f = fopen(path, "w");
 
@@ -272,7 +277,7 @@ void query_4(char *city, char *path, CATALOG *c)
         return;
     }
 
-    double avg_cost = get_stat_avg_cost(s);
+    double avg_cost = get_city_stat_avg_cost(s);
 
     fprintf(f, "%.3f\n", avg_cost);
 
@@ -296,13 +301,13 @@ void query_5(char *date_a, char *date_b, char *path, CATALOG *c)
 
 gint compare_avg_score_city(gconstpointer a, gconstpointer b)
 {
-    STAT *s1 = (STAT *)a;
-    STAT *s2 = (STAT *)b;
+    QUERY7_STAT *s1 = (QUERY7_STAT *)a;
+    QUERY7_STAT *s2 = (QUERY7_STAT *)b;
 
     int r;
 
-    double avg_score1 = get_stat_avg_score(s1);
-    double avg_score2 = get_stat_avg_score(s2);
+    double avg_score1 = get_query7_stat_avg_score(s1);
+    double avg_score2 = get_query7_stat_avg_score(s2);
 
     if (avg_score1 > avg_score2)
         r = -1;
@@ -310,8 +315,8 @@ gint compare_avg_score_city(gconstpointer a, gconstpointer b)
         r = 1;
     else
     {
-        char *id1 = get_stat_id(s1);
-        char *id2 = get_stat_id(s2);
+        char *id1 = get_query7_stat_id(s1);
+        char *id2 = get_query7_stat_id(s2);
 
         if (strcmp(id1, id2) > 0)
             r = -1;
@@ -336,12 +341,12 @@ void query_7(int N, char *city, char *path, CATALOG *c)
     FILE *f = fopen(path, "w");
 
     int acc;
-    STAT *stat;
-    for (acc = 0, stat = g_list_nth_data(list, acc); acc < N && stat != NULL; ++acc, stat = g_list_nth_data(list, acc)) 
+    QUERY7_STAT *stat;
+    for (acc = 0, stat = g_list_nth_data(list, acc); acc < N && stat != NULL; ++acc, stat = g_list_nth_data(list, acc))
     {
-        char *id = get_stat_id(stat);
-        char *driver_name = get_stat_driver_name(stat);
-        double avg_score = get_stat_avg_score(stat);
+        char *id = get_query7_stat_id(stat);
+        char *driver_name = get_query7_stat_driver_name(stat);
+        double avg_score = get_query7_stat_avg_score(stat);
 
         fprintf(f, "%s;%s;%.3f\n", id, driver_name, avg_score);
 
@@ -359,13 +364,13 @@ void query_7(int N, char *city, char *path, CATALOG *c)
 
 gint compare_query8_dates(gconstpointer a, gconstpointer b)
 {
-    STAT *s1 = (STAT *)a;
-    STAT *s2 = (STAT *)b;
+    QUERY8_STAT *s1 = (QUERY8_STAT *)a;
+    QUERY8_STAT *s2 = (QUERY8_STAT *)b;
 
     int r;
 
-    int age1_d = get_stat_acc_age_d(s1);
-    int age2_d = get_stat_acc_age_d(s2);
+    int age1_d = get_query8_stat_acc_age_d(s1);
+    int age2_d = get_query8_stat_acc_age_d(s2);
 
     if (age1_d > age2_d)
         r = -1;
@@ -373,8 +378,8 @@ gint compare_query8_dates(gconstpointer a, gconstpointer b)
         r = 1;
     else
     {
-        int age1_u = get_stat_acc_age_u(s1);
-        int age2_u = get_stat_acc_age_u(s2);
+        int age1_u = get_query8_stat_acc_age_u(s1);
+        int age2_u = get_query8_stat_acc_age_u(s2);
 
         if (age1_u > age2_u)
             r = -1;
@@ -382,8 +387,8 @@ gint compare_query8_dates(gconstpointer a, gconstpointer b)
             r = 1;
         else
         {
-            char *id1 = get_stat_ride_id(s1);
-            char *id2 = get_stat_ride_id(s2);
+            char *id1 = get_query8_stat_ride_id(s1);
+            char *id2 = get_query8_stat_ride_id(s2);
 
             r = strcmp(id1, id2);
 
@@ -405,15 +410,15 @@ void query_8(char *gender, int X, char *path, CATALOG *c)
 
     FILE *f = fopen(path, "w");
 
-    guint N = g_list_length(list);
+    int N = g_list_length(list);
 
     int acc;
-    STAT *stat;
+    QUERY8_STAT *stat;
     for (acc = 0, stat = g_list_nth_data(list, acc); acc < N; ++acc, stat = g_list_nth_data(list, acc)) 
     {
-        char *id = get_stat_id(stat);
+        char *id = get_query8_stat_id(stat);
         char *driver_name = get_driver_name(g_hash_table_lookup(get_catalog_drivers(c), id));
-        char *username = get_stat_username(stat);
+        char *username = get_query8_stat_username(stat);
         char *user_name = get_user_name(g_hash_table_lookup(get_catalog_users(c), username));
 
         fprintf(f, "%s;%s;%s;%s\n", id, driver_name, username, user_name);
