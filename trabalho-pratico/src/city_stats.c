@@ -17,21 +17,6 @@ struct stat
 
 // FUNÇÕES GET
 
-char *get_city_stat_city(CITY_STAT *s)
-{
-    return strdup(s->city);
-}
-
-int get_city_stat_trips(CITY_STAT *s)
-{
-    return s->trips;
-}
-
-double get_city_stat_money(CITY_STAT *s)
-{
-    return s->money;
-}
-
 double get_city_stat_avg_cost(CITY_STAT *s)
 {
     return s->avg_cost;

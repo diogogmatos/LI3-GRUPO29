@@ -5,6 +5,7 @@
 #include "../include/catalog.h"
 #include "../include/ride.h"
 #include "../include/stat.h"
+#include "../include/utils.h"
 
 /* Função `main()`
  * Recebe 2 argumentos, o primeiro é o caminho para o dataset a ser utilizado e o segundo é o
@@ -43,6 +44,8 @@ int main(int argc, char **argv)
 
     free(line);
     destroy_catalog(c);
+
+    display_stats();
 
     return 0;
 }
