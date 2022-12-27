@@ -13,6 +13,7 @@
 #include "../include/driver_stats.h"
 #include "../include/city_stats.h"
 #include "../include/query5_stats.h"
+#include "../include/query6_stats.h"
 #include "../include/query7_stats.h"
 #include "../include/query8_stats.h"
 
@@ -293,6 +294,19 @@ void query_5(char *date_a, char *date_b, char *path, CATALOG *c)
     FILE *f = fopen(path, "w");
 
     fprintf(f, "%.3f\n", avg_cost);
+
+    fclose(f);
+}
+
+// QUERY 6
+
+void query_6(char *city, char *date_a, char *date_b, char *path, CATALOG *c)
+{
+    double avg_distance = create_query6_stat(city, date_a, date_b, c);
+
+    FILE *f = fopen(path, "w");
+
+    fprintf(f, "%.3f\n", avg_distance);
 
     fclose(f);
 }
