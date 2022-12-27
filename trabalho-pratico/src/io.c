@@ -108,6 +108,18 @@ void handle_input(int query, char *input, CATALOG *c, int i)
         free(path);
         return;
     }
+case 9:
+    {
+        char *date_a = strsep(&input, " ");
+        char *date_b = strsep(&input, "\n");
+        char *path = get_results_path(i);
+
+        query_9(date_a, date_b, path, c);
+        printf("Output %d - [OK]\n", i);
+
+        free(path);
+        return;
+    }
     default:
     {
         char *path = get_results_path(i);
