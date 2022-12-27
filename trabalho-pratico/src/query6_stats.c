@@ -17,7 +17,7 @@ struct stat
 
 	int total_distance;
 	int trips;
-}
+};
 
 void build_query6_stat(gpointer key, gpointer value, gpointer userdata)
 {
@@ -33,6 +33,7 @@ void build_query6_stat(gpointer key, gpointer value, gpointer userdata)
 		s->trips += 1;
 	}
     free(date);
+    free(city);
 }
 
 double create_query6_stat(char *city, char *date_a, char *date_b, CATALOG *c)
