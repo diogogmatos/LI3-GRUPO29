@@ -73,7 +73,7 @@ void handle_input(int query, char *input, CATALOG *c, int i)
     }
     case 6:
     {
-        char *city = strsep (&input, " ");
+        char *city = strsep(&input, " ");
         char *date_a = strsep(&input, " ");
         char *date_b = strsep(&input, "\n");
         char *path = get_results_path(i);
@@ -108,7 +108,7 @@ void handle_input(int query, char *input, CATALOG *c, int i)
         free(path);
         return;
     }
-case 9:
+    case 9:
     {
         char *date_a = strsep(&input, " ");
         char *date_b = strsep(&input, "\n");

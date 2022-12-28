@@ -15,7 +15,7 @@
  */
 char *get_results_path(int i)
 {
-    char *path = malloc(sizeof(char) * 32);
+    char *path = malloc(sizeof(char) * 50);
     sprintf(path, "Resultados/command%d_output.txt", i);
 
     return path;
@@ -189,7 +189,6 @@ int get_age(char *date)
 
     return r;
 }
-
 
 int compare_dates(char *date1, char *date2)
 {

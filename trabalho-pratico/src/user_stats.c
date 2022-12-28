@@ -10,68 +10,68 @@
 
 struct stat
 {
-    char *username;
-    char *user_name;
-    char *gender;
-    int age;
-    double score;
-    double avg_score;
-    int trips;
-    double money;
-    int total_distance;
-    char *most_recent_trip;
+	char *username;
+	char *user_name;
+	char *gender;
+	int age;
+	double score;
+	double avg_score;
+	int trips;
+	double money;
+	int total_distance;
+	char *most_recent_trip;
 };
 
 // FUNÇÕES GET
 
 char *get_user_stat_username(USER_STAT *s)
 {
-    return strdup(s->username);
+	return strdup(s->username);
 }
 
 char *get_user_stat_user_name(USER_STAT *s)
 {
-    return strdup(s->user_name);
+	return strdup(s->user_name);
 }
 
 char *get_user_stat_gender(USER_STAT *s)
 {
-    return strdup(s->gender);
+	return strdup(s->gender);
 }
 
 int get_user_stat_age(USER_STAT *s)
 {
-    return s->age;
+	return s->age;
 }
 
 double get_user_stat_score(USER_STAT *s)
 {
-    return s->score;
+	return s->score;
 }
 
 double get_user_stat_avg_score(USER_STAT *s)
 {
-    return s->avg_score;
+	return s->avg_score;
 }
 
 int get_user_stat_trips(USER_STAT *s)
 {
-    return s->trips;
+	return s->trips;
 }
 
 double get_user_stat_money(USER_STAT *s)
 {
-    return s->money;
+	return s->money;
 }
 
 int get_user_stat_total_distance(USER_STAT *s)
 {
-    return s->total_distance;
+	return s->total_distance;
 }
 
 char *get_user_stat_most_recent_trip(USER_STAT *s)
 {
-    return strdup(s->most_recent_trip);
+	return strdup(s->most_recent_trip);
 }
 
 // FUNÇÕES DESTROY

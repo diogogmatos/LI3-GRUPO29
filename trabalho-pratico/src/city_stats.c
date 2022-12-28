@@ -9,17 +9,17 @@
 
 struct stat
 {
-    char *city;
-    int trips;
-    double money;
-    double avg_cost;
+	char *city;
+	int trips;
+	double money;
+	double avg_cost;
 };
 
 // FUNÇÕES GET
 
 double get_city_stat_avg_cost(CITY_STAT *s)
 {
-    return s->avg_cost;
+	return s->avg_cost;
 }
 
 // FUNÇÕES DESTROY

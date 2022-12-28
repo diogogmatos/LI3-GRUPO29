@@ -7,6 +7,7 @@
 #include "../include/catalog.h"
 #include "../include/query9_stats.h"
 #include "../include/utils.h"
+
 struct stat
 {
 	char *date_a;
@@ -21,14 +22,16 @@ struct stat
 	double tip;
 };
 
+// FUNÇÕES GET
+
 char *get_query9_stat_id(QUERY9_STAT *s)
 {
-    return strdup(s->id);
+	return strdup(s->id);
 }
 
 char *get_query9_stat_date(QUERY9_STAT *s)
 {
-    return strdup(s->date);
+	return strdup(s->date);
 }
 
 char *get_query9_stat_city(QUERY9_STAT *s)
@@ -38,7 +41,7 @@ char *get_query9_stat_city(QUERY9_STAT *s)
 
 int get_query9_distance(QUERY9_STAT *s)
 {
-    return s->distance;
+	return s->distance;
 }
 
 double get_query9_tip(QUERY9_STAT *s)
@@ -46,15 +49,19 @@ double get_query9_tip(QUERY9_STAT *s)
 	return s->tip;
 }
 
+// FUNÇÕES DESTROY
+
 void destroy_query9_stat(void *v)
 {
-    QUERY9_STAT *s = v;
+	QUERY9_STAT *s = v;
 
-    free(s->id);
-    free(s->date);
-    free(s->city);
-    free(s);
+	free(s->id);
+	free(s->date);
+	free(s->city);
+	free(s);
 }
+
+// FUNÇÕES DE CRIAÇÃO DE ESTATÍSTICAS
 
 void build_query9_stat(gpointer key, gpointer value, gpointer userdata)
 {
@@ -63,18 +70,22 @@ void build_query9_stat(gpointer key, gpointer value, gpointer userdata)
 	double tip = get_ride_tip(r);
 	char *date = get_ride_date(r);
 
-	if ((tip > 0) && (compare_dates(s->date_a, date) <= 0) && (compare_dates(date, s->date_b) <= 0))
-		{
-			QUERY9_STAT *ride_stat = malloc(sizeof(QUERY9_STAT));
+	if (tip > 0 && compare_dates(s->date_a, date) <= 0 && compare_dates(date, s->date_b) <= 0)
+	{
+		QUERY9_STAT *ride_stat = malloc(sizeof(QUERY9_STAT));
 
-			ride_stat->id = get_ride_id(r);
-			ride_stat->date = date;
-			ride_stat->city = get_ride_city(r);
-			ride_stat->distance = get_ride_distance(r);
-			ride_stat->tip = tip;
+		ride_stat->id = get_ride_id(r);
+		ride_stat->date = date;
+		ride_stat->distance = get_ride_distance(r);
+		ride_stat->city = get_ride_city(r);
+		ride_stat->tip = tip;
 
-			g_hash_table_insert(s->ht, ride_stat->id, ride_stat);
-		}
+		g_hash_table_insert(s->ht, ride_stat->id, ride_stat);
+	}
+	else
+	{
+		free(date);
+	}
 }
 
 void create_query9_stats(GHashTable *query9_stats, char *date_a, char *date_b, CATALOG *c)

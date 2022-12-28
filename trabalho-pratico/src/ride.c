@@ -126,7 +126,7 @@ void destroy_ride(void *v)
  * Responsável por fazer o parsing do ficheiro rides.csv. Para cada linha do ficheiro, cria uma struct RIDE
  * com os dados da linha e adiciona-a à hash table `rides`. No fim da execução, liberta a memória alocada e retorna
  * a hash table criada, isto é, um apontador para mesma.
- * 
+ *
  * Usada também para inicializar as funções `create_driver_stat()` e `create_user_stat()` de criação das hash tables de
  * estatísticas para os users e para os drivers, em cada linha.
  */

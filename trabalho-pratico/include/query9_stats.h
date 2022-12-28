@@ -16,7 +16,7 @@ double get_query9_tip(QUERY9_STAT *s);
 
 // FUNÇÕES DESTROY
 
-void destroy_query8_stat(void *v);
+void destroy_query9_stat(void *v);
 
 // FUNÇÕES DE CRIAÇÃO DE ESTATÍSTICAS
 

@@ -9,29 +9,29 @@
 
 struct stat
 {
-    char *id;
-    char *driver_name;
-    char *gender;
-    int age;
-    char *city;
-    double score;
-    double avg_score;
-    int trips;
-    double money;
-    int total_distance;
-    char *most_recent_trip;
+	char *id;
+	char *driver_name;
+	char *gender;
+	int age;
+	char *city;
+	double score;
+	double avg_score;
+	int trips;
+	double money;
+	int total_distance;
+	char *most_recent_trip;
 };
 
 // FUNÇÕES GET
 
 char *get_driver_stat_id(DRIVER_STAT *s)
 {
-    return strdup(s->id);
+	return strdup(s->id);
 }
 
 char *get_driver_stat_driver_name(DRIVER_STAT *s)
 {
-    return strdup(s->driver_name);
+	return strdup(s->driver_name);
 }
 
 char *get_driver_stat_gender(DRIVER_STAT *s)
