@@ -11,43 +11,43 @@
 
 struct stat
 {
-    GHashTable *ht;
-    char *gender;
-    int age;
-    CATALOG *c;
+	GHashTable *ht;
+	char *gender;
+	int age;
+	CATALOG *c;
 
-    char *ride_id;
-    char *id;
-    char *username;
-    int acc_age_d;
-    int acc_age_u;
+	char *ride_id;
+	char *id;
+	char *username;
+	int acc_age_d;
+	int acc_age_u;
 };
 
 // FUNÇÕES GET
 
 char *get_query8_stat_ride_id(QUERY8_STAT *s)
 {
-    return strdup(s->ride_id);
+	return strdup(s->ride_id);
 }
 
 char *get_query8_stat_id(QUERY8_STAT *s)
 {
-    return strdup(s->id);
+	return strdup(s->id);
 }
 
 char *get_query8_stat_username(QUERY8_STAT *s)
 {
-    return strdup(s->username);
+	return strdup(s->username);
 }
 
 int get_query8_stat_acc_age_d(QUERY8_STAT *s)
 {
-    return s->acc_age_d;
+	return s->acc_age_d;
 }
 
 int get_query8_stat_acc_age_u(QUERY8_STAT *s)
 {
-    return s->acc_age_u;
+	return s->acc_age_u;
 }
 
 // FUNÇÕES DESTROY
@@ -128,7 +128,7 @@ void create_query8_stats(GHashTable *query8_stats, char *gender, int X, CATALOG 
 {
 	QUERY8_STAT *s = malloc(sizeof(QUERY8_STAT));
 
-    s->ht = query8_stats;
+	s->ht = query8_stats;
 	s->gender = gender;
 	s->age = X;
 	s->c = c;

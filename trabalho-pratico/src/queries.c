@@ -16,6 +16,7 @@
 #include "../include/query6_stats.h"
 #include "../include/query7_stats.h"
 #include "../include/query8_stats.h"
+#include "../include/query9_stats.h"
 
 // QUERY 1
 
@@ -418,9 +419,9 @@ void query_8(char *gender, int X, char *path, CATALOG *c)
 {
     GHashTable *query8_stats = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, destroy_query8_stat);
     create_query8_stats(query8_stats, gender, X, c);
-    
+
     GList *list = g_hash_table_get_values(query8_stats);
-    list = g_list_sort(list, compare_query8_dates); 
+    list = g_list_sort(list, compare_query8_dates);
 
     FILE *f = fopen(path, "w");
 
@@ -428,7 +429,7 @@ void query_8(char *gender, int X, char *path, CATALOG *c)
 
     int acc;
     QUERY8_STAT *stat;
-    for (acc = 0, stat = g_list_nth_data(list, acc); acc < N; ++acc, stat = g_list_nth_data(list, acc)) 
+    for (acc = 0, stat = g_list_nth_data(list, acc); acc < N; ++acc, stat = g_list_nth_data(list, acc))
     {
         char *id = get_query8_stat_id(stat);
         char *driver_name = get_driver_name(g_hash_table_lookup(get_catalog_drivers(c), id));
@@ -440,13 +441,94 @@ void query_8(char *gender, int X, char *path, CATALOG *c)
         free(id);
         free(driver_name);
         free(username);
-        free(user_name); 
+        free(user_name);
     }
 
     fclose(f);
 
     g_list_free(list);
     g_hash_table_destroy(query8_stats);
+}
+
+// QUERY 9
+
+gint compare_query9_rides(gconstpointer a, gconstpointer b)
+{
+    QUERY9_STAT *s1 = (QUERY9_STAT *)a;
+    QUERY9_STAT *s2 = (QUERY9_STAT *)b;
+
+    int r;
+
+    int distance1 = get_query9_distance(s1);
+    int distance2 = get_query9_distance(s2);
+
+    if (distance1 > distance2)
+        r = -1;
+    else if (distance1 < distance2)
+        r = 1;
+    else
+    {
+        char *date1 = get_query9_stat_date(s1);
+        char *date2 = get_query9_stat_date(s2);
+
+        if (compare_dates(date1, date2) > 0)
+            r = -1;
+        else if (compare_dates(date1, date2) < 0)
+            r = 1;
+        else
+        {
+            char *id1 = get_query9_stat_id(s1);
+            char *id2 = get_query9_stat_id(s2);
+
+            if (strcmp(id1, id2) > 0)
+                r = -1;
+            else
+                r = 1;
+
+            free(id1);
+            free(id2);
+        }
+
+        free(date1);
+        free(date2);
+    }
+
+    return r;
+}
+
+void query_9(char *date_a, char *date_b, char *path, CATALOG *c)
+{
+    GHashTable *query9_stats = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, destroy_query9_stat);
+    create_query9_stats(query9_stats, date_a, date_b, c);
+
+    GList *list = g_hash_table_get_values(query9_stats);
+    list = g_list_sort(list, compare_query9_rides);
+
+    FILE *f = fopen(path, "w");
+
+    int N = g_list_length(list);
+
+    int acc;
+    QUERY9_STAT *stat;
+    for (acc = 0, stat = g_list_nth_data(list, acc); acc < N; ++acc, stat = g_list_nth_data(list, acc))
+    {
+        char *id = get_query9_stat_id(stat);
+        char *date = get_query9_stat_date(stat);
+        int distance = get_query9_distance(stat);
+        char *city = get_query9_stat_city(stat);
+        double tip = get_query9_tip(stat);
+
+        fprintf(f, "%s;%s;%d;%s;%.3f\n", id, date, distance, city, tip);
+
+        free(id);
+        free(date);
+        free(city);
+    }
+
+    fclose(f);
+
+    g_list_free(list);
+    g_hash_table_destroy(query9_stats);
 }
 
 // QUERY INVÁLIDA

@@ -12,6 +12,7 @@ void query_5(char *date_a, char *date_b, char *path, CATALOG *c);
 void query_6(char *city, char *date_a, char *date_b, char *path, CATALOG *c);
 void query_7(int N, char *city, char *path, CATALOG *c);
 void query_8(char *gender, int X, char *path, CATALOG *c);
+void query_9(char *date_a, char *date_b, char *path, CATALOG *c);
 void invalid_query(char *path);
 
 #endif

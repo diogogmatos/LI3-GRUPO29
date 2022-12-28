@@ -19,6 +19,8 @@ struct stat
 	int trips;
 };
 
+// FUNÇÕES DE CRIAÇÃO DE ESTATÍSTICAS
+
 void build_query6_stat(gpointer key, gpointer value, gpointer userdata)
 {
 	RIDE *r = value;

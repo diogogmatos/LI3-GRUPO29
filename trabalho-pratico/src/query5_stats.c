@@ -10,12 +10,12 @@
 
 struct stat
 {
-    char* date_a;
-    char* date_b;
-    CATALOG* c;
+	char *date_a;
+	char *date_b;
+	CATALOG *c;
 
-    double money;
-    int trips;
+	double money;
+	int trips;
 };
 
 // FUNÇÕES DE CRIAÇÃO DE ESTATÍSTICAS
@@ -34,17 +34,17 @@ void build_query5_stat(gpointer key, gpointer value, gpointer userdata)
 
 		int distance = get_ride_distance(r);
 
-        s->money += get_price(d) + get_tax(d) * distance;
+		s->money += get_price(d) + get_tax(d) * distance;
 		s->trips += 1;
 
 		free(id);
 	}
-    free(date);
+	free(date);
 }
 
 double create_query5_stat(char *date_a, char *date_b, CATALOG *c)
 {
-	QUERY5_STAT *s = malloc(sizeof(QUERY5_STAT)); 
+	QUERY5_STAT *s = malloc(sizeof(QUERY5_STAT));
 	double r, money, trips;
 
 	s->date_a = date_a;
