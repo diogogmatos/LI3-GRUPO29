@@ -9,15 +9,18 @@
 
 struct stat
 {
-    char *city;
-    CATALOG *c;
-    GHashTable *ht;
-
     char *id;
     char *driver_name;
     int trips;
     double score;
     double avg_score;
+};
+
+struct aux
+{
+    char *city;
+    CATALOG *c;
+    GHashTable *ht;
 };
 
 // FUNÇÕES GET
@@ -53,7 +56,7 @@ void destroy_query7_stat(void *v)
 void build_query7_stat(gpointer key, gpointer value, gpointer userdata)
 {
     RIDE *r = value;
-    QUERY7_STAT *s = userdata;
+    QUERY7_AUX *s = userdata;
 
     char *id = get_ride_driver(r);
     DRIVER *d = g_hash_table_lookup(get_catalog_drivers(s->c), id);
@@ -104,7 +107,7 @@ void build_query7_stat(gpointer key, gpointer value, gpointer userdata)
 
 void create_query7_stats(GHashTable *query7_stats, char *city, CATALOG *c)
 {
-    QUERY7_STAT *s = malloc(sizeof(QUERY7_STAT)); // Usada para passar valores à função `create_query7_stat()`
+    QUERY7_AUX *s = malloc(sizeof(QUERY7_AUX)); // Usada para passar valores à função `create_query7_stat()`
 
     s->ht = query7_stats;
     s->city = city;

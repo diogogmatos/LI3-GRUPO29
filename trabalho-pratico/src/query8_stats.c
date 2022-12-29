@@ -11,16 +11,19 @@
 
 struct stat
 {
-	GHashTable *ht;
-	char *gender;
-	int age;
-	CATALOG *c;
-
 	char *ride_id;
 	char *id;
 	char *username;
 	int acc_age_d;
 	int acc_age_u;
+};
+
+struct aux
+{
+	GSList *list;
+	char *gender;
+	int age;
+	CATALOG *c;
 };
 
 // FUNÇÕES GET
@@ -67,7 +70,7 @@ void destroy_query8_stat(void *v)
 void build_query8_stat(gpointer key, gpointer value, gpointer userdata)
 {
 	RIDE *r = value;
-	QUERY8_STAT *s = userdata;
+	QUERY8_AUX *s = userdata;
 
 	char *id = get_ride_driver(r);
 	DRIVER *d = g_hash_table_lookup(get_catalog_drivers(s->c), id);
@@ -101,7 +104,7 @@ void build_query8_stat(gpointer key, gpointer value, gpointer userdata)
 			ride_stat->acc_age_d = aged;
 			ride_stat->acc_age_u = ageu;
 
-			g_hash_table_insert(s->ht, ride_stat->ride_id, ride_stat);
+			s->list = g_slist_append(s->list, ride_stat);
 		}
 		else
 		{
@@ -124,16 +127,22 @@ void build_query8_stat(gpointer key, gpointer value, gpointer userdata)
 	free(account_status_u);
 }
 
-void create_query8_stats(GHashTable *query8_stats, char *gender, int X, CATALOG *c)
+GSList *create_query8_stats(char *gender, int X, CATALOG *c)
 {
-	QUERY8_STAT *s = malloc(sizeof(QUERY8_STAT));
+	GSList *r;
+	
+	QUERY8_AUX *s = malloc(sizeof(QUERY8_AUX));
 
-	s->ht = query8_stats;
+	s->list = NULL;
 	s->gender = gender;
 	s->age = X;
 	s->c = c;
 
 	g_hash_table_foreach(get_catalog_rides(c), build_query8_stat, s);
 
+	r = s->list;
+
 	free(s);
+
+	return r;
 }

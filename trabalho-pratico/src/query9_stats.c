@@ -10,16 +10,19 @@
 
 struct stat
 {
-	char *date_a;
-	char *date_b;
-	CATALOG *c;
-	GHashTable *ht;
-
 	char *id;
 	char *date;
 	char *city;
 	int distance;
 	double tip;
+};
+
+struct aux
+{
+	char *date_a;
+	char *date_b;
+	CATALOG *c;
+	GSList *list;
 };
 
 // FUNÇÕES GET
@@ -39,12 +42,12 @@ char *get_query9_stat_city(QUERY9_STAT *s)
 	return strdup(s->city);
 }
 
-int get_query9_distance(QUERY9_STAT *s)
+int get_query9_stat_distance(QUERY9_STAT *s)
 {
 	return s->distance;
 }
 
-double get_query9_tip(QUERY9_STAT *s)
+double get_query9_stat_tip(QUERY9_STAT *s)
 {
 	return s->tip;
 }
@@ -66,7 +69,8 @@ void destroy_query9_stat(void *v)
 void build_query9_stat(gpointer key, gpointer value, gpointer userdata)
 {
 	RIDE *r = value;
-	QUERY9_STAT *s = userdata;
+	QUERY9_AUX *s = userdata;
+
 	double tip = get_ride_tip(r);
 	char *date = get_ride_date(r);
 
@@ -80,7 +84,7 @@ void build_query9_stat(gpointer key, gpointer value, gpointer userdata)
 		ride_stat->city = get_ride_city(r);
 		ride_stat->tip = tip;
 
-		g_hash_table_insert(s->ht, ride_stat->id, ride_stat);
+		s->list = g_slist_append(s->list, ride_stat);
 	}
 	else
 	{
@@ -88,16 +92,22 @@ void build_query9_stat(gpointer key, gpointer value, gpointer userdata)
 	}
 }
 
-void create_query9_stats(GHashTable *query9_stats, char *date_a, char *date_b, CATALOG *c)
+GSList *create_query9_stats(char *date_a, char *date_b, CATALOG *c)
 {
-	QUERY9_STAT *s = malloc(sizeof(QUERY9_STAT));
+	GSList *r;
+	
+	QUERY9_AUX *s = malloc(sizeof(QUERY9_AUX));
 
-	s->ht = query9_stats;
+	s->list = NULL;
 	s->date_a = date_a;
 	s->date_b = date_b;
 	s->c = c;
 
 	g_hash_table_foreach(get_catalog_rides(c), build_query9_stat, s);
 
+	r = s->list;
+	
 	free(s);
+
+	return r;
 }

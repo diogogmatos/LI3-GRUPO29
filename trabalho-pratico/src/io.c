@@ -21,7 +21,7 @@ void handle_input(int query, char *input, CATALOG *c, int i)
         char *path = get_results_path(i);
 
         query_1(is_id, value, path, c);
-        printf("Output %d - [OK]\n", i);
+        printf("Output %d - Query %d - [OK]\n", i, query);
 
         free(path);
         return;
@@ -32,7 +32,7 @@ void handle_input(int query, char *input, CATALOG *c, int i)
         char *path = get_results_path(i);
 
         query_2(N, path, c);
-        printf("Output %d - [OK]\n", i);
+        printf("Output %d - Query %d - [OK]\n", i, query);
 
         free(path);
         return;
@@ -43,7 +43,7 @@ void handle_input(int query, char *input, CATALOG *c, int i)
         char *path = get_results_path(i);
 
         query_3(N, path, c);
-        printf("Output %d - [OK]\n", i);
+        printf("Output %d - Query %d - [OK]\n", i, query);
 
         free(path);
         return;
@@ -54,7 +54,7 @@ void handle_input(int query, char *input, CATALOG *c, int i)
         char *path = get_results_path(i);
 
         query_4(city, path, c);
-        printf("Output %d - [OK]\n", i);
+        printf("Output %d - Query %d - [OK]\n", i, query);
 
         free(path);
         return;
@@ -66,7 +66,7 @@ void handle_input(int query, char *input, CATALOG *c, int i)
         char *path = get_results_path(i);
 
         query_5(date_a, date_b, path, c);
-        printf("Output %d - [OK]\n", i);
+        printf("Output %d - Query %d - [OK]\n", i, query);
 
         free(path);
         return;
@@ -79,7 +79,7 @@ void handle_input(int query, char *input, CATALOG *c, int i)
         char *path = get_results_path(i);
 
         query_6(city, date_a, date_b, path, c);
-        printf("Output %d - [OK]\n", i);
+        printf("Output %d - Query %d - [OK]\n", i, query);
 
         free(path);
         return;
@@ -91,7 +91,7 @@ void handle_input(int query, char *input, CATALOG *c, int i)
         char *path = get_results_path(i);
 
         query_7(N, city, path, c);
-        printf("Output %d - [OK]\n", i);
+        printf("Output %d - Query %d - [OK]\n", i, query);
 
         free(path);
         return;
@@ -103,7 +103,7 @@ void handle_input(int query, char *input, CATALOG *c, int i)
         char *path = get_results_path(i);
 
         query_8(gender, X, path, c);
-        printf("Output %d - [OK]\n", i);
+        printf("Output %d - Query %d - [OK]\n", i, query);
 
         free(path);
         return;
@@ -115,7 +115,7 @@ void handle_input(int query, char *input, CATALOG *c, int i)
         char *path = get_results_path(i);
 
         query_9(date_a, date_b, path, c);
-        printf("Output %d - [OK]\n", i);
+        printf("Output %d - Query %d - [OK]\n", i, query);
 
         free(path);
         return;
@@ -125,7 +125,7 @@ void handle_input(int query, char *input, CATALOG *c, int i)
         char *path = get_results_path(i);
 
         invalid_query(path);
-        printf("Output %d - [ERRO: Query Inexistente %d]\n", i, query);
+        printf("Output %d - Query %d - [ERRO: Query Inexistente]\n", i, query);
 
         free(path);
         return;

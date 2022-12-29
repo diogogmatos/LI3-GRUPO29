@@ -142,7 +142,7 @@ void create_driver_stat(RIDE *r, GHashTable *d_stats, GHashTable *drivers)
 			dl->money += tip + get_price(d) + get_tax(d) * distance;
 			dl->total_distance += distance;
 
-			if (convert_date(date) > convert_date(dl->most_recent_trip))
+			if (compare_dates(date, dl->most_recent_trip) > 0)
 			{
 				free(dl->most_recent_trip);
 				dl->most_recent_trip = date;

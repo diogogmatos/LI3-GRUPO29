@@ -127,24 +127,25 @@ gint compare_avg_score(gconstpointer a, gconstpointer b)
         char *date1 = get_driver_stat_most_recent_trip(s1);
         char *date2 = get_driver_stat_most_recent_trip(s2);
 
-        int da = convert_date(date1);
-        int db = convert_date(date2);
+        int dc = compare_dates(date1, date2);
+
+        if (dc > 0)
+            r = -1;
+        else if (dc < 0)
+            r = 1;
+        else
+        {
+            char *id1 = get_driver_stat_id(s1);
+            char *id2 = get_driver_stat_id(s2);
+
+            r = strcmp(id1, id2);
+
+            free(id1);
+            free(id2);
+        }
 
         free(date1);
         free(date2);
-
-        char *id1 = get_driver_stat_id(s1);
-        char *id2 = get_driver_stat_id(s2);
-
-        if (da > db)
-            r = -1;
-        else if (da < db)
-            r = 1;
-        else
-            r = strcmp(id1, id2);
-
-        free(id1);
-        free(id2);
     }
 
     return r;
@@ -165,13 +166,13 @@ void query_2(int N, char *path, CATALOG *c)
     FILE *f = fopen(path, "w");
 
     int acc;
-    DRIVER_STAT *stat;
-    for (acc = 0, stat = g_list_nth_data(list, acc); acc < N && stat != NULL; ++acc, stat = g_list_nth_data(list, acc))
+    GList *iterator;
+    for (acc = 0, iterator = list; acc < N && iterator; ++acc, iterator = iterator->next)
     {
-        char *id = get_driver_stat_id(stat);
-        char *driver_name = get_driver_stat_driver_name(stat);
+        char *id = get_driver_stat_id(iterator->data);
+        char *driver_name = get_driver_stat_driver_name(iterator->data);
 
-        double avg_score = get_driver_stat_avg_score(stat);
+        double avg_score = get_driver_stat_avg_score(iterator->data);
 
         fprintf(f, "%s;%s;%.3f\n", id, driver_name, avg_score);
 
@@ -209,24 +210,25 @@ gint compare_tot_dist(gconstpointer a, gconstpointer b)
         char *date1 = get_user_stat_most_recent_trip(s1);
         char *date2 = get_user_stat_most_recent_trip(s2);
 
-        int da = convert_date(date1);
-        int db = convert_date(date2);
+        int dc = compare_dates(date1, date2);
+
+        if (dc > 0)
+            r = -1;
+        else if (dc < 0)
+            r = 1;
+        else
+        {
+            char *username1 = get_user_stat_username(s1);
+            char *username2 = get_user_stat_username(s2);
+
+            r = strcmp(username1, username2);
+
+            free(username1);
+            free(username2);
+        }
 
         free(date1);
         free(date2);
-
-        char *username1 = get_user_stat_username(s1);
-        char *username2 = get_user_stat_username(s2);
-
-        if (da > db)
-            r = -1;
-        else if (da < db)
-            r = 1;
-        else
-            r = strcmp(username1, username2);
-
-        free(username1);
-        free(username2);
     }
 
     return r;
@@ -247,12 +249,12 @@ void query_3(int N, char *path, CATALOG *c)
     FILE *f = fopen(path, "w");
 
     int acc;
-    USER_STAT *stat;
-    for (acc = 0, stat = g_list_nth_data(list, acc); acc < N && stat != NULL; ++acc, stat = g_list_nth_data(list, acc))
+    GList *iterator;
+    for (acc = 0, iterator = list; acc < N && iterator; ++acc, iterator = iterator->next)
     {
-        char *username = get_user_stat_username(stat);
-        char *user_name = get_user_stat_user_name(stat);
-        int tot_dist = get_user_stat_total_distance(stat);
+        char *username = get_user_stat_username(iterator->data);
+        char *user_name = get_user_stat_user_name(iterator->data);
+        int tot_dist = get_user_stat_total_distance(iterator->data);
 
         fprintf(f, "%s;%s;%d\n", username, user_name, tot_dist);
 
@@ -356,12 +358,12 @@ void query_7(int N, char *city, char *path, CATALOG *c)
     FILE *f = fopen(path, "w");
 
     int acc;
-    QUERY7_STAT *stat;
-    for (acc = 0, stat = g_list_nth_data(list, acc); acc < N && stat != NULL; ++acc, stat = g_list_nth_data(list, acc))
+    GList *iterator;
+    for (acc = 0, iterator = list; acc < N && iterator; ++acc, iterator = iterator->next)
     {
-        char *id = get_query7_stat_id(stat);
-        char *driver_name = get_query7_stat_driver_name(stat);
-        double avg_score = get_query7_stat_avg_score(stat);
+        char *id = get_query7_stat_id(iterator->data);
+        char *driver_name = get_query7_stat_driver_name(iterator->data);
+        double avg_score = get_query7_stat_avg_score(iterator->data);
 
         fprintf(f, "%s;%s;%.3f\n", id, driver_name, avg_score);
 
@@ -417,23 +419,17 @@ gint compare_query8_dates(gconstpointer a, gconstpointer b)
 
 void query_8(char *gender, int X, char *path, CATALOG *c)
 {
-    GHashTable *query8_stats = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, destroy_query8_stat);
-    create_query8_stats(query8_stats, gender, X, c);
-
-    GList *list = g_hash_table_get_values(query8_stats);
-    list = g_list_sort(list, compare_query8_dates);
+    GSList *query8_stats = create_query8_stats(gender, X, c);
+    query8_stats = g_slist_sort(query8_stats, compare_query8_dates);
 
     FILE *f = fopen(path, "w");
 
-    int N = g_list_length(list);
-
-    int acc;
-    QUERY8_STAT *stat;
-    for (acc = 0, stat = g_list_nth_data(list, acc); acc < N; ++acc, stat = g_list_nth_data(list, acc))
+    GSList *iterator;
+    for (iterator = query8_stats; iterator; iterator = iterator->next)
     {
-        char *id = get_query8_stat_id(stat);
+        char *id = get_query8_stat_id(iterator->data);
         char *driver_name = get_driver_name(g_hash_table_lookup(get_catalog_drivers(c), id));
-        char *username = get_query8_stat_username(stat);
+        char *username = get_query8_stat_username(iterator->data);
         char *user_name = get_user_name(g_hash_table_lookup(get_catalog_users(c), username));
 
         fprintf(f, "%s;%s;%s;%s\n", id, driver_name, username, user_name);
@@ -446,8 +442,7 @@ void query_8(char *gender, int X, char *path, CATALOG *c)
 
     fclose(f);
 
-    g_list_free(list);
-    g_hash_table_destroy(query8_stats);
+    g_slist_free_full(query8_stats, destroy_query8_stat);
 }
 
 // QUERY 9
@@ -459,8 +454,8 @@ gint compare_query9_rides(gconstpointer a, gconstpointer b)
 
     int r;
 
-    int distance1 = get_query9_distance(s1);
-    int distance2 = get_query9_distance(s2);
+    int distance1 = get_query9_stat_distance(s1);
+    int distance2 = get_query9_stat_distance(s2);
 
     if (distance1 > distance2)
         r = -1;
@@ -498,25 +493,19 @@ gint compare_query9_rides(gconstpointer a, gconstpointer b)
 
 void query_9(char *date_a, char *date_b, char *path, CATALOG *c)
 {
-    GHashTable *query9_stats = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, destroy_query9_stat);
-    create_query9_stats(query9_stats, date_a, date_b, c);
-
-    GList *list = g_hash_table_get_values(query9_stats);
-    list = g_list_sort(list, compare_query9_rides);
+    GSList *query9_stats = create_query9_stats(date_a, date_b, c);
+    query9_stats = g_slist_sort(query9_stats, compare_query9_rides);
 
     FILE *f = fopen(path, "w");
 
-    int N = g_list_length(list);
-
-    int acc;
-    QUERY9_STAT *stat;
-    for (acc = 0, stat = g_list_nth_data(list, acc); acc < N; ++acc, stat = g_list_nth_data(list, acc))
+    GSList *iterator;
+    for (iterator = query9_stats; iterator; iterator = iterator->next)
     {
-        char *id = get_query9_stat_id(stat);
-        char *date = get_query9_stat_date(stat);
-        int distance = get_query9_distance(stat);
-        char *city = get_query9_stat_city(stat);
-        double tip = get_query9_tip(stat);
+        char *id = get_query9_stat_id(iterator->data);
+        char *date = get_query9_stat_date(iterator->data);
+        int distance = get_query9_stat_distance(iterator->data);
+        char *city = get_query9_stat_city(iterator->data);
+        double tip = get_query9_stat_tip(iterator->data);
 
         fprintf(f, "%s;%s;%d;%s;%.3f\n", id, date, distance, city, tip);
 
@@ -527,8 +516,7 @@ void query_9(char *date_a, char *date_b, char *path, CATALOG *c)
 
     fclose(f);
 
-    g_list_free(list);
-    g_hash_table_destroy(query9_stats);
+    g_slist_free_full(query9_stats, destroy_query9_stat);
 }
 
 // QUERY INVÁLIDA

@@ -5,6 +5,7 @@
 #include "catalog.h"
 
 typedef struct stat QUERY7_STAT;
+typedef struct aux QUERY7_AUX;
 
 // FUNÇÕES GET
 

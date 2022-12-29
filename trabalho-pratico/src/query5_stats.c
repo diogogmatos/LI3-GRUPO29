@@ -27,7 +27,7 @@ void build_query5_stat(gpointer key, gpointer value, gpointer userdata)
 
 	char *date = get_ride_date(r);
 
-	if ((compare_dates(s->date_a, date) <= 0) && (compare_dates(date, s->date_b) <= 0)) // Apenas considerados os valores de viagens efetuadas entre as datas referidas
+	if (compare_dates(s->date_a, date) <= 0 && compare_dates(date, s->date_b) <= 0) // Apenas considerados os valores de viagens efetuadas entre as datas referidas
 	{
 		char *id = get_ride_driver(r);
 		DRIVER *d = g_hash_table_lookup(get_catalog_drivers(s->c), id);
@@ -45,7 +45,7 @@ void build_query5_stat(gpointer key, gpointer value, gpointer userdata)
 double create_query5_stat(char *date_a, char *date_b, CATALOG *c)
 {
 	QUERY5_STAT *s = malloc(sizeof(QUERY5_STAT));
-	double r, money, trips;
+	double r;
 
 	s->date_a = date_a;
 	s->date_b = date_b;
@@ -56,9 +56,7 @@ double create_query5_stat(char *date_a, char *date_b, CATALOG *c)
 
 	g_hash_table_foreach(get_catalog_rides(c), build_query5_stat, s);
 
-	money = s->money;
-	trips = s->trips;
-	r = money / trips;
+	r = (double)s->money / (double)s->trips;
 
 	free(s);
 

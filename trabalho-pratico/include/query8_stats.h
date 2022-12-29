@@ -5,6 +5,7 @@
 #include "catalog.h"
 
 typedef struct stat QUERY8_STAT;
+typedef struct aux QUERY8_AUX;
 
 // FUNÇÕES GET
 
@@ -20,6 +21,6 @@ void destroy_query8_stat(void *v);
 
 // FUNÇÕES DE CRIAÇÃO DE ESTATÍSTICAS
 
-void create_query8_stats(GHashTable *query8_stats, char *gender, int X, CATALOG *c);
+GSList *create_query8_stats(char *gender, int X, CATALOG *c);
 
 #endif

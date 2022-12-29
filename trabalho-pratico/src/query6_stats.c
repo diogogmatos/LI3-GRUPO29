@@ -29,11 +29,12 @@ void build_query6_stat(gpointer key, gpointer value, gpointer userdata)
 	char *date = get_ride_date(r);
 	char *city = get_ride_city(r);
 
-	if ((!strcmp(city, s->city)) && (compare_dates(s->date_a, date) <= 0) && (compare_dates(date, s->date_b) <= 0)) // Apenas considerados os valores de viagens efetuadas entre as datas referidas numa determinada cidade
+	if (!strcmp(city, s->city) && compare_dates(s->date_a, date) <= 0 && compare_dates(date, s->date_b) <= 0) // Apenas considerados os valores de viagens efetuadas entre as datas referidas numa determinada cidade
 	{
         s->total_distance += get_ride_distance(r);
 		s->trips += 1;
 	}
+	
     free(date);
     free(city);
 }

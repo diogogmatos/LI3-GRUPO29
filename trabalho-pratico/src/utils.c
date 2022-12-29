@@ -214,9 +214,13 @@ void display_stats()
     // Get the current memory usage
     struct rusage usage;
     getrusage(RUSAGE_SELF, &usage);
-    printf("\nMemory usage: %ld megabytes\n", usage.ru_maxrss / 1000);
+    printf("\nMemory usage: %ld MiB\n", usage.ru_maxrss / 1024);
 
     // Get the current CPU time
     clock_t clock_time = clock();
-    printf("CPU time: %ld seconds\n", clock_time / CLOCKS_PER_SEC);
+    long clock_time_sec = clock_time / CLOCKS_PER_SEC;
+    if (clock_time_sec < 60)
+        printf("CPU time: %ld seconds\n", clock_time_sec);
+    else
+        printf("CPU time: %ld minutes and %ld seconds\n", clock_time_sec / 60, clock_time_sec % 60);
 }
