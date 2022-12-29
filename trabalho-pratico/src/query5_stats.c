@@ -39,6 +39,7 @@ void build_query5_stat(gpointer key, gpointer value, gpointer userdata)
 
 		free(id);
 	}
+
 	free(date);
 }
 
@@ -56,7 +57,10 @@ double create_query5_stat(char *date_a, char *date_b, CATALOG *c)
 
 	g_hash_table_foreach(get_catalog_rides(c), build_query5_stat, s);
 
-	r = (double)s->money / (double)s->trips;
+	if (s->money == 0) // não temos de verificar se s->trips == 0, pois se s->money == 0, então s->trips == 0 (e vice-versa)
+		r = -1;
+	else
+		r = (double)s->money / (double)s->trips;
 
 	free(s);
 

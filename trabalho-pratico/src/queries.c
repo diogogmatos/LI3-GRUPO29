@@ -160,10 +160,16 @@ gint compare_avg_score(gconstpointer a, gconstpointer b)
  */
 void query_2(int N, char *path, CATALOG *c)
 {
+    FILE *f = fopen(path, "w");
+
+    if (N <= 0)
+    {
+        fclose(f);
+        return;
+    }
+
     GList *list = g_hash_table_get_values(get_catalog_driver_stats(c)); // retorna os valores da hash table "ht" para uma lista
     list = g_list_sort(list, compare_avg_score);                        // ordena a lista por ordem decrescente de average score, tendo em conta as situações de desempate do enunciado
-
-    FILE *f = fopen(path, "w");
 
     int acc;
     GList *iterator;
@@ -243,10 +249,16 @@ gint compare_tot_dist(gconstpointer a, gconstpointer b)
  */
 void query_3(int N, char *path, CATALOG *c)
 {
+    FILE *f = fopen(path, "w");
+
+    if (N <= 0)
+    {
+        fclose(f);
+        return;
+    }
+
     GList *list = g_hash_table_get_values(get_catalog_user_stats(c));
     list = g_list_sort(list, compare_tot_dist);
-
-    FILE *f = fopen(path, "w");
 
     int acc;
     GList *iterator;
@@ -296,6 +308,12 @@ void query_5(char *date_a, char *date_b, char *path, CATALOG *c)
 
     FILE *f = fopen(path, "w");
 
+    if (avg_cost < 0)
+    {
+        fclose(f);
+        return;
+    }
+
     fprintf(f, "%.3f\n", avg_cost);
 
     fclose(f);
@@ -308,6 +326,12 @@ void query_6(char *city, char *date_a, char *date_b, char *path, CATALOG *c)
     double avg_distance = create_query6_stat(city, date_a, date_b, c);
 
     FILE *f = fopen(path, "w");
+
+    if (avg_distance < 0)
+    {
+        fclose(f);
+        return;
+    }
 
     fprintf(f, "%.3f\n", avg_distance);
 

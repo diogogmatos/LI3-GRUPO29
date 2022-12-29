@@ -102,19 +102,16 @@ double get_tax(DRIVER *d)
 long IsLeapG(long yr)
 {
     if (((((yr % 400) == 0) || ((yr % 100) != 0)) && ((yr % 4) == 0)))
-    {
         return (1);
-    }
     else
-    {
         return (0);
-    }
 }
 
 // Day of the Year
 long rbdug(long d, long m, long y)
 {
     long a, r[13];
+
     r[1] = 0;
     r[2] = 31;
     r[3] = 59;
@@ -127,7 +124,9 @@ long rbdug(long d, long m, long y)
     r[10] = 273;
     r[11] = 304;
     r[12] = 334;
+
     a = r[m] + d;
+    
     if ((IsLeapG(y) == 1) && (m > 2))
         a += 1;
     return (a);
@@ -137,12 +136,14 @@ long Godn(long yy1, long yy2)
 {
     long jj, bb;
     bb = 0;
+
     for (jj = yy1; jj < yy2; jj++)
     {
         bb += 365;
         if (IsLeapG(jj) == 1)
             bb += 1;
     }
+
     return (bb);
 }
 
@@ -150,17 +151,15 @@ long DatDif(long d1, long m1, long y1, long d2, long m2, long y2)
 {
     long suma;
     suma = rbdug(d2, m2, y2) - rbdug(d1, m1, y1);
+
     if (y1 != y2)
     {
         if (y1 < y2)
-        {
             suma += Godn(y1, y2);
-        }
         else
-        {
             suma -= Godn(y2, y1);
-        }
     }
+
     return (suma);
 }
 
@@ -192,19 +191,18 @@ int get_age(char *date)
 
 int compare_dates(char *date1, char *date2)
 {
-    int dia1, mes1, ano1, dia2, mes2, ano2, r;
+    int dia1, mes1, ano1, dia2, mes2, ano2;
 
     sscanf(date1, "%d/%d/%d", &dia1, &mes1, &ano1);
     sscanf(date2, "%d/%d/%d", &dia2, &mes2, &ano2);
 
     if ((ano1 > ano2) || (ano1 == ano2 && mes1 > mes2) || (ano1 == ano2 && mes1 == mes2 && dia1 > dia2))
-        r = 1;
-    else if (ano1 == ano2 && mes1 == mes2 && dia1 == dia2)
-        r = 0;
-    else
-        r = -1;
+        return 1;
 
-    return r;
+    if (ano1 == ano2 && mes1 == mes2 && dia1 == dia2)
+        return 0;
+    
+    return -1;
 }
 
 // OUTROS
@@ -222,5 +220,5 @@ void display_stats()
     if (clock_time_sec < 60)
         printf("CPU time: %ld seconds\n", clock_time_sec);
     else
-        printf("CPU time: %ld minutes and %ld seconds\n", clock_time_sec / 60, clock_time_sec % 60);
+        printf("CPU time: %ld minutes and %ld seconds (%ld seconds)\n", clock_time_sec / 60, clock_time_sec % 60, clock_time_sec);
 }

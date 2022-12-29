@@ -10,10 +10,10 @@
 
 struct stat
 {
-	char* date_a;
-	char* date_b;
-	char* city;
-	CATALOG* c;
+	char *date_a;
+	char *date_b;
+	char *city;
+	CATALOG *c;
 
 	int total_distance;
 	int trips;
@@ -31,17 +31,17 @@ void build_query6_stat(gpointer key, gpointer value, gpointer userdata)
 
 	if (!strcmp(city, s->city) && compare_dates(s->date_a, date) <= 0 && compare_dates(date, s->date_b) <= 0) // Apenas considerados os valores de viagens efetuadas entre as datas referidas numa determinada cidade
 	{
-        s->total_distance += get_ride_distance(r);
+		s->total_distance += get_ride_distance(r);
 		s->trips += 1;
 	}
-	
-    free(date);
-    free(city);
+
+	free(date);
+	free(city);
 }
 
 double create_query6_stat(char *city, char *date_a, char *date_b, CATALOG *c)
 {
-	QUERY6_STAT *s = malloc(sizeof(QUERY6_STAT)); 
+	QUERY6_STAT *s = malloc(sizeof(QUERY6_STAT));
 	double r;
 
 	s->date_a = date_a;
@@ -54,7 +54,10 @@ double create_query6_stat(char *city, char *date_a, char *date_b, CATALOG *c)
 
 	g_hash_table_foreach(get_catalog_rides(c), build_query6_stat, s);
 
-	r = (double)s->total_distance / (double)s->trips;
+	if (s->total_distance == 0) // não temos de verificar se s->trips == 0, pois se s->total_distance == 0, então s->trips == 0 (e vice-versa)
+		r = -1;
+	else
+		r = (double)s->total_distance / (double)s->trips;
 
 	free(s);
 
