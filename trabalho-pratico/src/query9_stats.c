@@ -68,6 +68,8 @@ void destroy_query9_stat(void *v)
 
 void build_query9_stat(gpointer key, gpointer value, gpointer userdata)
 {
+	key = key; // Para evitar warnings de variáveis não utilizadas
+	
 	RIDE *r = value;
 	QUERY9_AUX *s = userdata;
 

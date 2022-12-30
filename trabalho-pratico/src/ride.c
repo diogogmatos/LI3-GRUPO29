@@ -9,6 +9,7 @@
 #include "../include/driver_stats.h"
 #include "../include/user_stats.h"
 #include "../include/city_stats.h"
+#include "../include/validation.h"
 
 /* Struct RIDE
  * Responsável por guardar os dados de uma viagem.
@@ -85,7 +86,7 @@ char *get_ride_comment(RIDE *r)
  * Responsável por inicializar uma struct RIDE com todas as informações de uma viagem,
  * contidas numa linha do ficheiro rides.csv.
  */
-RIDE *create_ride(char *line)
+RIDE *create_ride(char *line, int *v)
 {
     RIDE *r = malloc(sizeof(RIDE));
 
@@ -99,6 +100,21 @@ RIDE *create_ride(char *line)
     r->score_driver = atoi(strsep(&line, ";"));
     r->tip = atof(strsep(&line, ";"));
     r->comment = strdup(strsep(&line, "\n")); // o último caracter da linha é um '\n' e não um ';'
+
+    // Validação
+
+    // Validação do tamanho dos campos (não podem ser vazios)
+    if (!validate_length(r->id))
+        v[0] = 0;
+    else if (!validate_length(r->driver))
+        v[0] = 0;
+    else if (!validate_length(r->user))
+        v[0] = 0;
+    else if (!validate_length(r->city))
+        v[0] = 0;
+    // Validação de datas
+    else if (!validate_date(r->date))
+        v[0] = 0;
 
     return r;
 }
@@ -142,14 +158,23 @@ GHashTable *read_rides(char *dataset, GHashTable *user_stats, GHashTable *driver
 
     GHashTable *rides = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, destroy_ride);
 
-    getline(&line, &len, file);
+    if (getline(&line, &len, file)) // Ignora a primeira linha do ficheiro (cabeçalho)
+    {
+    } // Para evitar warnings de unused return value (if)
 
+    int v[1]; // Apontador para guardar o resultado da validação
     while (getline(&line, &len, file) != -1)
     {
         // PARSING DE DADOS
 
-        RIDE *ride = create_ride(line);
-        g_hash_table_insert(rides, ride->id, ride);
+        v[0] = 1; // Reset do resultado da validação
+
+        RIDE *ride = create_ride(line, v);
+
+        if (v[0])
+            g_hash_table_insert(rides, ride->id, ride);
+        else
+            destroy_ride(ride);
 
         // CRIAÇÃO DE ESTATÍSTICAS
 

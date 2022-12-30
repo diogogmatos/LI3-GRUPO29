@@ -22,6 +22,8 @@ struct stat
 
 void build_query5_stat(gpointer key, gpointer value, gpointer userdata)
 {
+	key = key; // Para evitar warnings de variáveis não utilizadas
+	
 	RIDE *r = value;
 	QUERY5_STAT *s = userdata;
 

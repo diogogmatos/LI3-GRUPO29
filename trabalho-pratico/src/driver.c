@@ -5,6 +5,7 @@
 
 #include <glib.h>
 #include "../include/utils.h"
+#include "../include/validation.h"
 
 /* Struct DRIVER
  * Responsável por guardar os dados de um condutor.
@@ -75,7 +76,7 @@ char *get_driver_account_status(DRIVER *d)
  * Responsável por inicializar uma struct DRIVER com todas as informações de um condutor,
  * contidas numa linha do ficheiro drivers.csv.
  */
-DRIVER *create_driver(char *line)
+DRIVER *create_driver(char *line, int *v)
 {
     DRIVER *d = malloc(sizeof(DRIVER));
 
@@ -88,6 +89,25 @@ DRIVER *create_driver(char *line)
     d->city = strdup(strsep(&line, ";"));
     d->account_creation = strdup(strsep(&line, ";"));
     d->account_status = strdup(strsep(&line, "\n")); // o último caracter da linha é um '\n' e não um ';'
+
+    // Validação
+
+    // Validação do tamanho dos campos (não podem ser vazios)
+    if (!validate_length(d->id))
+        v[0] = 0;
+    else if (!validate_length(d->name))
+        v[0] = 0;
+    else if (!validate_length(d->gender))
+        v[0] = 0;
+    else if (!validate_length(d->license_plate))
+        v[0] = 0;
+    else if (!validate_length(d->city))
+        v[0] = 0;
+    // Validação de datas
+    else if (!validate_date(d->birth_day))
+        v[0] = 0;
+    else if (!validate_date(d->account_creation))
+        v[0] = 0;
 
     return d;
 }
@@ -131,12 +151,21 @@ GHashTable *read_drivers(char *dataset)
 
     GHashTable *drivers = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, destroy_driver);
 
-    getline(&line, &len, file);
+    if (getline(&line, &len, file)) // Ignora a primeira linha do ficheiro (cabeçalho)
+    {
+    } // Para evitar warnings de unused return value (if)
 
+    int v[1]; // Apontador para guardar o resultado da validação
     while (getline(&line, &len, file) != -1)
     {
-        DRIVER *driver = create_driver(line);
-        g_hash_table_insert(drivers, driver->id, driver);
+        v[0] = 1; // Reset do resultado da validação
+
+        DRIVER *driver = create_driver(line, v);
+
+        if (v[0])
+            g_hash_table_insert(drivers, driver->id, driver);
+        else
+            destroy_driver(driver);
     }
 
     fclose(file);
