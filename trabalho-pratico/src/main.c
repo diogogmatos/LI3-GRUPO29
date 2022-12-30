@@ -25,10 +25,6 @@ int main(int argc, char **argv)
 
     CATALOG *c = create_catalog(dataset);
 
-    DRIVER *d = g_hash_table_lookup(get_catalog_drivers(c), "000000000001");
-    if (d == NULL)
-        printf("NULL");
-
     FILE *file = fopen(input, "r");
     // "../exemplos_de_queries/tests_2/input.txt"
 
