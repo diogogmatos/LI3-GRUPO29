@@ -20,7 +20,7 @@ char *get_ride_comment(RIDE *r);
 
 // FUNÇÕES CREATE / DESTROY
 
-RIDE *create_ride(char *line);
+RIDE *create_ride(char *line, int *v);
 void destroy_ride(void *v);
 
 // PARSING

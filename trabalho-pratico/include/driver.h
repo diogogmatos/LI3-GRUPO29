@@ -19,7 +19,7 @@ char *get_driver_account_status(DRIVER *d);
 
 // FUNÇÕES CREATE / DESTROY
 
-DRIVER *create_driver(char *line);
+DRIVER *create_driver(char *line, int *v);
 void destroy_driver(void *v);
 
 // PARSING

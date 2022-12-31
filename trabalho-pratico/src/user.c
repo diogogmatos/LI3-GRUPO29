@@ -5,6 +5,7 @@
 
 #include <glib.h>
 #include "../include/utils.h"
+#include "../include/validation.h"
 
 /* Struct USER
  * Responsável por guardar os dados de um utilizador.
@@ -63,7 +64,7 @@ char *get_user_account_status(USER *u)
  * Responsável por inicializar uma struct USER com todas as informações de um utilizador,
  * contidas numa linha do ficheiro users.csv.
  */
-USER *create_user(char *line)
+USER *create_user(char *line, int *v)
 {
     USER *u = malloc(sizeof(USER));
 
@@ -74,6 +75,23 @@ USER *create_user(char *line)
     u->account_creation = strdup(strsep(&line, ";"));
     u->pay_method = strdup(strsep(&line, ";"));
     u->account_status = strdup(strsep(&line, "\n")); // o último caracter da linha é um '\n' e não um ';'
+
+    // Validação
+
+    // Validação do tamanho dos campos (não podem ser vazios)
+    if (!validate_length(u->username))
+        v[0] = 0;
+    else if (!validate_length(u->name))
+        v[0] = 0;
+    else if (!validate_length(u->gender))
+        v[0] = 0;
+    else if (!validate_length(u->pay_method))
+        v[0] = 0;
+    // Validação de datas
+    else if (!validate_date(u->birth_date))
+        v[0] = 0;
+    else if (!validate_date(u->account_creation))
+        v[0] = 0;
 
     return u;
 }
@@ -115,12 +133,21 @@ GHashTable *read_users(char *dataset)
 
     GHashTable *users = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, destroy_user);
 
-    getline(&line, &len, file);
+    if (getline(&line, &len, file)) // Ignora a primeira linha do ficheiro (cabeçalho)
+    {
+    } // Para evitar warnings de unused return value (if)
 
+    int v[1]; // Apontador para guardar o resultado da validação
     while (getline(&line, &len, file) != -1)
     {
-        USER *user = create_user(line);
-        g_hash_table_insert(users, user->username, user);
+        v[0] = 1; // Reset do resultado da validação
+
+        USER *user = create_user(line, v);
+
+        if (v[0])
+            g_hash_table_insert(users, user->username, user);
+        else
+            destroy_user(user);
     }
 
     fclose(file);

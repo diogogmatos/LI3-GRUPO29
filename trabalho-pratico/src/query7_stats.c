@@ -55,6 +55,8 @@ void destroy_query7_stat(void *v)
 
 void build_query7_stat(gpointer key, gpointer value, gpointer userdata)
 {
+    key = key; // Para evitar warnings de variáveis não utilizadas
+    
     RIDE *r = value;
     QUERY7_AUX *s = userdata;
 

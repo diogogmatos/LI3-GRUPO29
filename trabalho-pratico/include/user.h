@@ -17,7 +17,7 @@ char *get_user_account_status(USER *u);
 
 // FUNÇÕES CREATE / DESTROY
 
-USER *create_user(char *line);
+USER *create_user(char *line, int *v);
 void destroy_user(void *v);
 
 // PARSING

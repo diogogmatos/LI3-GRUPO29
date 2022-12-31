@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -pedantic-errors -O3 -march=native -g $(shell pkg-config --cflags glib-2.0)
+CFLAGS = -Wall -Wextra -pedantic-errors -O3 -g $(shell pkg-config --cflags glib-2.0)
 LIBS = -lm $(shell pkg-config --libs glib-2.0)
 OBJS = $(patsubst %.c,%.o,$(wildcard src/*.c))            # Get all object files by replacing .c with .o
 TARGET = programa-principal
