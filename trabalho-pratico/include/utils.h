@@ -1,7 +1,7 @@
 #ifndef utils_h
 #define utils_h
 
-#include "../include/driver.h"
+#include "driver.h"
 #include <glib.h>
 
 char *get_results_path(int i);
@@ -11,6 +11,8 @@ double get_tax(DRIVER *d);
 int convert_date(char *date);
 int get_age(char *date);
 int compare_dates(char *date1, char *date2);
+void increase_date(char *date);
+void increase_something_date(char *something_date);
 void display_stats();
 
 #endif

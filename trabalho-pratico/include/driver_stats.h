@@ -27,5 +27,6 @@ void destroy_driver_stat(void *v);
 // FUNÇÕES DE CRIAÇÃO DE ESTATÍSTICAS
 
 void create_driver_stat(RIDE *r, GHashTable *d_stats, GHashTable *drivers);
+GList *sort_query2_stats(GHashTable *driver_stats);
 
 #endif

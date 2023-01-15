@@ -160,3 +160,53 @@ void create_driver_stat(RIDE *r, GHashTable *d_stats, GHashTable *drivers)
 
 	free(account_status);
 }
+
+/* Função `compare_avg_score()`
+ * Responsável por comparar duas estatísticas relativas à avaliação média de um condutor e retornar -1 ou 1 de acordo
+ * com o resultado da comparação. É utilizada de forma auxiliar a `g_list_sort()` para ordenar uma lista de STAT's.
+ */
+gint compare_avg_score(gconstpointer a, gconstpointer b)
+{
+	DRIVER_STAT *s1 = (DRIVER_STAT *)a;
+	DRIVER_STAT *s2 = (DRIVER_STAT *)b;
+
+	int r;
+
+	double avg_score1 = s1->avg_score;
+	double avg_score2 = s2->avg_score;
+
+	if (avg_score1 > avg_score2)
+		r = -1;
+	else if (avg_score1 < avg_score2)
+		r = 1;
+	else
+	{
+		char *date1 = s1->most_recent_trip;
+		char *date2 = s2->most_recent_trip;
+
+		int dc = compare_dates(date1, date2);
+
+		if (dc > 0)
+			r = -1;
+		else if (dc < 0)
+			r = 1;
+		else
+		{
+			char *id1 = s1->id;
+			char *id2 = s2->id;
+
+			r = strcmp(id1, id2);
+		}
+	}
+
+	return r;
+}
+
+GList *sort_query2_stats(GHashTable *driver_stats)
+{
+	GList *list = g_hash_table_get_values(driver_stats);
+
+	list = g_list_sort(list, compare_avg_score);
+
+	return list;
+}

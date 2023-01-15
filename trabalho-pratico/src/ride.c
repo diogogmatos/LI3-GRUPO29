@@ -10,6 +10,10 @@
 #include "../include/user_stats.h"
 #include "../include/city_stats.h"
 #include "../include/validation.h"
+#include "../include/query5_stats.h"
+#include "../include/query6_stats.h"
+#include "../include/query7_stats.h"
+#include "../include/query8_stats.h"
 
 /* Struct RIDE
  * Responsável por guardar os dados de uma viagem.
@@ -25,7 +29,6 @@ struct ride
     int score_user;
     int score_driver;
     double tip;
-    char *comment;
 };
 
 // FUNÇÕES GET
@@ -75,11 +78,6 @@ double get_ride_tip(RIDE *r)
     return r->tip;
 }
 
-char *get_ride_comment(RIDE *r)
-{
-    return strdup(r->comment);
-}
-
 // FUNÇÕES CREATE / DESTROY
 
 /* Função `create_ride()`
@@ -99,7 +97,6 @@ RIDE *create_ride(char *line, int *v)
     r->score_user = atoi(strsep(&line, ";"));
     r->score_driver = atoi(strsep(&line, ";"));
     r->tip = atof(strsep(&line, ";"));
-    r->comment = strdup(strsep(&line, "\n")); // o último caracter da linha é um '\n' e não um ';'
 
     // Validação
 
@@ -132,7 +129,6 @@ void destroy_ride(void *v)
     free(r->driver);
     free(r->user);
     free(r->city);
-    free(r->comment);
     free(r);
 }
 
@@ -146,7 +142,7 @@ void destroy_ride(void *v)
  * Usada também para inicializar as funções `create_driver_stat()` e `create_user_stat()` de criação das hash tables de
  * estatísticas para os users e para os drivers, em cada linha.
  */
-GHashTable *read_rides(char *dataset, GHashTable *user_stats, GHashTable *driver_stats, GHashTable *city_stats, GHashTable *drivers, GHashTable *users)
+GHashTable *read_rides(char *dataset, GHashTable *user_stats, GHashTable *driver_stats, GHashTable *city_stats, GHashTable *bydate_stats, GHashTable *bycitydate_stats, GHashTable *query7_stats, GHashTable *query8_stats, GHashTable *drivers, GHashTable *users)
 {
     char *path = get_dataset_path(dataset, "rides");
 
@@ -181,6 +177,10 @@ GHashTable *read_rides(char *dataset, GHashTable *user_stats, GHashTable *driver
         create_driver_stat(ride, driver_stats, drivers);
         create_user_stat(ride, user_stats, drivers, users);
         create_city_stat(ride, city_stats, drivers);
+        create_bydate_stat(ride, bydate_stats, drivers);
+        create_bycitydate_stat(ride, bycitydate_stats);
+        create_query7_stat(ride, query7_stats, drivers);
+        create_query8_stats(ride, query8_stats, drivers, users);
     }
 
     fclose(file);

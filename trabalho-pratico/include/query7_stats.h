@@ -2,23 +2,16 @@
 #define query7_stats_h
 
 #include <glib.h>
-#include "catalog.h"
+#include "../include/ride.h"
 
 typedef struct stat QUERY7_STAT;
-typedef struct aux QUERY7_AUX;
 
-// FUNÇÕES GET
-
-char *get_query7_stat_id(QUERY7_STAT *s);
-char *get_query7_stat_driver_name(QUERY7_STAT *s);
+char *get_query7_stat_citydriver(QUERY7_STAT *s);
 double get_query7_stat_avg_score(QUERY7_STAT *s);
-
-// FUNÇÕES DESTROY
 
 void destroy_query7_stat(void *v);
 
-// FUNÇÕES DE CRIAÇÃO DE ESTATÍSTICAS
-
-void create_query7_stats(GHashTable *query7_stats, char *city, CATALOG *c);
+void create_query7_stat(RIDE *r, GHashTable *query7_stats, GHashTable *drivers);
+GList *sort_query7_stats(GHashTable *query7_stats);
 
 #endif

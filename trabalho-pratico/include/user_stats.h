@@ -26,5 +26,6 @@ void destroy_user_stat(void *v);
 // FUNÇÕES DE CRIAÇÃO DE ESTATÍSTICAS
 
 void create_user_stat(RIDE *r, GHashTable *u_stats, GHashTable *drivers, GHashTable *users);
+GList *sort_query3_stats(GHashTable *user_stats);
 
 #endif

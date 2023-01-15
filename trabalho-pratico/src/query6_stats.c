@@ -2,66 +2,94 @@
 #include <stdlib.h>
 #include <string.h>
 #include <glib.h>
-#include "../include/driver.h"
-#include "../include/ride.h"
 #include "../include/utils.h"
 #include "../include/catalog.h"
 #include "../include/query6_stats.h"
 
 struct stat
 {
-	char *date_a;
-	char *date_b;
-	char *city;
-	CATALOG *c;
-
-	int total_distance;
-	int trips;
+    char *citydate;
+    int distance;
+    int trips;
 };
+
+// FUNÇÕES DESTROY
+
+void destroy_bycitydate_stat(void *v)
+{
+    BYCITYDATE_STAT *s = v;
+
+    free(s->citydate);
+    free(s);
+}
 
 // FUNÇÕES DE CRIAÇÃO DE ESTATÍSTICAS
 
-void build_query6_stat(gpointer key, gpointer value, gpointer userdata)
+void create_bycitydate_stat(RIDE *r, GHashTable *bycitydate_stats)
 {
-	key = key; // Para evitar warnings de variáveis não utilizadas
-	
-	RIDE *r = value;
-	QUERY6_STAT *s = userdata;
+    char *city = get_ride_city(r);
+    char *date = get_ride_date(r);
 
-	char *date = get_ride_date(r);
-	char *city = get_ride_city(r);
+    char *citydate = malloc(strlen(city) + strlen(date) + 2);
+    sprintf(citydate, "%s-%s", city, date);
 
-	if (!strcmp(city, s->city) && compare_dates(s->date_a, date) <= 0 && compare_dates(date, s->date_b) <= 0) // Apenas considerados os valores de viagens efetuadas entre as datas referidas numa determinada cidade
-	{
-		s->total_distance += get_ride_distance(r);
-		s->trips += 1;
-	}
+    BYCITYDATE_STAT *sl = g_hash_table_lookup(bycitydate_stats, citydate);
 
-	free(date);
-	free(city);
+    int distance = get_ride_distance(r);
+
+    if (sl == NULL)
+    {
+        BYCITYDATE_STAT *s = malloc(sizeof(BYCITYDATE_STAT));
+
+        s->citydate = citydate;
+        s->distance = distance;
+        s->trips = 1;
+
+        g_hash_table_insert(bycitydate_stats, s->citydate, s);
+    }
+    else
+    {
+        sl->distance += distance;
+        sl->trips++;
+
+        free(citydate);
+    }
+
+    free(city);
+    free(date);
 }
 
 double create_query6_stat(char *city, char *date_a, char *date_b, CATALOG *c)
 {
-	QUERY6_STAT *s = malloc(sizeof(QUERY6_STAT));
-	double r;
+    double d = 0, t = 0, r = 0;
 
-	s->date_a = date_a;
-	s->date_b = date_b;
-	s->city = city;
-	s->c = c;
+    char *citydate_a = malloc(strlen(city) + strlen(date_a) + 2);
+    sprintf(citydate_a, "%s-%s", city, date_a);
 
-	s->total_distance = 0;
-	s->trips = 0;
+    char *citydate_b = malloc(strlen(city) + strlen(date_b) + 2);
+    sprintf(citydate_b, "%s-%s", city, date_b);
 
-	g_hash_table_foreach(get_catalog_rides(c), build_query6_stat, s);
+    increase_something_date(citydate_b);
 
-	if (s->total_distance == 0) // não temos de verificar se s->trips == 0, pois se s->total_distance == 0, então s->trips == 0 (e vice-versa)
-		r = -1;
-	else
-		r = (double)s->total_distance / (double)s->trips;
+    char *citydate;
+    for (citydate = citydate_a; strcmp(citydate, citydate_b); increase_something_date(citydate))
+    {
+        BYCITYDATE_STAT *s = g_hash_table_lookup(get_catalog_bycitydate_stats(c), citydate);
 
-	free(s);
+        if (s != NULL)
+        {
+            d += s->distance;
+            t += s->trips;
+        }
+    }
 
-	return r;
+    free(citydate_a);
+    free(citydate_b);
+
+    if (d == 0) // não temos de verificar se t == 0, pois se d == 0, então t == 0 (e vice-versa)
+        r = -1;
+    else
+        r = d / t;
+
+    return r;
 }

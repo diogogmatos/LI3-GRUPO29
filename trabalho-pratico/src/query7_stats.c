@@ -2,37 +2,23 @@
 #include <stdlib.h>
 #include <string.h>
 #include <glib.h>
-#include "../include/driver.h"
 #include "../include/ride.h"
-#include "../include/catalog.h"
+#include "../include/driver.h"
 #include "../include/query7_stats.h"
 
 struct stat
 {
-    char *id;
-    char *driver_name;
-    int trips;
+    char *citydriver;
     double score;
+    int trips;
     double avg_score;
-};
-
-struct aux
-{
-    char *city;
-    CATALOG *c;
-    GHashTable *ht;
 };
 
 // FUNÇÕES GET
 
-char *get_query7_stat_id(QUERY7_STAT *s)
+char *get_query7_stat_citydriver(QUERY7_STAT *s)
 {
-    return strdup(s->id);
-}
-
-char *get_query7_stat_driver_name(QUERY7_STAT *s)
-{
-    return strdup(s->driver_name);
+    return strdup(s->citydriver);
 }
 
 double get_query7_stat_avg_score(QUERY7_STAT *s)
@@ -46,76 +32,88 @@ void destroy_query7_stat(void *v)
 {
     QUERY7_STAT *s = v;
 
-    free(s->id);
-    free(s->driver_name);
+    free(s->citydriver);
     free(s);
 }
 
 // FUNÇÕES DE CRIAÇÃO DE ESTATÍSTICAS
 
-void build_query7_stat(gpointer key, gpointer value, gpointer userdata)
+void create_query7_stat(RIDE *r, GHashTable *query7_stats, GHashTable *drivers)
 {
-    key = key; // Para evitar warnings de variáveis não utilizadas
-    
-    RIDE *r = value;
-    QUERY7_AUX *s = userdata;
-
     char *id = get_ride_driver(r);
-    DRIVER *d = g_hash_table_lookup(get_catalog_drivers(s->c), id);
+    char *account_status = get_driver_account_status(g_hash_table_lookup(drivers, id));
 
-    char *account_status = get_driver_account_status(d);
-
-    if (!strcmp(account_status, "active")) // Apenas se a conta do condutor estiver ativa
+    if (!strcmp(account_status, "active"))
     {
         char *city = get_ride_city(r);
 
-        if (!strcmp(city, s->city)) // Apenas considerados os valores de viagens efetuadas na cidade pretendida
+        char *citydriver = malloc(strlen(city) + strlen(id) + 2);
+        sprintf(citydriver, "%s-%s", city, id);
+
+        QUERY7_STAT *sl = g_hash_table_lookup(query7_stats, citydriver);
+
+        double score = get_ride_score_driver(r);
+
+        if (sl == NULL)
         {
-            QUERY7_STAT *dl = g_hash_table_lookup(s->ht, id);
+            QUERY7_STAT *s = malloc(sizeof(QUERY7_STAT));
 
-            if (dl == NULL) // Se o condutor ainda não está na tabela hash, inicializamos os dados e adicionamos à tabela
-            {
-                QUERY7_STAT *driver_stat = malloc(sizeof(QUERY7_STAT));
-                DRIVER *d = g_hash_table_lookup(get_catalog_drivers(s->c), id);
+            s->citydriver = citydriver;
+            s->score = score;
+            s->trips = 1;
+            s->avg_score = score;
 
-                driver_stat->id = id;
-                driver_stat->driver_name = get_driver_name(d);
-
-                driver_stat->trips = 1;
-                driver_stat->score = get_ride_score_driver(r);
-                driver_stat->avg_score = driver_stat->score;
-
-                g_hash_table_insert(s->ht, driver_stat->id, driver_stat);
-            }
-            else // Se o condutor já está na tabela hash, atualizamos os dados
-            {
-                dl->trips += 1;
-                dl->score += get_ride_score_driver(r);
-                dl->avg_score = dl->score / dl->trips;
-
-                free(id);
-            }
+            g_hash_table_insert(query7_stats, s->citydriver, s);
         }
         else
-            free(id);
+        {
+            sl->score += score;
+            sl->trips++;
+            sl->avg_score = sl->score / sl->trips;
+
+            free(citydriver);
+        }
 
         free(city);
     }
-    else
-        free(id);
 
     free(account_status);
+    free(id);
 }
 
-void create_query7_stats(GHashTable *query7_stats, char *city, CATALOG *c)
+gint compare_query7_stats(gconstpointer a, gconstpointer b)
 {
-    QUERY7_AUX *s = malloc(sizeof(QUERY7_AUX)); // Usada para passar valores à função `create_query7_stat()`
+    QUERY7_STAT *s1 = (QUERY7_STAT *)a;
+    QUERY7_STAT *s2 = (QUERY7_STAT *)b;
 
-    s->ht = query7_stats;
-    s->city = city;
-    s->c = c;
+    int r;
 
-    g_hash_table_foreach(get_catalog_rides(c), build_query7_stat, s);
+    double avg_score1 = s1->avg_score;
+    double avg_score2 = s2->avg_score;
 
-    free(s);
+    if (avg_score1 > avg_score2)
+        r = -1;
+    else if (avg_score1 < avg_score2)
+        r = 1;
+    else
+    {
+        char *id1 = strchr(s1->citydriver, '-') + 1;
+        char *id2 = strchr(s2->citydriver, '-') + 1;
+
+        if (strcmp(id1, id2) > 0)
+            r = -1;
+        else
+            r = 1;
+    }
+
+    return r;
+}
+
+GList *sort_query7_stats(GHashTable *query7_stats)
+{
+    GList *list = g_hash_table_get_values(query7_stats);
+
+    list = g_list_sort(list, compare_query7_stats);
+
+    return list;
 }
