@@ -261,18 +261,17 @@ int compare_dates(char *date1, char *date2)
 
 // OUTROS
 
-void display_stats()
+void print_time_and_memory()
 {
-    // Get the current memory usage
     struct rusage usage;
     getrusage(RUSAGE_SELF, &usage);
-    printf("\nMemory usage: %ld MiB\n", usage.ru_maxrss / 1024);
-
-    // Get the current CPU time
-    clock_t clock_time = clock();
-    long clock_time_sec = clock_time / CLOCKS_PER_SEC;
-    if (clock_time_sec < 60)
-        printf("CPU time: %ld seconds\n", clock_time_sec);
+    double user_time = usage.ru_utime.tv_sec + usage.ru_utime.tv_usec / 1000000.0;
+    double sys_time = usage.ru_stime.tv_sec + usage.ru_stime.tv_usec / 1000000.0;
+    double total_time = user_time + sys_time;
+    printf("\nMemory usage: %ld MB\n", usage.ru_maxrss / 1000);
+    int time = total_time;
+    if (total_time < 60)
+        printf("CPU time: %.3f seconds\n", total_time);
     else
-        printf("CPU time: %ld minutes and %ld seconds (%ld seconds)\n", clock_time_sec / 60, clock_time_sec % 60, clock_time_sec);
+        printf("CPU time: %d minutes and %d seconds (%.3f seconds)\n", time / 60, time % 60, total_time);
 }

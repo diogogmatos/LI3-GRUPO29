@@ -13,6 +13,6 @@ int get_age(char *date);
 int compare_dates(char *date1, char *date2);
 void increase_date(char *date);
 void increase_something_date(char *something_date);
-void display_stats();
+void print_time_and_memory();
 
 #endif
