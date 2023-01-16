@@ -2,10 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <glib.h>
-#include "../include/catalog.h"
 #include "../include/driver.h"
 #include "../include/user.h"
 #include "../include/ride.h"
+#include "../include/catalog.h"
 #include "../include/user_stats.h"
 #include "../include/driver_stats.h"
 #include "../include/city_stats.h"
@@ -118,7 +118,7 @@ CATALOG *create_catalog(char *dataset)
     GHashTable *bydate_stats = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, destroy_bydate_stat);         // estatísticas da query 5
     GHashTable *bycitydate_stats = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, destroy_bycitydate_stat); // estatísticas da query 6
     GHashTable *query7_stats_hash = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, destroy_query7_stat);    // estatísticas da query 7 (hash table)
-    GHashTable *query8_stats_hash = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, destroy_query8_stat);    // estatísticas da query 8 (hash table)
+    GHashTable *query8_stats_hash = g_hash_table_new_full(g_int_hash, g_int_equal, NULL, destroy_query8_stat);    // estatísticas da query 8 (hash table)
 
     GHashTable *rides = read_rides(dataset, user_stats, driver_stats, city_stats, bydate_stats, bycitydate_stats, query7_stats_hash, query8_stats_hash, drivers, users); // dados de viagens
 

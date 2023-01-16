@@ -15,8 +15,8 @@ struct stat
 	char *gender;
 	int age;
 	double score;
-	double avg_score;
 	int trips;
+	double avg_score;
 	double money;
 	int total_distance;
 	char *most_recent_trip;
@@ -106,7 +106,8 @@ void create_user_stat(RIDE *r, GHashTable *u_stats, GHashTable *drivers, GHashTa
 		char *date = get_ride_date(r);
 
 		char *driver = get_ride_driver(r);
-		DRIVER *d = g_hash_table_lookup(drivers, driver);
+		int driver_int = atoi(driver);
+		DRIVER *d = g_hash_table_lookup(drivers, &driver_int);
 
 		if (ul == NULL)
 		{

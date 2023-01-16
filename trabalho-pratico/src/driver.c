@@ -12,7 +12,7 @@
  */
 struct driver
 {
-    char *id;
+    int id;
     char *name;
     char *birth_day;
     char *gender;
@@ -24,11 +24,6 @@ struct driver
 };
 
 // FUNÇÕES GET
-
-char *get_driver_id(DRIVER *d)
-{
-    return strdup(d->id);
-}
 
 char *get_driver_name(DRIVER *d)
 {
@@ -80,7 +75,7 @@ DRIVER *create_driver(char *line, int *v)
 {
     DRIVER *d = malloc(sizeof(DRIVER));
 
-    d->id = strdup(strsep(&line, ";"));
+    d->id = atoi(strsep(&line, ";"));
     d->name = strdup(strsep(&line, ";"));
     d->birth_day = strdup(strsep(&line, ";"));
     d->gender = strdup(strsep(&line, ";"));
@@ -93,7 +88,7 @@ DRIVER *create_driver(char *line, int *v)
     // Validação
 
     // Validação do tamanho dos campos (não podem ser vazios)
-    if (!validate_length(d->id))
+    if (!validate_length_int(d->id))
         v[0] = 0;
     else if (!validate_length(d->name))
         v[0] = 0;
@@ -120,7 +115,6 @@ void destroy_driver(void *v)
 {
     DRIVER *d = v;
 
-    free(d->id);
     free(d->name);
     free(d->birth_day);
     free(d->gender);
@@ -149,7 +143,7 @@ GHashTable *read_drivers(char *dataset)
     char *line = NULL;
     size_t len = 0;
 
-    GHashTable *drivers = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, destroy_driver);
+    GHashTable *drivers = g_hash_table_new_full(g_int_hash, g_int_equal, NULL, destroy_driver);
 
     if (getline(&line, &len, file)) // Ignora a primeira linha do ficheiro (cabeçalho)
     {
@@ -163,7 +157,7 @@ GHashTable *read_drivers(char *dataset)
         DRIVER *driver = create_driver(line, v);
 
         if (v[0])
-            g_hash_table_insert(drivers, driver->id, driver);
+            g_hash_table_insert(drivers, &(driver->id), driver);
         else
             destroy_driver(driver);
     }

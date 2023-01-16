@@ -261,6 +261,13 @@ int compare_dates(char *date1, char *date2)
 
 // OUTROS
 
+char *id_to_string(int id)
+{
+    char *str = malloc(13);    // allocate memory for the string
+    sprintf(str, "%012d", id); // convert the integer to a string with 12 digits
+    return str;
+}
+
 void print_time_and_memory()
 {
     struct rusage usage;

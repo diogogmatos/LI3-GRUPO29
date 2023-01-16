@@ -41,7 +41,8 @@ void destroy_query7_stat(void *v)
 void create_query7_stat(RIDE *r, GHashTable *query7_stats, GHashTable *drivers)
 {
     char *id = get_ride_driver(r);
-    char *account_status = get_driver_account_status(g_hash_table_lookup(drivers, id));
+    int id_int = atoi(id);
+    char *account_status = get_driver_account_status(g_hash_table_lookup(drivers, &id_int));
 
     if (!strcmp(account_status, "active"))
     {

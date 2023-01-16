@@ -7,7 +7,7 @@
 typedef struct stat QUERY8_STAT;
 
 char *get_query8_stat_gender(QUERY8_STAT *s);
-char *get_query8_stat_ride(QUERY8_STAT *s);
+int get_query8_stat_ride(QUERY8_STAT *s);
 double get_query8_stat_driver_acc_age(QUERY8_STAT *s);
 double get_query8_stat_user_acc_age(QUERY8_STAT *s);
 

@@ -12,7 +12,7 @@
 struct stat
 {
 	char *gender;
-	char *ride;
+	int ride;
 	double driver_acc_age;
 	double user_acc_age;
 };
@@ -22,9 +22,9 @@ char *get_query8_stat_gender(QUERY8_STAT *s)
 	return strdup(s->gender);
 }
 
-char *get_query8_stat_ride(QUERY8_STAT *s)
+int get_query8_stat_ride(QUERY8_STAT *s)
 {
-	return strdup(s->ride);
+	return s->ride;
 }
 
 double get_query8_stat_driver_acc_age(QUERY8_STAT *s)
@@ -42,7 +42,6 @@ void destroy_query8_stat(void *v)
 	QUERY8_STAT *s = v;
 
 	free(s->gender);
-	free(s->ride);
 	free(s);
 }
 
@@ -51,7 +50,8 @@ void create_query8_stats(RIDE *r, GHashTable *query8_stats, GHashTable *drivers,
 	char *driver = get_ride_driver(r);
 	char *user = get_ride_user(r);
 
-	DRIVER *d = g_hash_table_lookup(drivers, driver);
+	int driver_int = atoi(driver);
+	DRIVER *d = g_hash_table_lookup(drivers, &driver_int);
 	USER *u = g_hash_table_lookup(users, user);
 
 	char *driver_acc_status = get_driver_account_status(d);
@@ -70,11 +70,11 @@ void create_query8_stats(RIDE *r, GHashTable *query8_stats, GHashTable *drivers,
 			char *user_acc_creation = get_user_account_creation(u);
 
 			s->gender = driver_gender;
-			s->ride = get_ride_id(r);
+			s->ride = get_ride_id_int(r);
 			s->driver_acc_age = convert_date(driver_acc_creation) / 365.2425;
 			s->user_acc_age = convert_date(user_acc_creation) / 365.2425;
 
-			g_hash_table_insert(query8_stats, s->ride, s);
+			g_hash_table_insert(query8_stats, &(s->ride), s);
 
 			free(driver_acc_creation);
 			free(user_acc_creation);
@@ -116,10 +116,13 @@ gint compare_query8_stats(gconstpointer a, gconstpointer b)
 			r = 1;
 		else
 		{
-			char *id1 = s1->ride;
-			char *id2 = s2->ride;
+			int id1 = s1->ride;
+			int id2 = s2->ride;
 
-			r = strcmp(id1, id2);
+			if (id1 < id2)
+				r = -1;
+			else
+				r = 1;
 		}
 	}
 

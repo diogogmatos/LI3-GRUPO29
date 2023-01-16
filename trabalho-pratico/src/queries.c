@@ -31,7 +31,8 @@ void query_1(int is_id, char *value, char *path, CATALOG *c)
     if (is_id != 0) // driver
     {
         char *id = value;
-        DRIVER *d = g_hash_table_lookup(get_catalog_drivers(c), id);
+        int id_int = atoi(id);
+        DRIVER *d = g_hash_table_lookup(get_catalog_drivers(c), &id_int);
 
         FILE *f = fopen(path, "w");
 
@@ -45,7 +46,7 @@ void query_1(int is_id, char *value, char *path, CATALOG *c)
 
         if (!strcmp(account_status, "active")) // se a conta for ativa executa normalmente
         {
-            DRIVER_STAT *s = g_hash_table_lookup(get_catalog_driver_stats(c), id);
+            DRIVER_STAT *s = g_hash_table_lookup(get_catalog_driver_stats(c), &id_int);
 
             char *name = get_driver_stat_driver_name(s);
             char *gender = get_driver_stat_gender(s);
@@ -257,7 +258,8 @@ void query_7(int N, char *city, char *path, CATALOG *c)
         if (!strcmp(city_l, city))
         {
             char *id = strsep(&citydriver, "\0");
-            char *driver_name = get_driver_stat_driver_name(g_hash_table_lookup(get_catalog_drivers(c), id));
+            int id_int = atoi(id);
+            char *driver_name = get_driver_stat_driver_name(g_hash_table_lookup(get_catalog_drivers(c), &id_int));
             double avg_score = get_query7_stat_avg_score(iterator->data);
 
             fprintf(f, "%s;%s;%.3f\n", id, driver_name, avg_score);
@@ -290,16 +292,15 @@ void query_8(char *gender, int X, char *path, CATALOG *c)
 
         if (!strcmp(gender_l, gender) && driver_acc_age >= X && user_acc_age >= X)
         {
-            char *ride = get_query8_stat_ride(iterator->data);
-
-            char *driver = get_ride_driver(g_hash_table_lookup(get_catalog_rides(c), ride));
-            char *driver_name = get_driver_name(g_hash_table_lookup(get_catalog_drivers(c), driver));
-            char *user = get_ride_user(g_hash_table_lookup(get_catalog_rides(c), ride));
+            int ride = get_query8_stat_ride(iterator->data);
+            char *driver = get_ride_driver(g_hash_table_lookup(get_catalog_rides(c), &ride));
+            int driver_int = atoi(driver);
+            char *driver_name = get_driver_name(g_hash_table_lookup(get_catalog_drivers(c), &driver_int));
+            char *user = get_ride_user(g_hash_table_lookup(get_catalog_rides(c), &ride));
             char *user_name = get_user_name(g_hash_table_lookup(get_catalog_users(c), user));
 
             fprintf(f, "%s;%s;%s;%s\n", driver, driver_name, user, user_name);
 
-            free(ride);
             free(driver);
             free(driver_name);
             free(user);
@@ -339,16 +340,13 @@ gint compare_query9_rides(gconstpointer a, gconstpointer b)
             r = 1;
         else
         {
-            char *id1 = get_query9_stat_id(s1);
-            char *id2 = get_query9_stat_id(s2);
+            int id1 = get_query9_stat_id_int(s1);
+            int id2 = get_query9_stat_id_int(s2);
 
-            if (strcmp(id1, id2) > 0)
-                r = -1;
-            else
+            if (id1 < id2)
                 r = 1;
-
-            free(id1);
-            free(id2);
+            else
+                r = -1;
         }
 
         free(date1);
@@ -369,9 +367,10 @@ void query_9(char *date_a, char *date_b, char *path, CATALOG *c)
     for (iterator = query9_stats; iterator; iterator = iterator->next)
     {
         char *id = get_query9_stat_id(iterator->data);
+        int id_int = atoi(id);
         char *date = get_query9_stat_date(iterator->data);
         int distance = get_query9_stat_distance(iterator->data);
-        char *city = get_query9_stat_city(iterator->data);
+        char *city = get_ride_city(g_hash_table_lookup(get_catalog_rides(c), &id_int));
         double tip = get_query9_stat_tip(iterator->data);
 
         fprintf(f, "%s;%s;%d;%s;%.3f\n", id, date, distance, city, tip);

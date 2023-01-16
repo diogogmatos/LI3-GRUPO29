@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <glib.h>
-#include "../include/driver.h"
 #include "../include/ride.h"
 #include "../include/utils.h"
 #include "../include/city_stats.h"
@@ -40,7 +39,8 @@ void create_city_stat(RIDE *r, GHashTable *c_stats, GHashTable *drivers)
 	CITY_STAT *cl = g_hash_table_lookup(c_stats, city);
 
 	char *driver = get_ride_driver(r);
-	DRIVER *d = g_hash_table_lookup(drivers, driver);
+	int driver_int = atoi(driver);
+	DRIVER *d = g_hash_table_lookup(drivers, &driver_int);
 
 	int distance = get_ride_distance(r);
 

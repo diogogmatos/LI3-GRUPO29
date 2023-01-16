@@ -14,15 +14,16 @@
 #include "../include/query6_stats.h"
 #include "../include/query7_stats.h"
 #include "../include/query8_stats.h"
+#include "../include/query9_stats.h"
 
 /* Struct RIDE
  * Responsável por guardar os dados de uma viagem.
  */
 struct ride
 {
-    char *id;
+    int id;
     char *date;
-    char *driver;
+    int driver;
     char *user;
     char *city;
     int distance;
@@ -35,7 +36,13 @@ struct ride
 
 char *get_ride_id(RIDE *r)
 {
-    return strdup(r->id);
+    char *id_str = id_to_string(r->id);
+    return id_str;
+}
+
+int get_ride_id_int(RIDE *r)
+{
+    return r->id;
 }
 
 char *get_ride_date(RIDE *r)
@@ -45,7 +52,13 @@ char *get_ride_date(RIDE *r)
 
 char *get_ride_driver(RIDE *r)
 {
-    return strdup(r->driver);
+    char* driver_str = id_to_string(r->driver);
+    return driver_str;
+}
+
+int get_ride_driver_int(RIDE *r)
+{
+    return r->driver;
 }
 
 char *get_ride_user(RIDE *r)
@@ -88,9 +101,9 @@ RIDE *create_ride(char *line, int *v)
 {
     RIDE *r = malloc(sizeof(RIDE));
 
-    r->id = strdup(strsep(&line, ";"));
+    r->id = atoi(strsep(&line, ";"));
     r->date = strdup(strsep(&line, ";"));
-    r->driver = strdup(strsep(&line, ";"));
+    r->driver = atoi(strsep(&line, ";"));
     r->user = strdup(strsep(&line, ";"));
     r->city = strdup(strsep(&line, ";"));
     r->distance = atoi(strsep(&line, ";"));
@@ -101,9 +114,9 @@ RIDE *create_ride(char *line, int *v)
     // Validação
 
     // Validação do tamanho dos campos (não podem ser vazios)
-    if (!validate_length(r->id))
+    if (!validate_length_int(r->id))
         v[0] = 0;
-    else if (!validate_length(r->driver))
+    else if (!validate_length_int(r->driver))
         v[0] = 0;
     else if (!validate_length(r->user))
         v[0] = 0;
@@ -124,9 +137,7 @@ void destroy_ride(void *v)
 {
     RIDE *r = v;
 
-    free(r->id);
     free(r->date);
-    free(r->driver);
     free(r->user);
     free(r->city);
     free(r);
@@ -152,7 +163,7 @@ GHashTable *read_rides(char *dataset, GHashTable *user_stats, GHashTable *driver
     char *line = NULL;
     size_t len = 0;
 
-    GHashTable *rides = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, destroy_ride);
+    GHashTable *rides = g_hash_table_new_full(g_int_hash, g_int_equal, NULL, destroy_ride);
 
     if (getline(&line, &len, file)) // Ignora a primeira linha do ficheiro (cabeçalho)
     {
@@ -168,7 +179,7 @@ GHashTable *read_rides(char *dataset, GHashTable *user_stats, GHashTable *driver
         RIDE *ride = create_ride(line, v);
 
         if (v[0])
-            g_hash_table_insert(rides, ride->id, ride);
+            g_hash_table_insert(rides, &(ride->id), ride);
         else
             destroy_ride(ride);
 

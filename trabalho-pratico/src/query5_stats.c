@@ -30,7 +30,8 @@ void destroy_bydate_stat(void *v)
 void create_bydate_stat(RIDE *r, GHashTable *bydate_stats, GHashTable *drivers)
 {
     char *id = get_ride_driver(r);
-    DRIVER *d = g_hash_table_lookup(drivers, id);
+    int id_int = atoi(id);
+    DRIVER *d = g_hash_table_lookup(drivers, &id_int);
 
     char *date = get_ride_date(r);
 

@@ -9,16 +9,14 @@
 
 struct stat
 {
-	char *id;
+	int id;
 	char *driver_name;
 	char *gender;
 	int age;
-	char *city;
 	double score;
-	double avg_score;
 	int trips;
+	double avg_score;
 	double money;
-	int total_distance;
 	char *most_recent_trip;
 };
 
@@ -26,7 +24,8 @@ struct stat
 
 char *get_driver_stat_id(DRIVER_STAT *s)
 {
-	return strdup(s->id);
+	char *id_str = id_to_string(s->id);
+	return id_str;
 }
 
 char *get_driver_stat_driver_name(DRIVER_STAT *s)
@@ -42,11 +41,6 @@ char *get_driver_stat_gender(DRIVER_STAT *s)
 int get_driver_stat_age(DRIVER_STAT *s)
 {
 	return s->age;
-}
-
-char *get_driver_stat_city(DRIVER_STAT *s)
-{
-	return strdup(s->city);
 }
 
 double get_driver_stat_score(DRIVER_STAT *s)
@@ -69,11 +63,6 @@ double get_driver_stat_money(DRIVER_STAT *s)
 	return s->money;
 }
 
-int get_driver_stat_total_distance(DRIVER_STAT *s)
-{
-	return s->total_distance;
-}
-
 char *get_driver_stat_most_recent_trip(DRIVER_STAT *s)
 {
 	return strdup(s->most_recent_trip);
@@ -85,10 +74,8 @@ void destroy_driver_stat(void *v)
 {
 	DRIVER_STAT *s = v;
 
-	free(s->id);
 	free(s->driver_name);
 	free(s->gender);
-	free(s->city);
 	free(s->most_recent_trip);
 	free(s);
 }
@@ -97,9 +84,9 @@ void destroy_driver_stat(void *v)
 
 void create_driver_stat(RIDE *r, GHashTable *d_stats, GHashTable *drivers)
 {
-	char *driver = get_ride_driver(r);
-	DRIVER *d = g_hash_table_lookup(drivers, driver);
-	DRIVER_STAT *dl = g_hash_table_lookup(d_stats, driver);
+	int driver = get_ride_driver_int(r);
+	DRIVER *d = g_hash_table_lookup(drivers, &driver);
+	DRIVER_STAT *dl = g_hash_table_lookup(d_stats, &driver);
 
 	int distance = get_ride_distance(r);
 	double score_driver = get_ride_score_driver(r);
@@ -121,17 +108,15 @@ void create_driver_stat(RIDE *r, GHashTable *d_stats, GHashTable *drivers)
 			driver_stat->driver_name = get_driver_name(d);
 			driver_stat->gender = get_driver_gender(d);
 			driver_stat->age = get_age(birth_date);
-			driver_stat->city = get_ride_city(r);
 
 			driver_stat->score = score_driver;
 			driver_stat->avg_score = score_driver;
 			driver_stat->trips = 1;
 			driver_stat->money = tip + get_price(d) + get_tax(d) * distance;
-			driver_stat->total_distance = distance;
 
 			driver_stat->most_recent_trip = date;
 
-			g_hash_table_insert(d_stats, driver_stat->id, driver_stat);
+			g_hash_table_insert(d_stats, &(driver_stat->id), driver_stat);
 
 			free(birth_date);
 		}
@@ -140,7 +125,6 @@ void create_driver_stat(RIDE *r, GHashTable *d_stats, GHashTable *drivers)
 			dl->score += score_driver;
 			dl->trips += 1;
 			dl->money += tip + get_price(d) + get_tax(d) * distance;
-			dl->total_distance += distance;
 
 			if (compare_dates(date, dl->most_recent_trip) > 0)
 			{
@@ -151,12 +135,8 @@ void create_driver_stat(RIDE *r, GHashTable *d_stats, GHashTable *drivers)
 				free(date);
 
 			dl->avg_score = dl->score / dl->trips;
-
-			free(driver);
 		}
 	}
-	else
-		free(driver);
 
 	free(account_status);
 }
@@ -192,10 +172,13 @@ gint compare_avg_score(gconstpointer a, gconstpointer b)
 			r = 1;
 		else
 		{
-			char *id1 = s1->id;
-			char *id2 = s2->id;
+			int id1 = s1->id;
+			int id2 = s2->id;
 
-			r = strcmp(id1, id2);
+			if (id1 < id2)
+				r = -1;
+			else
+				r = 1;
 		}
 	}
 

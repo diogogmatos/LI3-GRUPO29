@@ -10,9 +10,8 @@
 
 struct stat
 {
-	char *id;
+	int id;
 	char *date;
-	char *city;
 	int distance;
 	double tip;
 };
@@ -29,17 +28,18 @@ struct aux
 
 char *get_query9_stat_id(QUERY9_STAT *s)
 {
-	return strdup(s->id);
+	char *id_str = id_to_string(s->id);
+	return id_str;
+}
+
+int get_query9_stat_id_int(QUERY9_STAT *s)
+{
+	return s->id;
 }
 
 char *get_query9_stat_date(QUERY9_STAT *s)
 {
 	return strdup(s->date);
-}
-
-char *get_query9_stat_city(QUERY9_STAT *s)
-{
-	return strdup(s->city);
 }
 
 int get_query9_stat_distance(QUERY9_STAT *s)
@@ -58,9 +58,7 @@ void destroy_query9_stat(void *v)
 {
 	QUERY9_STAT *s = v;
 
-	free(s->id);
 	free(s->date);
-	free(s->city);
 	free(s);
 }
 
@@ -80,10 +78,9 @@ void build_query9_stat(gpointer key, gpointer value, gpointer userdata)
 	{
 		QUERY9_STAT *ride_stat = malloc(sizeof(QUERY9_STAT));
 
-		ride_stat->id = get_ride_id(r);
+		ride_stat->id = get_ride_id_int(r);
 		ride_stat->date = date;
 		ride_stat->distance = get_ride_distance(r);
-		ride_stat->city = get_ride_city(r);
 		ride_stat->tip = tip;
 
 		s->list = g_slist_append(s->list, ride_stat);

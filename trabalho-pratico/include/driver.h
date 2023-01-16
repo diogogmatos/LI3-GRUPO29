@@ -7,7 +7,6 @@ typedef struct driver DRIVER;
 
 // FUNÇÕES GET
 
-char *get_driver_id(DRIVER *d);
 char *get_driver_name(DRIVER *d);
 char *get_driver_birth_day(DRIVER *d);
 char *get_driver_gender(DRIVER *d);

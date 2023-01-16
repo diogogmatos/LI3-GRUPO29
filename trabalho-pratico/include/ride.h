@@ -8,8 +8,10 @@ typedef struct ride RIDE;
 // FUNÇÕES GET
 
 char *get_ride_id(RIDE *r);
+int get_ride_id_int(RIDE *r);
 char *get_ride_date(RIDE *r);
 char *get_ride_driver(RIDE *r);
+int get_ride_driver_int(RIDE *r);
 char *get_ride_user(RIDE *r);
 char *get_ride_city(RIDE *r);
 int get_ride_distance(RIDE *r);

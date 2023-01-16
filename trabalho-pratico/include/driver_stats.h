@@ -12,12 +12,10 @@ char *get_driver_stat_id(DRIVER_STAT *s);
 char *get_driver_stat_driver_name(DRIVER_STAT *s);
 char *get_driver_stat_gender(DRIVER_STAT *s);
 int get_driver_stat_age(DRIVER_STAT *s);
-char *get_driver_stat_city(DRIVER_STAT *s);
 double get_driver_stat_score(DRIVER_STAT *s);
 double get_driver_stat_avg_score(DRIVER_STAT *s);
 int get_driver_stat_trips(DRIVER_STAT *s);
 double get_driver_stat_money(DRIVER_STAT *s);
-int get_driver_stat_total_distance(DRIVER_STAT *s);
 char *get_driver_stat_most_recent_trip(DRIVER_STAT *s);
 
 // FUNÇÕES DESTROY
