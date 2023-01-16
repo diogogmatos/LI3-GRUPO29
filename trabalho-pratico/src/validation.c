@@ -12,6 +12,14 @@ int validate_length(char *str)
     return 1;
 }
 
+int validate_length_int(int n)
+{
+    if (n == 0)
+        return 0;
+
+    return 1;
+}
+
 int validate_date(char *date)
 {
     // Verifica se a data tem tamanho suficiente para ser válida

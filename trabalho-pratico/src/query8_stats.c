@@ -11,140 +11,129 @@
 
 struct stat
 {
-	char *ride_id;
-	char *id;
-	char *username;
-	int acc_age_d;
-	int acc_age_u;
-};
-
-struct aux
-{
-	GSList *list;
 	char *gender;
-	int age;
-	CATALOG *c;
+	int ride;
+	double driver_acc_age;
+	double user_acc_age;
 };
 
-// FUNÇÕES GET
-
-char *get_query8_stat_ride_id(QUERY8_STAT *s)
+char *get_query8_stat_gender(QUERY8_STAT *s)
 {
-	return strdup(s->ride_id);
+	return strdup(s->gender);
 }
 
-char *get_query8_stat_id(QUERY8_STAT *s)
+int get_query8_stat_ride(QUERY8_STAT *s)
 {
-	return strdup(s->id);
+	return s->ride;
 }
 
-char *get_query8_stat_username(QUERY8_STAT *s)
+double get_query8_stat_driver_acc_age(QUERY8_STAT *s)
 {
-	return strdup(s->username);
+	return s->driver_acc_age;
 }
 
-int get_query8_stat_acc_age_d(QUERY8_STAT *s)
+double get_query8_stat_user_acc_age(QUERY8_STAT *s)
 {
-	return s->acc_age_d;
+	return s->user_acc_age;
 }
-
-int get_query8_stat_acc_age_u(QUERY8_STAT *s)
-{
-	return s->acc_age_u;
-}
-
-// FUNÇÕES DESTROY
 
 void destroy_query8_stat(void *v)
 {
 	QUERY8_STAT *s = v;
 
-	free(s->id);
-	free(s->username);
-	free(s->ride_id);
+	free(s->gender);
 	free(s);
 }
 
-// FUNÇÕES DE CRIAÇÃO DE ESTATÍSTICAS
-
-void build_query8_stat(gpointer key, gpointer value, gpointer userdata)
+void create_query8_stats(RIDE *r, GHashTable *query8_stats, GHashTable *drivers, GHashTable *users)
 {
-	key = key; // Para evitar warnings de variáveis não utilizadas
-	
-	RIDE *r = value;
-	QUERY8_AUX *s = userdata;
+	char *driver = get_ride_driver(r);
+	char *user = get_ride_user(r);
 
-	char *id = get_ride_driver(r);
-	DRIVER *d = g_hash_table_lookup(get_catalog_drivers(s->c), id);
+	int driver_int = atoi(driver);
+	DRIVER *d = g_hash_table_lookup(drivers, &driver_int);
+	USER *u = g_hash_table_lookup(users, user);
 
-	char *username = get_ride_user(r);
-	USER *u = g_hash_table_lookup(get_catalog_users(s->c), username);
+	char *driver_acc_status = get_driver_account_status(d);
+	char *user_acc_status = get_user_account_status(u);
 
-	char *account_status_d = get_driver_account_status(d);
-	char *account_status_u = get_user_account_status(u);
-
-	if (!strcmp(account_status_d, "active") && !strcmp(account_status_u, "active"))
+	if (!strcmp(driver_acc_status, "active") && !strcmp(user_acc_status, "active"))
 	{
-		char *genderd = get_driver_gender(d);
-		char *genderu = get_user_gender(u);
-		char *dated_s = get_driver_account_creation(d);
-		char *dateu_s = get_user_account_creation(u);
+		char *driver_gender = get_driver_gender(d);
+		char *user_gender = get_user_gender(u);
 
-		int aged = convert_date(dated_s);
-		int ageu = convert_date(dateu_s);
-
-		double aged_y = aged / 365.2425;
-		double ageu_y = ageu / 365.2425;
-
-		if (!strcmp(genderd, s->gender) && !strcmp(genderu, s->gender) && aged_y >= s->age && ageu_y >= s->age)
+		if (!strcmp(user_gender, driver_gender))
 		{
-			QUERY8_STAT *ride_stat = malloc(sizeof(QUERY8_STAT));
+			QUERY8_STAT *s = malloc(sizeof(QUERY8_STAT));
 
-			ride_stat->ride_id = get_ride_id(r);
-			ride_stat->id = id;
-			ride_stat->username = username;
-			ride_stat->acc_age_d = aged;
-			ride_stat->acc_age_u = ageu;
+			char *driver_acc_creation = get_driver_account_creation(d);
+			char *user_acc_creation = get_user_account_creation(u);
 
-			s->list = g_slist_append(s->list, ride_stat);
+			s->gender = driver_gender;
+			s->ride = get_ride_id_int(r);
+			s->driver_acc_age = convert_date(driver_acc_creation) / 365.2425;
+			s->user_acc_age = convert_date(user_acc_creation) / 365.2425;
+
+			g_hash_table_insert(query8_stats, &(s->ride), s);
+
+			free(driver_acc_creation);
+			free(user_acc_creation);
 		}
 		else
-		{
-			free(id);
-			free(username);
-		}
+			free(driver_gender);
 
-		free(genderd);
-		free(genderu);
-		free(dated_s);
-		free(dateu_s);
-	}
-	else
-	{
-		free(id);
-		free(username);
+		free(user_gender);
 	}
 
-	free(account_status_d);
-	free(account_status_u);
+	free(driver);
+	free(user);
+	free(driver_acc_status);
+	free(user_acc_status);
 }
 
-GSList *create_query8_stats(char *gender, int X, CATALOG *c)
+gint compare_query8_stats(gconstpointer a, gconstpointer b)
 {
-	GSList *r;
-	
-	QUERY8_AUX *s = malloc(sizeof(QUERY8_AUX));
+	QUERY8_STAT *s1 = (QUERY8_STAT *)a;
+	QUERY8_STAT *s2 = (QUERY8_STAT *)b;
 
-	s->list = NULL;
-	s->gender = gender;
-	s->age = X;
-	s->c = c;
+	int r;
 
-	g_hash_table_foreach(get_catalog_rides(c), build_query8_stat, s);
+	double age1_d = s1->driver_acc_age;
+	double age2_d = s2->driver_acc_age;
 
-	r = s->list;
+	if (age1_d > age2_d)
+		r = -1;
+	else if (age1_d < age2_d)
+		r = 1;
+	else
+	{
+		double age1_u = s1->user_acc_age;
+		double age2_u = s2->user_acc_age;
 
-	free(s);
+		if (age1_u > age2_u)
+			r = -1;
+		else if (age1_u < age2_u)
+			r = 1;
+		else
+		{
+			int id1 = s1->ride;
+			int id2 = s2->ride;
+
+			if (id1 < id2)
+				r = -1;
+			else
+				r = 1;
+		}
+	}
 
 	return r;
+}
+
+GList *sort_query8_stats(GHashTable *query8_stats)
+{
+	GList *list = g_hash_table_get_values(query8_stats);
+
+	list = g_list_sort(list, compare_query8_stats);
+
+	return list;
 }

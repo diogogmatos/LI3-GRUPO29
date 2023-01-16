@@ -15,8 +15,8 @@ struct stat
 	char *gender;
 	int age;
 	double score;
-	double avg_score;
 	int trips;
+	double avg_score;
 	double money;
 	int total_distance;
 	char *most_recent_trip;
@@ -106,7 +106,8 @@ void create_user_stat(RIDE *r, GHashTable *u_stats, GHashTable *drivers, GHashTa
 		char *date = get_ride_date(r);
 
 		char *driver = get_ride_driver(r);
-		DRIVER *d = g_hash_table_lookup(drivers, driver);
+		int driver_int = atoi(driver);
+		DRIVER *d = g_hash_table_lookup(drivers, &driver_int);
 
 		if (ul == NULL)
 		{
@@ -157,4 +158,54 @@ void create_user_stat(RIDE *r, GHashTable *u_stats, GHashTable *drivers, GHashTa
 		free(username);
 
 	free(account_status);
+}
+
+/* Função `compare_tot_dist()`
+ * Responsável por comparar duas estatísticas relativas à distância total de um utilizador e retornar -1 ou 1 de acordo
+ * com o resultado da comparação. É utilizada de forma auxiliar a `g_list_sort()` para ordenar uma lista de STAT's.
+ */
+gint compare_tot_dist(gconstpointer a, gconstpointer b)
+{
+	USER_STAT *s1 = (USER_STAT *)a;
+	USER_STAT *s2 = (USER_STAT *)b;
+
+	int r;
+
+	int distance1 = s1->total_distance;
+	int distance2 = s2->total_distance;
+
+	if (distance1 > distance2)
+		r = -1;
+	else if (distance1 < distance2)
+		r = 1;
+	else
+	{
+		char *date1 = s1->most_recent_trip;
+		char *date2 = s2->most_recent_trip;
+
+		int dc = compare_dates(date1, date2);
+
+		if (dc > 0)
+			r = -1;
+		else if (dc < 0)
+			r = 1;
+		else
+		{
+			char *username1 = s1->username;
+			char *username2 = s2->username;
+
+			r = strcmp(username1, username2);
+		}
+	}
+
+	return r;
+}
+
+GList *sort_query3_stats(GHashTable *user_stats)
+{
+	GList *list = g_hash_table_get_values(user_stats);
+
+	list = g_list_sort(list, compare_tot_dist);
+
+	return list;
 }

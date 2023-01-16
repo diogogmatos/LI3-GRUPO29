@@ -126,7 +126,7 @@ long rbdug(long d, long m, long y)
     r[12] = 334;
 
     a = r[m] + d;
-    
+
     if ((IsLeapG(y) == 1) && (m > 2))
         a += 1;
     return (a);
@@ -161,6 +161,60 @@ long DatDif(long d1, long m1, long y1, long d2, long m2, long y2)
     }
 
     return (suma);
+}
+
+// Returns 1 if the given year is a leap year, 0 otherwise.
+int is_leap_year(int year)
+{
+    if (year % 400 == 0)
+        return 1;
+    if (year % 100 == 0)
+        return 0;
+    if (year % 4 == 0)
+        return 1;
+    return 0;
+}
+
+// Returns the number of days in the given month (1-based) in the given year.
+int days_in_month(int month, int year)
+{
+    int days[] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    if (month == 2 && is_leap_year(year))
+        return 29;
+    return days[month];
+}
+
+// Increases the given date string by one day.
+void increase_date(char *date)
+{
+    // Parse the year, month, and day from the date string.
+    int year, month, day;
+    sscanf(date, "%d/%d/%d", &day, &month, &year);
+
+    // Increase the day by one.
+    day++;
+    if (day > days_in_month(month, year))
+    {
+        // If the day is now invalid, set it to 1 and increase the month.
+        day = 1;
+        month++;
+        if (month > 12)
+        {
+            // If the month is now invalid, set it to 1 and increase the year.
+            month = 1;
+            year++;
+        }
+    }
+
+    // Update the date string with the incremented date.
+    sprintf(date, "%02d/%02d/%04d", day, month, year);
+}
+
+void increase_something_date(char *something_date)
+{
+    char *date = strchr(something_date, '-') + 1;
+
+    increase_date(date);
 }
 
 /* Função `convert_date()`
@@ -201,24 +255,30 @@ int compare_dates(char *date1, char *date2)
 
     if (ano1 == ano2 && mes1 == mes2 && dia1 == dia2)
         return 0;
-    
+
     return -1;
 }
 
 // OUTROS
 
-void display_stats()
+char *id_to_string(int id)
 {
-    // Get the current memory usage
+    char *str = malloc(13);    // allocate memory for the string
+    sprintf(str, "%012d", id); // convert the integer to a string with 12 digits
+    return str;
+}
+
+void print_time_and_memory()
+{
     struct rusage usage;
     getrusage(RUSAGE_SELF, &usage);
-    printf("\nMemory usage: %ld MiB\n", usage.ru_maxrss / 1024);
-
-    // Get the current CPU time
-    clock_t clock_time = clock();
-    long clock_time_sec = clock_time / CLOCKS_PER_SEC;
-    if (clock_time_sec < 60)
-        printf("CPU time: %ld seconds\n", clock_time_sec);
+    double user_time = usage.ru_utime.tv_sec + usage.ru_utime.tv_usec / 1000000.0;
+    double sys_time = usage.ru_stime.tv_sec + usage.ru_stime.tv_usec / 1000000.0;
+    double total_time = user_time + sys_time;
+    printf("\nMemory usage: %ld MB\n", usage.ru_maxrss / 1000);
+    int time = total_time;
+    if (total_time < 60)
+        printf("CPU time: %.3f seconds\n", total_time);
     else
-        printf("CPU time: %ld minutes and %ld seconds (%ld seconds)\n", clock_time_sec / 60, clock_time_sec % 60, clock_time_sec);
+        printf("CPU time: %d minutes and %d seconds (%.3f seconds)\n", time / 60, time % 60, total_time);
 }

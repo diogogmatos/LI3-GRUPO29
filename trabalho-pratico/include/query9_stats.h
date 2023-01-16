@@ -10,6 +10,7 @@ typedef struct aux QUERY9_AUX;
 // FUNÇÕES GET
 
 char *get_query9_stat_id(QUERY9_STAT *s);
+int get_query9_stat_id_int(QUERY9_STAT *s);
 char *get_query9_stat_date(QUERY9_STAT *s);
 char *get_query9_stat_city(QUERY9_STAT *s);
 int get_query9_stat_distance(QUERY9_STAT *s);

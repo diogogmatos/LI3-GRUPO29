@@ -2,10 +2,18 @@
 #define query6_stats_h
 
 #include <glib.h>
+#include "ride.h"
 #include "catalog.h"
 
-typedef struct stat QUERY6_STAT;
+typedef struct stat BYCITYDATE_STAT;
 
+// FUNÇÕES DESTROY
+
+void destroy_bycitydate_stat(void *v);
+
+// FUNÇÕES DE CRIAÇÃO DE ESTATÍSTICAS
+
+void create_bycitydate_stat(RIDE *r, GHashTable *bycitydate_stats);
 double create_query6_stat(char *city, char *date_a, char *date_b, CATALOG *c);
 
 #endif

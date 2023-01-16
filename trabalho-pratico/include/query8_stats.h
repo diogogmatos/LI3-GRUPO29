@@ -5,22 +5,15 @@
 #include "catalog.h"
 
 typedef struct stat QUERY8_STAT;
-typedef struct aux QUERY8_AUX;
 
-// FUNÇÕES GET
-
-char *get_query8_stat_ride_id(QUERY8_STAT *s);
-char *get_query8_stat_id(QUERY8_STAT *s);
-char *get_query8_stat_username(QUERY8_STAT *s);
-int get_query8_stat_acc_age_d(QUERY8_STAT *s);
-int get_query8_stat_acc_age_u(QUERY8_STAT *s);
-
-// FUNÇÕES DESTROY
+char *get_query8_stat_gender(QUERY8_STAT *s);
+int get_query8_stat_ride(QUERY8_STAT *s);
+double get_query8_stat_driver_acc_age(QUERY8_STAT *s);
+double get_query8_stat_user_acc_age(QUERY8_STAT *s);
 
 void destroy_query8_stat(void *v);
 
-// FUNÇÕES DE CRIAÇÃO DE ESTATÍSTICAS
-
-GSList *create_query8_stats(char *gender, int X, CATALOG *c);
+void create_query8_stats(RIDE *r, GHashTable *query8_stats, GHashTable *drivers, GHashTable *users);
+GList *sort_query8_stats(GHashTable *query8_stats);
 
 #endif

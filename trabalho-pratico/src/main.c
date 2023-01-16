@@ -44,7 +44,7 @@ int main(int argc, char **argv)
     free(line);
     destroy_catalog(c);
 
-    display_stats();
+    print_time_and_memory();
 
     return 0;
 }
