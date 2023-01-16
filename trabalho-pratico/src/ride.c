@@ -179,19 +179,21 @@ GHashTable *read_rides(char *dataset, GHashTable *user_stats, GHashTable *driver
         RIDE *ride = create_ride(line, v);
 
         if (v[0])
+        {
             g_hash_table_insert(rides, &(ride->id), ride);
+
+            // CRIAÇÃO DE ESTATÍSTICAS
+
+            create_driver_stat(ride, driver_stats, drivers);
+            create_user_stat(ride, user_stats, drivers, users);
+            create_city_stat(ride, city_stats, drivers);
+            create_bydate_stat(ride, bydate_stats, drivers);
+            create_bycitydate_stat(ride, bycitydate_stats);
+            create_query7_stat(ride, query7_stats, drivers);
+            create_query8_stats(ride, query8_stats, drivers, users);
+        }
         else
             destroy_ride(ride);
-
-        // CRIAÇÃO DE ESTATÍSTICAS
-
-        create_driver_stat(ride, driver_stats, drivers);
-        create_user_stat(ride, user_stats, drivers, users);
-        create_city_stat(ride, city_stats, drivers);
-        create_bydate_stat(ride, bydate_stats, drivers);
-        create_bycitydate_stat(ride, bycitydate_stats);
-        create_query7_stat(ride, query7_stats, drivers);
-        create_query8_stats(ride, query8_stats, drivers, users);
     }
 
     fclose(file);

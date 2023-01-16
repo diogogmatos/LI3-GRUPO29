@@ -86,17 +86,18 @@ void create_driver_stat(RIDE *r, GHashTable *d_stats, GHashTable *drivers)
 {
 	int driver = get_ride_driver_int(r);
 	DRIVER *d = g_hash_table_lookup(drivers, &driver);
-	DRIVER_STAT *dl = g_hash_table_lookup(d_stats, &driver);
-
-	int distance = get_ride_distance(r);
-	double score_driver = get_ride_score_driver(r);
-	double tip = get_ride_tip(r);
 
 	char *account_status = get_driver_account_status(d);
 
 	if (!strcmp(account_status, "active"))
 	{
 		char *date = get_ride_date(r);
+
+		int distance = get_ride_distance(r);
+		double score_driver = get_ride_score_driver(r);
+		double tip = get_ride_tip(r);
+
+		DRIVER_STAT *dl = g_hash_table_lookup(d_stats, &driver);
 
 		if (dl == NULL)
 		{

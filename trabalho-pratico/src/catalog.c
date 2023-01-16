@@ -112,7 +112,7 @@ CATALOG *create_catalog(char *dataset)
     GHashTable *drivers = read_drivers(dataset); // dados de condutores
     GHashTable *users = read_users(dataset);     // dados de utilizadores
 
-    GHashTable *driver_stats = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, destroy_driver_stat);         // estatísticas de condutores
+    GHashTable *driver_stats = g_hash_table_new_full(g_int_hash, g_int_equal, NULL, destroy_driver_stat);         // estatísticas de condutores
     GHashTable *user_stats = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, destroy_user_stat);             // estatísticas de utilizadores
     GHashTable *city_stats = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, destroy_city_stat);             // estatísticas da query 4
     GHashTable *bydate_stats = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, destroy_bydate_stat);         // estatísticas da query 5
