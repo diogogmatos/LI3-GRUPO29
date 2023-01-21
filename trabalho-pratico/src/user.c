@@ -92,6 +92,9 @@ USER *create_user(char *line, int *v)
         v[0] = 0;
     else if (!validate_date(u->account_creation))
         v[0] = 0;
+    // Validação do status da conta
+    else if (!validate_account_status(u->account_status))
+        v[0] = 0;
 
     return u;
 }

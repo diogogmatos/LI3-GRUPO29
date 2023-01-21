@@ -67,3 +67,48 @@ int validate_date(char *date)
     // -> Se chegou aqui, a data é válida 
     return 1;
 }
+
+void to_lower_case(char *s)
+{
+    int i;
+
+    for (i = 0; s[i]!='\0'; i++) {
+      if(s[i] >= 'A' && s[i] <= 'Z') {
+         s[i] += 32;
+        }
+    }
+}
+
+int validate_car_class(char *car_class)
+{
+    to_lower_case(car_class);
+
+    if (strcmp(car_class, "basic"))
+        return 1;
+    if (strcmp(car_class, "green"))
+        return 1;
+    if (strcmp(car_class, "premium"))
+        return 1;
+
+    return 0;
+}
+
+int validate_account_status(char *account_status)
+{
+    to_lower_case(account_status);
+
+    if (strcmp(account_status, "active"))
+        return 1;
+    if (strcmp(account_status, "inactive"))
+        return 1;
+
+    return 0;
+}
+
+int validate_distance(int distance)
+{
+    if (distance > 0)
+        return 1;
+
+    return 0;
+}

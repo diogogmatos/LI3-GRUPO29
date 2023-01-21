@@ -103,6 +103,12 @@ DRIVER *create_driver(char *line, int *v)
         v[0] = 0;
     else if (!validate_date(d->account_creation))
         v[0] = 0;
+    // Validação da classe do carro
+    else if (!validate_car_class(d->car_class))
+        v[0] = 0;
+    // Validação do status da conta
+    else if (!validate_account_status(d->account_status))
+        v[0] = 0;
 
     return d;
 }
