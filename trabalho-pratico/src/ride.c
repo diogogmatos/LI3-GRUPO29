@@ -125,6 +125,9 @@ RIDE *create_ride(char *line, int *v)
     // Validação de datas
     else if (!validate_date(r->date))
         v[0] = 0;
+    // Validação da distancia
+    else if (!validate_distance(r->distance))
+        v[0] = 0;
 
     return r;
 }
