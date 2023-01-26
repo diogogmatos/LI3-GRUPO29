@@ -8,5 +8,7 @@ void to_lower_case(char *s);
 int validate_car_class(char *car_class);
 int validate_account_status(char *account_status);
 int validate_distance(int distance);
+int validate_digits(char *s);
+int validate_number(char *tip);
 
 #endif

@@ -107,9 +107,9 @@ RIDE *create_ride(char *line, int *v)
     r->user = strdup(strsep(&line, ";"));
     r->city = strdup(strsep(&line, ";"));
     r->distance = atoi(strsep(&line, ";"));
-    r->score_user = atoi(strsep(&line, ";"));
-    r->score_driver = atoi(strsep(&line, ";"));
-    r->tip = atof(strsep(&line, ";"));
+    char *su = strsep(&line, ";");
+    char *sd = strsep(&line, ";");
+    char *t  = strsep(&line, ";");
 
     // Validação
 
@@ -128,6 +128,19 @@ RIDE *create_ride(char *line, int *v)
     // Validação da distancia
     else if (!validate_distance(r->distance))
         v[0] = 0;
+    // Validação do score do user
+    else if (!validate_number(su))
+        v[0] = 0;
+    // Validação do score do driver
+    else if (!validate_number(sd))
+        v[0] = 0;
+    // Validação da tip
+    else if (!validate_number(t))
+        v[0] = 0;
+
+    r->score_user = atoi(su);
+    r->score_driver = atoi(sd);
+    r->tip = atof(t);
 
     return r;
 }
