@@ -110,6 +110,9 @@ RIDE *create_ride(char *line, int *v)
     char *su = strsep(&line, ";");
     char *sd = strsep(&line, ";");
     char *t  = strsep(&line, ";");
+    r->score_user = atoi(su);
+    r->score_driver = atoi(sd);
+    r->tip = atof(t);
 
     // Validação
 
@@ -137,10 +140,6 @@ RIDE *create_ride(char *line, int *v)
     // Validação da tip
     else if (!validate_number(t))
         v[0] = 0;
-
-    r->score_user = atoi(su);
-    r->score_driver = atoi(sd);
-    r->tip = atof(t);
 
     return r;
 }
