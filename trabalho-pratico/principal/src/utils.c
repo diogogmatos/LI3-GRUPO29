@@ -280,5 +280,28 @@ void print_time_and_memory()
     if (total_time < 60)
         printf("CPU time: %.3f seconds\n", total_time);
     else
-        printf("CPU time: %d minutes and %d seconds (%.3f seconds)\n", time / 60, time % 60, total_time);
+        printf("CPU time: %d min and %d sec (%.3f sec)\n", time / 60, time % 60, total_time);
+}
+
+void print_query_time(clock_t start, clock_t end)
+{
+    double cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
+
+    if (cpu_time_used < 0.001)
+        printf(" | CPU time: %.0f us\n", cpu_time_used * 1000000);
+    else if(cpu_time_used < 1)
+        printf(" | CPU time: %.1f ms\n", cpu_time_used * 1000);
+    else
+        printf(" | CPU time: %.1f s\n", cpu_time_used);
+}
+
+void print_loading_time(clock_t start, clock_t end, char *str)
+{
+    double cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
+    int time = cpu_time_used;
+
+    if (cpu_time_used < 60)
+        printf("%s loading time: %.3f sec\n", str, cpu_time_used);
+    else
+        printf("%s loading time: %d min and %d sec (%.3f sec)\n", str, time / 60, time % 60, cpu_time_used);
 }

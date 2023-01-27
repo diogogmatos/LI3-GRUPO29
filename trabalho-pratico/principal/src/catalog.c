@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include <glib.h>
 #include "../include/driver.h"
 #include "../include/user.h"
@@ -13,6 +14,7 @@
 #include "../include/query6_stats.h"
 #include "../include/query7_stats.h"
 #include "../include/query8_stats.h"
+#include "../include/utils.h"
 
 /* Struct CATALOG
  * Responsável por guardar os apontadores para as 3 hash table de dados (drivers, users e rides),
@@ -109,8 +111,19 @@ CATALOG *create_catalog(char *dataset)
 {
     CATALOG *c = malloc(sizeof(CATALOG));
 
+    clock_t start, end;
+
+    start = clock();
     GHashTable *drivers = read_drivers(dataset); // dados de condutores
+    end = clock();
+
+    print_loading_time(start, end, "DRIVERS");
+
+    start = clock();
     GHashTable *users = read_users(dataset);     // dados de utilizadores
+    end = clock();
+
+    print_loading_time(start, end, "USERS");
 
     GHashTable *driver_stats = g_hash_table_new_full(g_int_hash, g_int_equal, NULL, destroy_driver_stat);         // estatísticas de condutores
     GHashTable *user_stats = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, destroy_user_stat);             // estatísticas de utilizadores
@@ -120,7 +133,11 @@ CATALOG *create_catalog(char *dataset)
     GHashTable *query7_stats_hash = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, destroy_query7_stat);    // estatísticas da query 7 (hash table)
     GHashTable *query8_stats_hash = g_hash_table_new_full(g_int_hash, g_int_equal, NULL, destroy_query8_stat);    // estatísticas da query 8 (hash table)
 
+    start = clock();
     GHashTable *rides = read_rides(dataset, user_stats, driver_stats, city_stats, bydate_stats, bycitydate_stats, query7_stats_hash, query8_stats_hash, drivers, users); // dados de viagens
+    end = clock();
+
+    print_loading_time(start, end, "RIDES");
 
     GList *query2_stats = sort_query2_stats(driver_stats);      // estatísticas da query 2 (lista ordenada)
     GList *query3_stats = sort_query3_stats(user_stats);        // estatísticas da query 3 (lista ordenada)

@@ -64,7 +64,7 @@ int validate_date(char *date)
     if (month < 1 || month > 12)
         return 0;
 
-    // -> Se chegou aqui, a data é válida 
+    // -> Se chegou aqui, a data é válida
     return 1;
 }
 
@@ -72,9 +72,11 @@ void to_lower_case(char *s)
 {
     int i;
 
-    for (i = 0; s[i]!='\0'; i++) {
-      if(s[i] >= 'A' && s[i] <= 'Z') {
-         s[i] += 32;
+    for (i = 0; s[i] != '\0'; i++)
+    {
+        if (s[i] >= 'A' && s[i] <= 'Z')
+        {
+            s[i] += 32;
         }
     }
 }
@@ -83,11 +85,11 @@ int validate_car_class(char *car_class)
 {
     to_lower_case(car_class);
 
-    if (strcmp(car_class, "basic"))
+    if (!strcmp(car_class, "basic"))
         return 1;
-    if (strcmp(car_class, "green"))
+    if (!strcmp(car_class, "green"))
         return 1;
-    if (strcmp(car_class, "premium"))
+    if (!strcmp(car_class, "premium"))
         return 1;
 
     return 0;
@@ -97,9 +99,9 @@ int validate_account_status(char *account_status)
 {
     to_lower_case(account_status);
 
-    if (strcmp(account_status, "active"))
+    if (!strcmp(account_status, "active"))
         return 1;
-    if (strcmp(account_status, "inactive"))
+    if (!strcmp(account_status, "inactive"))
         return 1;
 
     return 0;
@@ -116,28 +118,26 @@ int validate_distance(int distance)
 // Verifica se uma string é um número inteiro ou décimal
 int validate_digits(char *s)
 {
-    char *t = s;
-
-    while (*t) {
-        if (isdigit(*t) == 0)
-        {
-          if (*t != '.') return 0;
-        }
-        t++;
+    int i;
+    for (i=0; s[i] != '\0'; i++)
+    {
+        if (!isdigit(s[i]) && s[i] != '.')
+            return 0;
     }
 
     return 1;
 }
 
 // Verifica se uma string é um número inteiro ou décimal superior ou igual a 0
-int validate_number(char *tip)
+int validate_number(char *value)
 {
-    if (validate_digits(tip) == 0) return 0;
-
-    // -> verifica se a tip é um número maior ou igual a 0
-    if (atof(tip) < 0)
+    if (!validate_digits(value))
         return 0;
 
-    // -> Se chegou até aqui, a tip é válida
+    // -> verifica se value é um número maior ou igual a 0
+    if (!(atof(value) >= 0))
+        return 0;
+
+    // -> Se chegou até aqui, value é válido
     return 1;
 }

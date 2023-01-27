@@ -1,20 +1,38 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -pedantic-errors -O3 -g $(shell pkg-config --cflags glib-2.0)
 LIBS = -lm $(shell pkg-config --libs glib-2.0)
-OBJS = $(patsubst %.c,%.o,$(wildcard src/*.c))            # Get all object files by replacing .c with .o
+OBJS = $(patsubst %.c,%.o,$(wildcard principal/src/*.c))            # Get all object files by replacing .c with .o
+OBJS_TESTES = $(patsubst %.c,%.o,$(wildcard testes/src/*.c))
 TARGET = programa-principal
+TARGET_TESTES = programa-testes
 RESULTS = Resultados/*.txt
 OUTPUT = Resultados
 
-INPUT = exemplos_de_queries/tests_2/input.txt
-DATASET = Dataset_Fase1
+TESTS = queries/tests-regular-2
 
-INPUT_BIG = exemplos_de_queries/large-outputs/largedataset.txt
-DATASET_BIG = data-large
+INPUT = queries/tests-regular-2/input.txt
+DATASET = data/data-regular
+
+INPUT_ERRORS = queries/tests-regular-errors/input.txt
+DATASET_ERRORS = data/data-regular-errors
+
+INPUT_BIG = queries/tests-large/input.txt
+DATASET_BIG = data/data-large
+
+INPUT_BIG_ERRORS = queries/tests-large-errors/input.txt
+DATASET_BIG_ERRORS = data/data-large-errors
 
 # -fsanitize=leak
 
-$(TARGET): $(OBJS)                                        # Compiling the program
+all: $(TARGET) $(TARGET_TESTES)
+
+programa-principal: $(OBJS)
+	@$(CC) $(CFLAGS) $^ $(LIBS) -o $@ ; echo "[COMPILED] $@"
+	@if [ ! -e $(OUTPUT) ]; then\
+		mkdir -p $(OUTPUT) ; echo "[CREATED] $(OUTPUT)/";\
+	fi
+
+programa-testes: $(OBJS_TESTES)
 	@$(CC) $(CFLAGS) $^ $(LIBS) -o $@ ; echo "[COMPILED] $@"
 	@if [ ! -e $(OUTPUT) ]; then\
 		mkdir -p $(OUTPUT) ; echo "[CREATED] $(OUTPUT)/";\
@@ -23,7 +41,7 @@ $(TARGET): $(OBJS)                                        # Compiling the progra
 %.o: %.c                                                  #Linking object files
 	@$(CC) $(CFLAGS) -c $< $(LIBS) -o $@ ; echo "[LINKED] $@"
 
-run: $(TARGET)                                            # Run the program
+run: $(TARGET)
 	@if [ ! -e $(OUTPUT) ]; then\
 		mkdir -p $(OUTPUT) ; echo "[CREATED] $(OUTPUT)/";\
 	else\
@@ -37,7 +55,49 @@ run: $(TARGET)                                            # Run the program
 	fi
 	./programa-principal "$(DATASET)" "$(INPUT)"
 
-run_big: $(TARGET)
+run-errors: $(TARGET)
+	@if [ ! -e $(OUTPUT) ]; then\
+		mkdir -p $(OUTPUT) ; echo "[CREATED] $(OUTPUT)/";\
+	else\
+		rm -f $(RESULTS) ; echo "[CLEANED] $(RESULTS)";\
+	fi
+	@if [ ! -e $(DATASET_ERRORS) ]; then\
+		echo "[ERROR] $(DATASET_ERRORS)/ not found!";\
+	fi
+	@if [ ! -e $(INPUT_ERRORS) ]; then\
+		echo "[ERROR] $(INPUT_ERRORS) not found!";\
+	fi
+	./programa-principal "$(DATASET_ERRORS)" "$(INPUT_ERRORS)"
+
+run-big: $(TARGET)
+	@if [ ! -e $(OUTPUT) ]; then\
+		mkdir -p $(OUTPUT) ; echo "[CREATED] $(OUTPUT)/";\
+	else\
+		rm -f $(RESULTS) ; echo "[CLEANED] $(RESULTS)";\
+	fi
+	@if [ ! -e $(DATASET_BIG) ]; then\
+		echo "[ERROR] $(DATASET_BIG)/ not found!";\
+	fi
+	@if [ ! -e $(INPUT_BIG) ]; then\
+		echo "[ERROR] $(INPUT_BIG) not found!";\
+	fi
+	./programa-principal "$(DATASET_BIG)" "$(INPUT_BIG)"
+
+run-big-errors: $(TARGET)
+	@if [ ! -e $(OUTPUT) ]; then\
+		mkdir -p $(OUTPUT) ; echo "[CREATED] $(OUTPUT)/";\
+	else\
+		rm -f $(RESULTS) ; echo "[CLEANED] $(RESULTS)";\
+	fi
+	@if [ ! -e $(DATASET_BIG_ERRORS) ]; then\
+		echo "[ERROR] $(DATASET_BIG_ERRORS)/ not found!";\
+	fi
+	@if [ ! -e $(INPUT_BIG_ERRORS) ]; then\
+		echo "[ERROR] $(INPUT_BIG_ERRORS) not found!";\
+	fi
+	./programa-principal "$(DATASET_BIG_ERRORS)" "$(INPUT_BIG_ERRORS)"
+
+run-testes: $(TARGET_TESTES)
 	@if [ ! -e $(OUTPUT) ]; then\
 		mkdir -p $(OUTPUT) ; echo "[CREATED] $(OUTPUT)/";\
 	else\
@@ -49,7 +109,8 @@ run_big: $(TARGET)
 	@if [ ! -e $(INPUT) ]; then\
 		echo "[ERROR] $(INPUT) not found!";\
 	fi
-	./programa-principal "$(DATASET_BIG)" "$(INPUT_BIG)"
+	make run
+	./programa-testes "$(DATASET)" "$(INPUT)" "$(TESTS)"
 
-clean:                                                    # Clean the output files
-	@rm -f $(TARGET) $(OBJS) $(RESULTS) ; echo "[CLEANED]"
+clean: # Clean the output files
+	@rm -f $(TARGET) $(TARGET_TESTES) $(OBJS) $(OBJS_TESTES) $(RESULTS) ; echo "[CLEANED]"
