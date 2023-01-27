@@ -112,3 +112,32 @@ int validate_distance(int distance)
 
     return 0;
 }
+
+// Verifica se uma string é um número inteiro ou décimal
+int validate_digits(char *s)
+{
+    char *t = s;
+
+    while (*t) {
+        if (isdigit(*t) == 0)
+        {
+          if (*t != '.') return 0;
+        }
+        t++;
+    }
+
+    return 1;
+}
+
+// Verifica se uma string é um número inteiro ou décimal superior ou igual a 0
+int validate_number(char *tip)
+{
+    if (validate_digits(tip) == 0) return 0;
+
+    // -> verifica se a tip é um número maior ou igual a 0
+    if (atof(tip) < 0)
+        return 0;
+
+    // -> Se chegou até aqui, a tip é válida
+    return 1;
+}
