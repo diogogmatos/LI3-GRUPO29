@@ -106,41 +106,46 @@ RIDE *create_ride(char *line, int *v)
     r->driver = atoi(strsep(&line, ";"));
     r->user = strdup(strsep(&line, ";"));
     r->city = strdup(strsep(&line, ";"));
-    r->distance = atoi(strsep(&line, ";"));
+    char *d = strsep(&line, ";");
     char *su = strsep(&line, ";");
     char *sd = strsep(&line, ";");
     char *t  = strsep(&line, ";");
+    r->distance = atoi(d);
     r->score_user = atoi(su);
     r->score_driver = atoi(sd);
     r->tip = atof(t);
 
     // Validação
 
-    // Validação do tamanho dos campos (não podem ser vazios)
-    if (!validate_length_int(r->id))
+    if (!validate_length_int(r->id)) // Validação do tamanho dos campos
         v[0] = 0;
-    else if (!validate_length_int(r->driver))
+    else if (!validate_length(r->date)) // Validação do tamanho dos campos
         v[0] = 0;
-    else if (!validate_length(r->user))
+    else if (!validate_date(r->date)) // Validação de datas
         v[0] = 0;
-    else if (!validate_length(r->city))
+    else if (!validate_length_int(r->driver)) // Validação do tamanho dos campos
         v[0] = 0;
-    // Validação de datas
-    else if (!validate_date(r->date))
+    else if (!validate_length(r->user)) // Validação do tamanho dos campos
         v[0] = 0;
-    // Validação da distância
-    else if (!validate_distance(r->distance))
+    else if (!validate_length(r->city)) // Validação do tamanho dos campos
         v[0] = 0;
-    // Validação do score do user
-    else if (!validate_number(su))
+    else if (!validate_length_int(r->distance)) // Validação do tamanho dos campos
         v[0] = 0;
-    // Validação do score do driver
-    else if (!validate_number(sd))
+    else if (!validate_distance(d)) // Validação da distância
         v[0] = 0;
-    // Validação da tip
-    else if (!validate_number(t))
+    else if (!validate_length_int(r->score_user)) // Validação do tamanho dos campos
         v[0] = 0;
-
+    else if (!validate_score(su)) // Validação dos scores
+        v[0] = 0;
+    else if (!validate_length_int(r->score_driver)) // Validação do tamanho dos campos
+        v[0] = 0;
+    else if (!validate_score(sd)) // Validação dos scores
+        v[0] = 0;
+    else if (!validate_length(t)) // Validação do tamanho dos campos
+        v[0] = 0;
+    else if (!validate_number(t)) // Validação da tip
+        v[0] = 0;
+    
     return r;
 }
 

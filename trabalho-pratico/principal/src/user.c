@@ -78,22 +78,25 @@ USER *create_user(char *line, int *v)
 
     // Validação
 
-    // Validação do tamanho dos campos (não podem ser vazios)
-    if (!validate_length(u->username))
+    if (!validate_length(u->username)) // Validação do tamanho dos campos
         v[0] = 0;
-    else if (!validate_length(u->name))
+    else if (!validate_length(u->name)) // Validação do tamanho dos campos
         v[0] = 0;
-    else if (!validate_length(u->gender))
+    else if (!validate_length(u->gender)) // Validação do tamanho dos campos
         v[0] = 0;
-    else if (!validate_length(u->pay_method))
+    else if (!validate_length(u->birth_date)) // Validação do tamanho dos campos
         v[0] = 0;
-    // Validação de datas
-    else if (!validate_date(u->birth_date))
+    else if (!validate_date(u->birth_date)) // Validação de datas
         v[0] = 0;
-    else if (!validate_date(u->account_creation))
+    else if (!validate_length(u->account_creation)) // Validação do tamanho dos campos
         v[0] = 0;
-    // Validação do status da conta
-    else if (!validate_account_status(u->account_status))
+    else if (!validate_date(u->account_creation)) // Validação de datas
+        v[0] = 0;
+    else if (!validate_length(u->pay_method)) // Validação do tamanho dos campos
+        v[0] = 0;
+    else if (!validate_length(u->account_status)) // Validação do tamanho dos campos
+        v[0] = 0;
+    else if (!validate_account_status(u->account_status)) // Validação do status da conta
         v[0] = 0;
 
     return u;

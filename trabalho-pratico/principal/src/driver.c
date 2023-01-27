@@ -88,26 +88,31 @@ DRIVER *create_driver(char *line, int *v)
     // Validação
 
     // Validação do tamanho dos campos (não podem ser vazios)
-    if (!validate_length_int(d->id))
+    if (!validate_length_int(d->id)) // Validação do tamanho dos campos
         v[0] = 0;
-    else if (!validate_length(d->name))
+    else if (!validate_length(d->name)) // Validação do tamanho dos campos
         v[0] = 0;
-    else if (!validate_length(d->gender))
+    else if (!validate_length(d->birth_day)) // Validação do tamanho dos campos
         v[0] = 0;
-    else if (!validate_length(d->license_plate))
+    else if (!validate_date(d->birth_day)) // Validação de datas
         v[0] = 0;
-    else if (!validate_length(d->city))
+    else if (!validate_length(d->gender)) // Validação do tamanho dos campos
         v[0] = 0;
-    // Validação de datas
-    else if (!validate_date(d->birth_day))
+    else if (!validate_length(d->car_class)) // Validação do tamanho dos campos
         v[0] = 0;
-    else if (!validate_date(d->account_creation))
+    else if (!validate_car_class(d->car_class)) // Validação da classe do carro
         v[0] = 0;
-    // Validação da classe do carro
-    else if (!validate_car_class(d->car_class))
+    else if (!validate_length(d->license_plate)) // Validação do tamanho dos campos
         v[0] = 0;
-    // Validação do status da conta
-    else if (!validate_account_status(d->account_status))
+    else if (!validate_length(d->city)) // Validação do tamanho dos campos
+        v[0] = 0;
+    else if (!validate_length(d->account_creation)) // Validação do tamanho dos campos
+        v[0] = 0;
+    else if (!validate_date(d->account_creation)) // Validação de datas
+        v[0] = 0;
+    else if (!validate_length(d->account_status)) // Validação do tamanho dos campos
+        v[0] = 0;
+    else if (!validate_account_status(d->account_status)) // Validação do status da conta
         v[0] = 0;
 
     return d;

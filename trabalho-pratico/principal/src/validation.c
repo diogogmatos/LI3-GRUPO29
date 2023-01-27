@@ -107,22 +107,50 @@ int validate_account_status(char *account_status)
     return 0;
 }
 
-int validate_distance(int distance)
+int validate_int(char *value)
 {
-    if (distance > 0)
-        return 1;
+    int i;
+    for (i = 0; value[i] != '\0'; i++)
+    {
+        if (!isdigit(value[i]))
+            return 0;
+    }
+    return 1;
+}
 
-    return 0;
+int validate_distance(char *distance)
+{
+    if(!validate_int(distance)) // verifica se é um número inteiro
+        return 0;
+
+    int d = atoi(distance);
+    if (!(d > 0)) // verifica se é um número positivo maior que 0
+        return 0;
+
+    return 1;
+}
+
+int validate_score(char *score)
+{
+    if(!validate_int(score)) // verifica se é um número inteiro
+        return 0;
+
+    int d = atoi(score);
+    if (!(d >= 0)) // verifica se é um número positivo maior ou igual 0
+        return 0;
+
+    return 1;
 }
 
 // Verifica se uma string é um número inteiro ou décimal
 int validate_digits(char *s)
 {
     int i;
-    for (i=0; s[i] != '\0'; i++)
+    for (i = 0; s[i] != '\0'; i++)
     {
-        if (!isdigit(s[i]) && s[i] != '.')
-            return 0;
+        if (!isdigit(s[i]))
+            if (s[i] != '.')
+                return 0;
     }
 
     return 1;

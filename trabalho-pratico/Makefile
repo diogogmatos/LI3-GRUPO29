@@ -9,6 +9,9 @@ RESULTS = Resultados/*.txt
 OUTPUT = Resultados
 
 TESTS = queries/tests-regular-2
+TESTS_ERRORS = queries/tests-regular-errors
+TESTS_BIG = queries/tests-large
+TESTS_BIG_ERRORS = queries/tests-large-errors
 
 INPUT = queries/tests-regular-2/input.txt
 DATASET = data/data-regular
@@ -111,6 +114,51 @@ run-testes: $(TARGET_TESTES)
 	fi
 	make run
 	./programa-testes "$(DATASET)" "$(INPUT)" "$(TESTS)"
+
+run-testes-errors: $(TARGET_TESTES)
+	@if [ ! -e $(OUTPUT) ]; then\
+		mkdir -p $(OUTPUT) ; echo "[CREATED] $(OUTPUT)/";\
+	else\
+		rm -f $(RESULTS) ; echo "[CLEANED] $(RESULTS)";\
+	fi
+	@if [ ! -e $(DATASET_ERRORS) ]; then\
+		echo "[ERROR] $(DATASET_ERRORS)/ not found!";\
+	fi
+	@if [ ! -e $(INPUT_ERRORS) ]; then\
+		echo "[ERROR] $(INPUT_ERRORS) not found!";\
+	fi
+	make run-errors
+	./programa-testes "$(DATASET_ERRORS)" "$(INPUT_ERRORS)" "$(TESTS_ERRORS)"
+
+run-testes-big: $(TARGET_TESTES)
+	@if [ ! -e $(OUTPUT) ]; then\
+		mkdir -p $(OUTPUT) ; echo "[CREATED] $(OUTPUT)/";\
+	else\
+		rm -f $(RESULTS) ; echo "[CLEANED] $(RESULTS)";\
+	fi
+	@if [ ! -e $(DATASET_BIG) ]; then\
+		echo "[ERROR] $(DATASET_BIG)/ not found!";\
+	fi
+	@if [ ! -e $(INPUT_BIG) ]; then\
+		echo "[ERROR] $(INPUT_BIG) not found!";\
+	fi
+	make run-big
+	./programa-testes "$(DATASET_BIG)" "$(INPUT_BIG)" "$(TESTS_BIG)"
+
+run-testes-big-errors: $(TARGET_TESTES)
+	@if [ ! -e $(OUTPUT) ]; then\
+		mkdir -p $(OUTPUT) ; echo "[CREATED] $(OUTPUT)/";\
+	else\
+		rm -f $(RESULTS) ; echo "[CLEANED] $(RESULTS)";\
+	fi
+	@if [ ! -e $(DATASET_BIG_ERRORS) ]; then\
+		echo "[ERROR] $(DATASET_BIG_ERRORS)/ not found!";\
+	fi
+	@if [ ! -e $(INPUT_BIG_ERRORS) ]; then\
+		echo "[ERROR] $(INPUT_BIG_ERRORS) not found!";\
+	fi
+	make run-big-errors
+	./programa-testes "$(DATASET_BIG_ERRORS)" "$(INPUT_BIG_ERRORS)" "$(TESTS_BIG_ERRORS)"	
 
 clean: # Clean the output files
 	@rm -f $(TARGET) $(TARGET_TESTES) $(OBJS) $(OBJS_TESTES) $(RESULTS) ; echo "[CLEANED]"
