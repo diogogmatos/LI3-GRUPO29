@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include <glib.h>
 #include "../include/io.h"
 #include "../include/catalog.h"
@@ -23,7 +24,15 @@ int main(int argc, char **argv)
     char *dataset = argv[1];
     char *input = argv[2];
 
+    clock_t start, end;
+
+    start = clock();
+    printf("\n");
     CATALOG *c = create_catalog(dataset);
+    end = clock();
+
+    print_loading_time(start, end, "TOTAL"); // Tempo de carregamento do catálogo
+    printf("\n");
 
     FILE *file = fopen(input, "r");
     // "../exemplos_de_queries/tests_2/input.txt"
@@ -36,7 +45,12 @@ int main(int argc, char **argv)
     {
         int query = line[0] - '0';
         char *args = line + 2;
+
+        start = clock();
         handle_input(query, args, c, i);
+        end = clock();
+
+        print_query_time(start, end); // Tempo de execução da query
     }
 
     fclose(file);
