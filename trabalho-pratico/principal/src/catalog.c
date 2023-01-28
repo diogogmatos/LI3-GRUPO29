@@ -139,10 +139,14 @@ CATALOG *create_catalog(char *dataset)
 
     print_loading_time(start, end, "RIDES");
 
+    start = clock();
     GList *query2_stats = sort_query2_stats(driver_stats);      // estatísticas da query 2 (lista ordenada)
     GList *query3_stats = sort_query3_stats(user_stats);        // estatísticas da query 3 (lista ordenada)
     GList *query7_stats = sort_query7_stats(query7_stats_hash); // estatísticas da query 7 (lista ordenada)
     GList *query8_stats = sort_query8_stats(query8_stats_hash); // estatísticas da query 8 (lista ordenada)
+    end = clock();
+
+    print_loading_time(start, end, "SORTING STATS");
 
     c->drivers = drivers;
     c->users = users;
