@@ -278,9 +278,9 @@ void print_time_and_memory()
     printf("\nMemory usage: %ld MB\n", usage.ru_maxrss / 1000);
     int time = total_time;
     if (total_time < 60)
-        printf("CPU time: %.3f seconds\n", total_time);
+        printf("CPU time: %.3f seconds\n\n", total_time);
     else
-        printf("CPU time: %d min and %d sec (%.3f sec)\n", time / 60, time % 60, total_time);
+        printf("CPU time: %d min and %d sec (%.3f sec)\n\n", time / 60, time % 60, total_time);
 }
 
 void print_query_time(clock_t start, clock_t end)

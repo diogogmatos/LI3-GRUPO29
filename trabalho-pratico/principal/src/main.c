@@ -5,6 +5,7 @@
 #include "../include/io.h"
 #include "../include/catalog.h"
 #include "../include/utils.h"
+#include "../include/interactive.h"
 
 /* Função `main()`
  * Recebe 2 argumentos, o primeiro é o caminho para o dataset a ser utilizado e o segundo é o
@@ -15,48 +16,19 @@
  */
 int main(int argc, char **argv)
 {
-    if (argc < 2)
+    if (argc == 1)
+    {
+        run_interactive();
+        return 0;
+    }
+    
+    if (argc < 3)
     {
         printf("[ERRO] - Falta de argumentos.\n");
+        printf("Uso: %s <path para dataset> <path para input>\n", argv[0]);
+        return 1;
     }
 
-    char *dataset = argv[1];
-    char *input = argv[2];
-
-    clock_t start, end;
-
-    start = clock();
-    printf("\n");
-    CATALOG *c = create_catalog(dataset);
-    end = clock();
-
-    print_loading_time(start, end, "TOTAL"); // Tempo de carregamento do catálogo
-    printf("\n");
-
-    FILE *file = fopen(input, "r");
-
-    char *line = NULL;
-    size_t len = 0;
-
-    int i;
-    for (i = 1; getline(&line, &len, file) != -1; ++i)
-    {
-        int query = line[0] - '0';
-        char *args = line + 2;
-
-        start = clock();
-        handle_input(query, args, c, i);
-        end = clock();
-
-        print_query_time(start, end); // Tempo de execução da query
-    }
-
-    fclose(file);
-
-    free(line);
-    destroy_catalog(c);
-
-    print_time_and_memory();
-
+    run_queries(argv[1], argv[2]);
     return 0;
 }

@@ -34,7 +34,11 @@ void query_1(int is_id, char *value, char *path, CATALOG *c)
         int id_int = atoi(id);
         DRIVER *d = g_hash_table_lookup(get_catalog_drivers(c), &id_int);
 
-        FILE *f = fopen(path, "w");
+        FILE *f;
+        if (path != NULL)
+            f = fopen(path, "w");
+        else
+            f = NULL;
 
         if (d == NULL)
         {
@@ -56,13 +60,16 @@ void query_1(int is_id, char *value, char *path, CATALOG *c)
             int trips = get_driver_stat_trips(s);
             double money = get_driver_stat_money(s);
 
-            fprintf(f, "%s;%s;%d;%.3f;%d;%.3f\n", name, gender, age, avg_score, trips, money);
+            if (path != NULL)
+                fprintf(f, "%s;%s;%d;%.3f;%d;%.3f\n", name, gender, age, avg_score, trips, money);
+            else
+                printf("%s;%s;%d;%.3f;%d;%.3f\n", name, gender, age, avg_score, trips, money);
 
             free(name);
             free(gender);
         }
 
-        fclose(f);
+        if (path != NULL) fclose(f);
         free(account_status);
     }
     else // user
