@@ -4,7 +4,6 @@
 #include <glib.h>
 #include "../include/io.h"
 #include "../include/catalog.h"
-#include "../include/ride.h"
 #include "../include/utils.h"
 
 /* Função `main()`
@@ -35,7 +34,6 @@ int main(int argc, char **argv)
     printf("\n");
 
     FILE *file = fopen(input, "r");
-    // "../exemplos_de_queries/tests_2/input.txt"
 
     char *line = NULL;
     size_t len = 0;

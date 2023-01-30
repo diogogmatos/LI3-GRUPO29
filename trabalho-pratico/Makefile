@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = -Wall -Wextra -pedantic-errors -O3 -g $(shell pkg-config --cflags glib-2.0)
 LIBS = -lm $(shell pkg-config --libs glib-2.0)
 OBJS = $(patsubst %.c,%.o,$(wildcard principal/src/*.c))            # Get all object files by replacing .c with .o
-OBJS_TESTES = $(patsubst %.c,%.o,$(wildcard testes/src/*.c))
+OBJS_TESTES = $(patsubst %.c,%.o,$(wildcard testes/src/*.c)) principal/src/catalog.o principal/src/city_stats.o principal/src/driver_stats.o principal/src/driver.o principal/src/io.o principal/src/queries.o principal/src/query5_stats.o principal/src/query6_stats.o principal/src/query7_stats.o principal/src/query8_stats.o principal/src/query9_stats.o principal/src/ride.o principal/src/user_stats.o principal/src/user.o principal/src/utils.o principal/src/validation.o
 TARGET = programa-principal
 TARGET_TESTES = programa-testes
 RESULTS = Resultados/*.txt
@@ -112,7 +112,6 @@ run-testes: $(TARGET_TESTES)
 	@if [ ! -e $(INPUT) ]; then\
 		echo "[ERROR] $(INPUT) not found!";\
 	fi
-	make run
 	./programa-testes "$(DATASET)" "$(INPUT)" "$(TESTS)"
 
 run-testes-errors: $(TARGET_TESTES)
@@ -127,7 +126,6 @@ run-testes-errors: $(TARGET_TESTES)
 	@if [ ! -e $(INPUT_ERRORS) ]; then\
 		echo "[ERROR] $(INPUT_ERRORS) not found!";\
 	fi
-	make run-errors
 	./programa-testes "$(DATASET_ERRORS)" "$(INPUT_ERRORS)" "$(TESTS_ERRORS)"
 
 run-testes-big: $(TARGET_TESTES)
@@ -142,7 +140,6 @@ run-testes-big: $(TARGET_TESTES)
 	@if [ ! -e $(INPUT_BIG) ]; then\
 		echo "[ERROR] $(INPUT_BIG) not found!";\
 	fi
-	make run-big
 	./programa-testes "$(DATASET_BIG)" "$(INPUT_BIG)" "$(TESTS_BIG)"
 
 run-testes-big-errors: $(TARGET_TESTES)
@@ -157,7 +154,6 @@ run-testes-big-errors: $(TARGET_TESTES)
 	@if [ ! -e $(INPUT_BIG_ERRORS) ]; then\
 		echo "[ERROR] $(INPUT_BIG_ERRORS) not found!";\
 	fi
-	make run-big-errors
 	./programa-testes "$(DATASET_BIG_ERRORS)" "$(INPUT_BIG_ERRORS)" "$(TESTS_BIG_ERRORS)"	
 
 clean: # Clean the output files
