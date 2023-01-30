@@ -18,10 +18,13 @@ void handle_input(int query, char *input, CATALOG *c, int i)
     {
         int is_id = atoi(input);
         char *value = strsep(&input, "\n");
-        char *path = get_results_path(i);
+
+        char *path;
+        i ? (path = get_results_path(i)) : (path = NULL);
 
         query_1(is_id, value, path, c);
-        printf("Output %d - Query %d - [OK]", i, query);
+        
+        i ? printf("Output %d - Query %d - [OK]", i, query) : printf("Query %d - [OK]", query);
 
         free(path);
         return;
@@ -131,4 +134,42 @@ void handle_input(int query, char *input, CATALOG *c, int i)
         return;
     }
     }
+}
+
+void run_queries(char *dataset, char *input)
+{
+    clock_t start, end;
+
+    start = clock();
+    printf("\n");
+    CATALOG *c = create_catalog(dataset);
+    end = clock();
+
+    print_loading_time(start, end, "TOTAL"); // Tempo de carregamento do catálogo
+    printf("\n");
+
+    FILE *file = fopen(input, "r");
+
+    char *line = NULL;
+    size_t len = 0;
+
+    int i;
+    for (i = 1; getline(&line, &len, file) != -1; ++i)
+    {
+        int query = line[0] - '0';
+        char *args = line + 2;
+
+        start = clock();
+        handle_input(query, args, c, i);
+        end = clock();
+
+        print_query_time(start, end); // Tempo de execução da query
+    }
+
+    fclose(file);
+
+    free(line);
+    destroy_catalog(c);
+
+    print_time_and_memory();
 }

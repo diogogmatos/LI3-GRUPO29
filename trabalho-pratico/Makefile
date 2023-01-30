@@ -156,5 +156,8 @@ run-testes-big-errors: $(TARGET_TESTES)
 	fi
 	./programa-testes "$(DATASET_BIG_ERRORS)" "$(INPUT_BIG_ERRORS)" "$(TESTS_BIG_ERRORS)"	
 
+run-interativo: $(TARGET)
+	./programa-principal
+
 clean: # Clean the output files
 	@rm -f $(TARGET) $(TARGET_TESTES) $(OBJS) $(OBJS_TESTES) $(RESULTS) ; echo "[CLEANED]"
