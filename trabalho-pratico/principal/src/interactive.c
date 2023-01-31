@@ -30,7 +30,7 @@ QUERY *query_info()
     queries[2].description = "Lista os N utilizadores com maior distância viajada.";
     queries[2].arguments = "<N> - Número de utilizadores a ser listados.";
     queries[2].output = "username;nome;distancia_total";
-    queries[2].example = "Anita-PetPinto38;Anita-Petra Pinto;240";
+    queries[2].example = "Anita-PetPinto37;Anita-Petra Pinto;240";
     
     queries[3].description = "Preço médio das viagens (sem considerar gorjetaas) numa determinada cidade.";
     queries[3].arguments = "<city> - Nome da cidade.";
