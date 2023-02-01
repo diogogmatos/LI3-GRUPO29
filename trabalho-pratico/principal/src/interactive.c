@@ -22,7 +22,7 @@ QUERY *query_info()
     QUERY *queries = malloc(sizeof(QUERY) * 9);
 
     queries[0].description = "Lista o resumo de um perfil registado no serviço através do seu identificador.";
-    queries[0].arguments = "ID de condutor / USERNAME de utilizador";
+    queries[0].arguments = "<ID> de condutor / <USERNAME> de utilizador";
     queries[0].output = "nome;genero;idade;avaliacao_media;numero_viagens;total_gasto";
     queries[0].example = "João;M;23;4.5;10;100";
 
@@ -72,6 +72,8 @@ QUERY *query_info()
 #define MARGIN 4
 #define SPACING 2
 
+// FUNÇÕES AUXILIARES
+
 int center_text(char *text, int width)
 {
     int len = strlen(text);
@@ -88,8 +90,8 @@ int center_options(int options, int height)
 
 int get_lines_number(char *text)
 {
-    int i, acc = 1;
-    for (i = 0; i < strlen(text); i++)
+    int i, acc = 1, len = strlen(text);
+    for (i = 0; i < len; i++)
     {
         if (text[i] == '\n')
             acc++;
@@ -101,27 +103,26 @@ char get_input()
 {
     switch (getch())
     {
-    case '\033':
-    {
-        getch();
-        switch (getch())
+        case '\033':
         {
-        case 'A':
-            return 'A';
-        case 'B':
-            return 'B';
-        case 'C':
-            return 'C';
-        case 'D':
-            return 'D';
+            getch();
+            switch (getch())
+            {
+                case 'A':
+                    return 'A';
+                case 'B':
+                    return 'B';
+                case 'C':
+                    return 'C';
+                case 'D':
+                    return 'D';
+            }
+            return '0';
         }
-    }
-    case '\n':
-    {
-        return '\n';
-    }
-    default:
-        return '0';
+        case '\n':
+            return '\n';
+        default:
+            return '0';
     }
 }
 
@@ -153,25 +154,15 @@ void delay(int secs)
     while (time(0) < retTime);
 }
 
-void print_text(WINDOW *win, int height, int width, char* str)
+int round_up(double d)
 {
-    int len = strlen(str);
-    int limit = width - 4;
-
-    int i, j, remaining, count;
-    for (i = 0, j = 0; i < len; i += count, j++)
-    {
-        char dest[limit];
-
-        remaining = len - i;
-        count = remaining < limit ? remaining : limit;
-
-        strncpy(dest, str, count);
-        dest[count] = '\0';
-
-        mvwprintw(win, height + j, center_text(dest, width), dest);
-    }
+    int i = (int)d;
+    if (d - i > 0)
+        return i + 1;
+    return i;
 }
+
+// FUNÇÕES DE CRIAÇÃO DE JANELAS
 
 WINDOW *new_window()
 {
@@ -213,231 +204,9 @@ WINDOW *new_info_window(int height, int width)
     return win;
 }
 
-void menu1(WINDOW *win, char *title, char *footer, char *options[], int N, int sel)
-{
-    // Tamanho da janela
-    struct winsize w;
-    ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-    int height = w.ws_row - 2;
-    int width = w.ws_col - 4;
+// FUNÇÕES DE DESENHO DE JANELAS
 
-    // Título
-    char *formated_title = malloc(sizeof(char) * (strlen(title) + 4));
-    sprintf(formated_title, " %s ", title);
-    mvwprintw(win, 0, 3, formated_title);
-
-    free(formated_title);
-
-    // Rodapé
-    if (footer != NULL) // Se o rodapé existir
-    {  
-        char *formated_footer = malloc(sizeof(char) * (strlen(footer) + 4));
-        sprintf(formated_footer, " %s ", footer);
-        mvwprintw(win, height - 1, center_text(formated_footer, width), formated_footer);
-
-        free(formated_footer);
-    }
-
-    // Opções
-    int i, margin = center_options(N, height), pos = center_text(options[0], width);
-
-    for (i = 0; i < N; i++)
-    {
-        if (i == sel)
-        {
-            wattron(win, A_REVERSE);
-            mvwprintw(win, i * SPACING + margin, pos, options[i]);
-            wattroff(win, A_REVERSE);
-        }
-        else
-            mvwprintw(win, i * SPACING + margin, pos, options[i]);
-    }
-
-    refresh();
-    wrefresh(win);
-}
-
-void menu2(WINDOW *win, char *title, char *desc, char *footer, QUERY *query)
-{
-    // Tamanho da janela
-    struct winsize w;
-    ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-    int height = w.ws_row - 2;
-    int width = w.ws_col - 4;
-
-    echo(); // Habilita echo
-
-    // Título
-    char *formated_title = malloc(sizeof(char) * (strlen(title) + 4));
-    sprintf(formated_title, " %s ", title);
-    mvwprintw(win, 0, 3, formated_title);
-
-    free(formated_title);
-
-    // Informações da query
-    if (query != NULL && strlen(query->description) < width - 4) // Só imprime se existir query e couber no terminal
-    {
-        mvwprintw(win, height / 2 - 10, center_text(query->description, width) - 2, "> ");
-        wprintw(win, query->description);
-
-        wattron(win, A_REVERSE);
-        mvwprintw(win, height / 2 - 8, center_text(query->description, width) - 2, "Argumentos:");
-        wattroff(win, A_REVERSE);
-        wprintw(win, " ");
-        wprintw(win, query->arguments);
-    }
-
-    // Rodapé
-    if (footer != NULL)
-    {  
-        char *formated_footer = malloc(sizeof(char) * (strlen(footer) + 4));
-        sprintf(formated_footer, " %s ", footer);
-        mvwprintw(win, height - 1, center_text(formated_footer, width), formated_footer);
-
-        free(formated_footer);
-    }
-
-    // Descrição & Input
-    wattron(win, A_REVERSE);
-    mvwprintw(win, height / 2 - 2, center_text(desc, width), desc);
-    wattroff(win, A_REVERSE);
-    mvwprintw(win, height / 2, center_text(desc, width), "> ");
-    
-    refresh();
-    wrefresh(win);
-}
-
-void menu_result(WINDOW *win, int start, int N, char *output)
-{   
-    // Tamanho da janela
-    struct winsize w;
-    ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-    int height = w.ws_row - 2;
-    int width = w.ws_col - 4;
-    int space = height - 4;
-
-    // Título
-    char *title = " RESULTADO ";
-    mvwprintw(win, 0, 3, title);
-
-    // Formato de output
-    if (strlen(output) < width - 30) // Só imprime se couber no terminal
-    {
-        char *formated_output = malloc(sizeof(char) * (strlen(output)));
-        sprintf(formated_output, " %s ", output);
-        mvwprintw(win, 0, center_text(formated_output, width), formated_output);
-
-        free(formated_output);
-    }
-
-    // Navegação
-    char *nav = " UP/DOWN/LEFT/RIGHT - Navegar ";
-    mvwprintw(win, height - 1, center_text(nav, width), nav);
-    
-    // Sair
-    char *quit = " ENTER - Sair ";
-    mvwprintw(win, height - 1, width - 3 - strlen(quit), quit);
-
-    // Informação de número de página
-    int pages = N / space;
-    int page = start / space + 1;
-    char *page_info = malloc(sizeof(char) * 34);
-    sprintf(page_info, " %d/%d ", page, pages);
-    mvwprintw(win, height - 1, 3, page_info);
-
-    free(page_info);
-
-    // Abrir ficheiro de output
-    char *path = get_results_path(0);
-    FILE *file = fopen(path, "r");
-
-    // Calcular comprimento da barra para o número de linha
-    char *N_str = malloc(sizeof(char) * 12);
-    sprintf(N_str, "%d", N);
-
-    int bar_len = strlen(N_str);
-
-    // Calcular posição em width do texto de acordo com a primeira linha de output
-    FILE *f = fopen(path, "r");
-
-    char *l = NULL;
-    size_t ln = 0;
-
-    getline(&l, &ln, f);
-    int pos = center_text(l, width) - bar_len - 1;
-    fclose(f);
-    
-    // Mecanismo de paginação
-    char *line = NULL;
-    size_t len = 0;
-
-    int i, j;
-    if (start > 0) for (i = 1; getline(&line, &len, file) != -1 && i < start; ++i);
-    for (i = start, j = 0; getline(&line, &len, file) != -1 && i < start + space; ++i, ++j)
-    {
-        char k[12];
-        sprintf(k, "%d", i + 1);
-
-        wattron(win, A_REVERSE);
-        for (int l = 0; l < bar_len - strlen(k); l++)
-            mvwprintw(win, j + 2, pos + l, " ");
-        mvwprintw(win, j + 2, pos + bar_len - strlen(k), k);
-        wattroff(win, A_REVERSE);
-        wprintw(win, " ");
-        wprintw(win, line);
-    }
-
-    fclose(file);
-    free(path);
-
-    refresh();
-    wrefresh(win);
-}
-
-void show_result(char *output)
-{
-    struct winsize w;
-    ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-    int height = w.ws_row - 2;
-    
-    int N;
-
-    char *line = NULL;
-    size_t len = 0;
-
-    char *path = get_results_path(0);
-    FILE *file = fopen(path, "r");
-
-    for (N = 0; getline(&line, &len, file) != -1; N++);
-
-    int start = 0, space = height - 4;
-    char i;
-    do
-    {
-        WINDOW *win = new_window();
-        
-        menu_result(win, start, N, output);
-        i = get_input();
-
-        if (i == 'A')
-            start--;
-        else if (i == 'B')
-            start++;
-        else if (i == 'C')
-            start += space;
-        else if (i == 'D')
-            start -= space;
-
-        if (start < 0)
-            start = N - space;
-        if (start + space > N)
-            start = 0;
-
-        werase(win);
-    }
-    while (i != '\n');
-}
-
+// -> Janelas de informação
 WINDOW *warning(char *warning, int time)
 {
     int height = 3;
@@ -485,14 +254,213 @@ WINDOW *info(char *info, int time)
 
     return win;
 }
+// --
 
-int menu_options(WINDOW *win, char *title, char *footer, char *options[], int N, int sel)
+void menu1(WINDOW *win, char *title, char *footer, char *info, char *options[], int N, int sel)
+{
+    // Tamanho da janela
+    struct winsize w;
+    ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+    int height = w.ws_row - 2;
+    int width = w.ws_col - 4;
+
+    // Título
+    char *formated_title = malloc(sizeof(char) * (strlen(title) + 4));
+    sprintf(formated_title, " %s ", title);
+    mvwprintw(win, 0, 3, formated_title);
+
+    free(formated_title);
+
+    // Rodapé
+    if (footer != NULL) // Se o rodapé existir
+    {  
+        char *formated_footer = malloc(sizeof(char) * (strlen(footer) + 4));
+        sprintf(formated_footer, " %s ", footer);
+        mvwprintw(win, height - 1, center_text(formated_footer, width), formated_footer);
+
+        free(formated_footer);
+    }
+
+    // Informação
+    if (info != NULL) // Se a informação existir
+    {
+        char *formated_info = malloc(sizeof(char) * (strlen(info) + 4));
+        sprintf(formated_info, " %s ", info);
+        mvwprintw(win, height - 1, 3, formated_info);
+
+        free(formated_info);
+    }
+
+    // Opções
+    int i, margin = center_options(N, height), pos = center_text(options[0], width);
+
+    for (i = 0; i < N; i++)
+    {
+        if (i == sel)
+        {
+            wattron(win, A_REVERSE);
+            mvwprintw(win, i * SPACING + margin, pos, options[i]);
+            wattroff(win, A_REVERSE);
+        }
+        else
+            mvwprintw(win, i * SPACING + margin, pos, options[i]);
+    }
+
+    refresh();
+    wrefresh(win);
+}
+
+void menu2(WINDOW *win, char *title, char *desc, char *footer, QUERY *query)
+{
+    // Tamanho da janela
+    struct winsize w;
+    ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+    int height = w.ws_row - 2;
+    int width = w.ws_col - 4;
+
+    echo(); // Habilita echo
+
+    // Título
+    char *formated_title = malloc(sizeof(char) * (strlen(title) + 4));
+    sprintf(formated_title, " %s ", title);
+    mvwprintw(win, 0, 3, formated_title);
+
+    free(formated_title);
+
+    // Informações da query
+    int q_desc_len;
+    if (query != NULL) q_desc_len = strlen(query->description);
+    if (query != NULL && q_desc_len < width - 4) // Só imprime se existir query e couber no terminal
+    {
+        mvwprintw(win, height / 2 - 10, center_text(query->description, width) - 2, "> ");
+        wprintw(win, query->description);
+
+        wattron(win, A_REVERSE);
+        mvwprintw(win, height / 2 - 8, center_text(query->description, width) - 2, "Argumentos:");
+        wattroff(win, A_REVERSE);
+        wprintw(win, " ");
+        wprintw(win, query->arguments);
+    }
+
+    // Rodapé
+    if (footer != NULL)
+    {  
+        char *formated_footer = malloc(sizeof(char) * (strlen(footer) + 4));
+        sprintf(formated_footer, " %s ", footer);
+        mvwprintw(win, height - 1, center_text(formated_footer, width), formated_footer);
+
+        free(formated_footer);
+    }
+
+    // Descrição & Input
+    wattron(win, A_REVERSE);
+    mvwprintw(win, height / 2 - 2, center_text(desc, width), desc);
+    wattroff(win, A_REVERSE);
+    mvwprintw(win, height / 2, center_text(desc, width), "> ");
+    
+    refresh();
+    wrefresh(win);
+}
+
+void menu_result(WINDOW *win, int start, int N, char *output)
+{   
+    // Tamanho da janela
+    struct winsize w;
+    ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+    int height = w.ws_row - 2;
+    int width = w.ws_col - 4;
+    int space = height - 4;
+
+    // Título
+    char *title = " RESULTADO ";
+    mvwprintw(win, 0, 3, title);
+
+    // Formato de output
+    int q_output_len = strlen(output);
+    if (q_output_len < width - 30) // Só imprime se couber no terminal
+    {
+        char *formated_output = malloc(sizeof(char) * (strlen(output)));
+        sprintf(formated_output, " %s ", output);
+        mvwprintw(win, 0, center_text(formated_output, width), formated_output);
+
+        free(formated_output);
+    }
+
+    // Navegação
+    char *nav = " UP/DOWN/LEFT/RIGHT - Navegar ";
+    mvwprintw(win, height - 1, center_text(nav, width), nav);
+    
+    // Sair
+    char *quit = " ENTER - Sair ";
+    mvwprintw(win, height - 1, width - 3 - strlen(quit), quit);
+
+    // Informação de número de página
+    int pages = round_up((double)N / (double)space);
+    if (pages > 0)
+    {
+        int page = round_up((double)start / (double)space + 1);
+        char *page_info = malloc(sizeof(char) * 34);
+        sprintf(page_info, " %d/%d ", page, pages);
+        mvwprintw(win, height - 1, 3, page_info);
+
+        free(page_info);
+    }
+
+    // Abrir ficheiro de output
+    char *path = get_results_path(0);
+    FILE *file = fopen(path, "r");
+
+    // Calcular comprimento da barra para o número de linha
+    char *N_str = malloc(sizeof(char) * 12);
+    sprintf(N_str, "%d", N);
+
+    int bar_len = strlen(N_str);
+
+    // Calcular posição em width do texto de acordo com a primeira linha de output
+    FILE *f = fopen(path, "r");
+
+    char *l = NULL;
+    size_t ln = 0;
+
+    if(getline(&l, &ln, f)) {};
+    int pos = center_text(l, width) - bar_len - 1;
+    fclose(f);
+    
+    // Mecanismo de paginação
+    char *line = NULL;
+    size_t len = 0;
+
+    int i, j;
+    if (start > 0) for (i = 1; getline(&line, &len, file) != -1 && i < start; ++i);
+    for (i = start, j = 0; getline(&line, &len, file) != -1 && i < start + space; ++i, ++j)
+    {
+        char k[12];
+        sprintf(k, "%d", i + 1);
+
+        wattron(win, A_REVERSE);
+        int k_len = strlen(k);
+        for (int l = 0; l < bar_len - k_len; l++)
+            mvwprintw(win, j + 2, pos + l, " ");
+        mvwprintw(win, j + 2, pos + bar_len - strlen(k), k);
+        wattroff(win, A_REVERSE);
+        wprintw(win, " ");
+        wprintw(win, line);
+    }
+
+    fclose(file);
+    free(path);
+
+    refresh();
+    wrefresh(win);
+}
+
+int menu_options(WINDOW *win, char *title, char *footer, char *info, char *options[], int N, int sel)
 {
     char i = '0';
 
     while (i != '\n')
     {
-        menu1(win, title, footer, options, N, sel);
+        menu1(win, title, footer, info, options, N, sel);
         i = get_input();
 
         if (i == 'A')
@@ -509,28 +477,92 @@ int menu_options(WINDOW *win, char *title, char *footer, char *options[], int N,
     return sel;
 }
 
-char *menu_input(WINDOW *win, char *title, char *desc, char *footer, QUERY *query)
+void menu_input(WINDOW *win, char *input, char *title, char *desc, char *footer, QUERY *query)
 {
     curs_set(1);
     menu2(win, title, desc, footer, query);
-    char *input = malloc(sizeof(char) * 50);
-    wgetnstr(win, input, 50);
+    wgetnstr(win, input, 100);
     curs_set(0);
-    return input;
 }
 
-int menu_principal()
+// JANELAS/MENUS DO PROGRAMA
+
+void show_result(char *output)
+{
+    struct winsize w;
+    ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+    int height = w.ws_row - 2;
+    
+    char *line = NULL;
+    size_t len = 0;
+
+    char *path = get_results_path(0);
+    FILE *file = fopen(path, "r");
+
+    int N;
+    for (N = 0; getline(&line, &len, file) != -1; N++);
+
+    int start = 0, space = height - 4;
+    char i;
+    do
+    {
+        WINDOW *win = new_window();
+        
+        menu_result(win, start, N, output);
+        i = get_input();
+
+        switch (i)
+        {
+            case 'A':
+                start--;
+                break;
+            case 'B':
+                start++;
+                break;
+            case 'C':
+                start += space;
+                break;
+            case 'D':
+                start -= space;
+                break;
+        }
+
+        if (N <= space)
+            start = 0;
+        if (start > N - space)
+            start = N - space;
+        if (start < 0)
+            start = 0;
+
+        werase(win);
+    }
+    while (i != '\n');
+}
+
+void run_query(int query, CATALOG *c, QUERY *queries)
 {
     WINDOW *win = new_window();
-    
-    char *options[] = {"> EXECUTAR QUERY", "> MUDAR DATASET","> SAIR"};
 
-    int sel = menu_options(win, "MENU PRINCIPAL", "ENTER - Selecionar", options, 3, 0);
+    char *title = malloc(sizeof(char) * 50);
+    sprintf(title, "QUERY %d", query);
 
-    return sel;
+    char *input = malloc(sizeof(char) * 50);
+    menu_input(win, input, title, "Introduza os argumentos para a query:", "ENTER - Executar", &queries[query - 1]);
+
+    WINDOW *info_win = info("[INFO] - Executando query...", -1);
+
+    handle_input(query, input, c, 0);
+
+    werase(info_win);
+    refresh();
+    wrefresh(info_win);
+
+    info("[INFO] - Query executada com sucesso.", 3);
+
+    show_result(queries[query - 1].output);
 }
 
-int menu_queries()
+int menu_queries(char *dataset)
 {
     WINDOW *win = new_window();
 
@@ -548,21 +580,30 @@ int menu_queries()
         "> VOLTAR"
     };
 
-    int sel = menu_options(win, "EXECUTAR QUERY", "ENTER - Selecionar", options, 10, 0);
+    int sel = menu_options(win, "EXECUTAR QUERY", "ENTER - Selecionar", dataset, options, 10, 0);
 
     return sel;
 }
 
-CATALOG *menu_dataset()
+int menu_principal(char *dataset)
 {
-    char *path;
+    WINDOW *win = new_window();
+    
+    char *options[] = {"> EXECUTAR QUERY", "> MUDAR DATASET","> SAIR"};
 
+    int sel = menu_options(win, "MENU PRINCIPAL", "ENTER - Selecionar", dataset, options, 3, 0);
+
+    return sel;
+}
+
+CATALOG *menu_dataset(char *path)
+{
     int valid;
     do
     {
         WINDOW *win = new_window();
         
-        path = menu_input(win, "CARREGAR DATASET", "Introduza o caminho para o dataset:", "ENTER - Carregar", NULL);
+        menu_input(win, path, "CARREGAR DATASET", "Introduza o caminho para o dataset:", "ENTER - Carregar Dataset", NULL);
 
         char *dataset = get_dataset_path(path, "drivers");
         FILE *file = fopen(dataset, "r");
@@ -596,46 +637,27 @@ CATALOG *menu_dataset()
     return c;
 }
 
-void run_query(int query, CATALOG *c, QUERY *queries)
-{
-    WINDOW *win = new_window();
-
-    char *title = malloc(sizeof(char) * 50);
-    sprintf(title, "QUERY %d", query);
-
-    char *input = menu_input(win, title, "Introduza os argumentos para a query:", "ENTER - Executar", &queries[query - 1]);
-
-    WINDOW *info_win = info("[INFO] - Executando query...", -1);
-
-    handle_input(query, input, c, 0);
-
-    werase(info_win);
-    refresh();
-    wrefresh(info_win);
-
-    info("[INFO] - Query executada com sucesso.", 3);
-
-    show_result(queries[query - 1].output);
-}
+// MAIN
 
 void run_interactive()
 {
     initscr();
 
+    char *path = malloc(sizeof(char) * 100);
     QUERY *q = query_info();
-    CATALOG *c = menu_dataset();
+    CATALOG *c = menu_dataset(path);
 
     int voltar_p = 1;
     while (voltar_p)
     {
-        int sel = menu_principal();
+        int sel = menu_principal(path);
 
         if (sel == 0) // EXECUTAR QUERY
         {   
             int voltar_q = 1;
             while (voltar_q)
             {
-                int query = menu_queries();
+                int query = menu_queries(path);
                 
                 switch(query)
                 {
@@ -675,13 +697,23 @@ void run_interactive()
         }
         else if (sel == 1) // MUDAR DATASET
         {
+            WINDOW *i = info("[INFO] - Destruindo catálogo de dados atual...", -1);
             destroy_catalog(c);
-            c = menu_dataset();
+            werase(i);
+            refresh();
+            wrefresh(i);
+            info("[INFO] - Feito!", 3);
+            c = menu_dataset(path);
         }
         else if (sel == 2) // SAIR
         {
-            endwin();
+            WINDOW *i = info("[INFO] - Destruindo catálogo de dados...", -1);
             destroy_catalog(c);
+            werase(i);
+            refresh();
+            wrefresh(i);
+            info("[INFO] - Feito!", 3);
+            endwin();
             return;
         }
     }
