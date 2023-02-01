@@ -23,7 +23,7 @@ GList *get_catalog_query8_stats(CATALOG *c);
 
 // FUNÇÕES CREATE / DESTROY
 
-CATALOG *create_catalog(char *dataset);
+CATALOG *create_catalog(char *dataset, int v);
 void destroy_catalog(void *v);
 
 #endif

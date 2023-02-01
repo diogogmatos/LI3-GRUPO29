@@ -19,12 +19,10 @@ void handle_input(int query, char *input, CATALOG *c, int i)
         int is_id = atoi(input);
         char *value = strsep(&input, "\n");
 
-        char *path;
-        i ? (path = get_results_path(i)) : (path = NULL);
+        char *path = get_results_path(i);
 
         query_1(is_id, value, path, c);
-        
-        i ? printf("Output %d - Query %d - [OK]", i, query) : printf("Query %d - [OK]", query);
+        printf("Output %d - Query %d - [OK]", i, query);
 
         free(path);
         return;
@@ -32,6 +30,7 @@ void handle_input(int query, char *input, CATALOG *c, int i)
     case 2:
     {
         int N = atoi(input);
+        
         char *path = get_results_path(i);
 
         query_2(N, path, c);
@@ -43,6 +42,7 @@ void handle_input(int query, char *input, CATALOG *c, int i)
     case 3:
     {
         int N = atoi(input);
+        
         char *path = get_results_path(i);
 
         query_3(N, path, c);
@@ -54,6 +54,7 @@ void handle_input(int query, char *input, CATALOG *c, int i)
     case 4:
     {
         char *city = strsep(&input, "\n");
+        
         char *path = get_results_path(i);
 
         query_4(city, path, c);
@@ -66,6 +67,7 @@ void handle_input(int query, char *input, CATALOG *c, int i)
     {
         char *date_a = strsep(&input, " ");
         char *date_b = strsep(&input, "\n");
+        
         char *path = get_results_path(i);
 
         query_5(date_a, date_b, path, c);
@@ -79,6 +81,7 @@ void handle_input(int query, char *input, CATALOG *c, int i)
         char *city = strsep(&input, " ");
         char *date_a = strsep(&input, " ");
         char *date_b = strsep(&input, "\n");
+        
         char *path = get_results_path(i);
 
         query_6(city, date_a, date_b, path, c);
@@ -91,6 +94,7 @@ void handle_input(int query, char *input, CATALOG *c, int i)
     {
         int N = atoi(strsep(&input, " "));
         char *city = strsep(&input, "\n");
+        
         char *path = get_results_path(i);
 
         query_7(N, city, path, c);
@@ -103,6 +107,7 @@ void handle_input(int query, char *input, CATALOG *c, int i)
     {
         char *gender = strsep(&input, " ");
         int X = atoi(strsep(&input, "\n"));
+        
         char *path = get_results_path(i);
 
         query_8(gender, X, path, c);
@@ -115,6 +120,7 @@ void handle_input(int query, char *input, CATALOG *c, int i)
     {
         char *date_a = strsep(&input, " ");
         char *date_b = strsep(&input, "\n");
+        
         char *path = get_results_path(i);
 
         query_9(date_a, date_b, path, c);
@@ -142,7 +148,7 @@ void run_queries(char *dataset, char *input)
 
     start = clock();
     printf("\n");
-    CATALOG *c = create_catalog(dataset);
+    CATALOG *c = create_catalog(dataset, 1);
     end = clock();
 
     print_loading_time(start, end, "TOTAL"); // Tempo de carregamento do catálogo
