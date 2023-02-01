@@ -107,7 +107,7 @@ GList *get_catalog_query8_stats(CATALOG *c)
  * Responsável por inicializar a struct CATALOG com os 3 módulos de dados (drivers, users e rides),
  * chamando as funções read_<módulo>() que fazem o parsing dos dados dos drivers, users e rides, respetivamente.
  */
-CATALOG *create_catalog(char *dataset)
+CATALOG *create_catalog(char *dataset, int v)
 {
     CATALOG *c = malloc(sizeof(CATALOG));
 
@@ -117,13 +117,13 @@ CATALOG *create_catalog(char *dataset)
     GHashTable *drivers = read_drivers(dataset); // dados de condutores
     end = clock();
 
-    print_loading_time(start, end, "DRIVERS");
+    if (v) print_loading_time(start, end, "DRIVERS");
 
     start = clock();
     GHashTable *users = read_users(dataset);     // dados de utilizadores
     end = clock();
 
-    print_loading_time(start, end, "USERS");
+    if (v) print_loading_time(start, end, "USERS");
 
     GHashTable *driver_stats = g_hash_table_new_full(g_int_hash, g_int_equal, NULL, destroy_driver_stat);         // estatísticas de condutores
     GHashTable *user_stats = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, destroy_user_stat);             // estatísticas de utilizadores
@@ -137,7 +137,7 @@ CATALOG *create_catalog(char *dataset)
     GHashTable *rides = read_rides(dataset, user_stats, driver_stats, city_stats, bydate_stats, bycitydate_stats, query7_stats_hash, query8_stats_hash, drivers, users); // dados de viagens
     end = clock();
 
-    print_loading_time(start, end, "RIDES");
+    if (v) print_loading_time(start, end, "RIDES");
 
     start = clock();
     GList *query2_stats = sort_query2_stats(driver_stats);      // estatísticas da query 2 (lista ordenada)
@@ -146,7 +146,7 @@ CATALOG *create_catalog(char *dataset)
     GList *query8_stats = sort_query8_stats(query8_stats_hash); // estatísticas da query 8 (lista ordenada)
     end = clock();
 
-    print_loading_time(start, end, "SORTING STATS");
+    if (v) print_loading_time(start, end, "SORTING STATS");
 
     c->drivers = drivers;
     c->users = users;

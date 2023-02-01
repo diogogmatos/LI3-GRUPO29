@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <glib.h>
+#include <ncurses.h>
 #include "../include/io.h"
 #include "../include/catalog.h"
 #include "../include/utils.h"
@@ -15,7 +16,7 @@
  * em `getline()`.
  */
 int main(int argc, char **argv)
-{
+{   
     if (argc == 1)
     {
         run_interactive();
