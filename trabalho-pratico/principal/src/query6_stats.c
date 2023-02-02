@@ -3,7 +3,7 @@
 #include <string.h>
 #include <glib.h>
 #include "../include/utils.h"
-#include "../include/catalog.h"
+#include "../include/stats.h"
 #include "../include/query6_stats.h"
 
 struct stat
@@ -59,7 +59,7 @@ void create_bycitydate_stat(RIDE *r, GHashTable *bycitydate_stats)
     free(date);
 }
 
-double create_query6_stat(char *city, char *date_a, char *date_b, CATALOG *c)
+double create_query6_stat(char *city, char *date_a, char *date_b, STATS *stats)
 {
     double d = 0, t = 0, r = 0;
 
@@ -74,7 +74,7 @@ double create_query6_stat(char *city, char *date_a, char *date_b, CATALOG *c)
     char *citydate;
     for (citydate = citydate_a; strcmp(citydate, citydate_b); increase_something_date(citydate))
     {
-        BYCITYDATE_STAT *s = g_hash_table_lookup(get_catalog_bycitydate_stats(c), citydate);
+        BYCITYDATE_STAT *s = g_hash_table_lookup(get_bycitydate_stats(stats), citydate);
 
         if (s != NULL)
         {

@@ -4,7 +4,6 @@
 #include <glib.h>
 #include "../include/driver.h"
 #include "../include/ride.h"
-#include "../include/catalog.h"
 #include "../include/query9_stats.h"
 #include "../include/utils.h"
 
@@ -20,7 +19,6 @@ struct aux
 {
 	char *date_a;
 	char *date_b;
-	CATALOG *c;
 	GSList *list;
 };
 
@@ -91,7 +89,7 @@ void build_query9_stat(gpointer key, gpointer value, gpointer userdata)
 	}
 }
 
-GSList *create_query9_stats(char *date_a, char *date_b, CATALOG *c)
+GSList *create_query9_stats(char *date_a, char *date_b, GHashTable *rides)
 {
 	GSList *r;
 	
@@ -100,9 +98,8 @@ GSList *create_query9_stats(char *date_a, char *date_b, CATALOG *c)
 	s->list = NULL;
 	s->date_a = date_a;
 	s->date_b = date_b;
-	s->c = c;
 
-	g_hash_table_foreach(get_catalog_rides(c), build_query9_stat, s);
+	g_hash_table_foreach(rides, build_query9_stat, s);
 
 	r = s->list;
 	

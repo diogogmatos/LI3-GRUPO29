@@ -6,7 +6,10 @@
 #include <time.h>
 #include "../include/interactive.h"
 #include "../include/utils.h"
-#include "../include/catalog.h"
+#include "../include/driver.h"
+#include "../include/user.h"
+#include "../include/ride.h"
+#include "../include/stats.h"
 #include "../include/io.h"
 
 typedef struct query
@@ -67,6 +70,11 @@ QUERY *query_info()
     queries[8].example = "000000295454;01/01/2021;13;Faro;3.000";
 
     return queries;
+}
+
+void destroy_queries(QUERY *queries)
+{
+    free(queries);
 }
 
 #define MARGIN 4
@@ -406,17 +414,16 @@ void menu_result(WINDOW *win, int start, int N, char *output)
         free(page_info);
     }
 
-    // Abrir ficheiro de output
-    char *path = get_results_path(0);
-    FILE *file = fopen(path, "r");
-
     // Calcular comprimento da barra para o número de linha
     char *N_str = malloc(sizeof(char) * 12);
     sprintf(N_str, "%d", N);
 
     int bar_len = strlen(N_str);
 
+    free(N_str);
+
     // Calcular posição em width do texto de acordo com a primeira linha de output
+    char *path = get_results_path(0);
     FILE *f = fopen(path, "r");
 
     char *l = NULL;
@@ -424,7 +431,12 @@ void menu_result(WINDOW *win, int start, int N, char *output)
 
     if(getline(&l, &ln, f)) {};
     int pos = center_text(l, width) - bar_len - 1;
+    
+    free(l);
     fclose(f);
+
+    // Abrir ficheiro de resultados
+    FILE *file = fopen(path, "r");
     
     // Mecanismo de paginação
     char *line = NULL;
@@ -447,9 +459,10 @@ void menu_result(WINDOW *win, int start, int N, char *output)
         wprintw(win, line);
     }
 
-    fclose(file);
+    free(line);
     free(path);
-
+    fclose(file);
+    
     refresh();
     wrefresh(win);
 }
@@ -502,6 +515,10 @@ void show_result(char *output)
     int N;
     for (N = 0; getline(&line, &len, file) != -1; N++);
 
+    free(path);
+    free(line);
+    fclose(file);
+
     int start = 0, space = height - 4;
     char i;
     do
@@ -537,27 +554,34 @@ void show_result(char *output)
         werase(win);
     }
     while (i != '\n');
+
+    free(path);
+    fclose(file);
 }
 
-void run_query(int query, CATALOG *c, QUERY *queries)
+void run_query(int query, QUERY *queries, GHashTable *d, GHashTable *u, GHashTable *r, STATS *s)
 {
     WINDOW *win = new_window();
 
     char *title = malloc(sizeof(char) * 50);
     sprintf(title, "QUERY %d", query);
 
-    char *input = malloc(sizeof(char) * 50);
+    char *input = malloc(sizeof(char) * 100);
     menu_input(win, input, title, "Introduza os argumentos para a query:", "ENTER - Executar", &queries[query - 1]);
+
+    free(title);
 
     WINDOW *info_win = info("[INFO] - Executando query...", -1);
 
-    handle_input(query, input, c, 0);
+    handle_input(query, input, d, u, r, s, 0);
 
     werase(info_win);
     refresh();
     wrefresh(info_win);
 
     info("[INFO] - Query executada com sucesso.", 3);
+
+    free(input);
 
     show_result(queries[query - 1].output);
 }
@@ -596,7 +620,7 @@ int menu_principal(char *dataset)
     return sel;
 }
 
-CATALOG *menu_dataset(char *path)
+void menu_dataset(char *path)
 {
     int valid;
     do
@@ -623,18 +647,6 @@ CATALOG *menu_dataset(char *path)
         free(dataset);
     }
     while (!valid);
-
-    WINDOW *info_win = info("[INFO] - Carregando dataset...", -1);
-
-    CATALOG *c = create_catalog(path, 0);
-
-    werase(info_win);
-    refresh();
-    wrefresh(info_win);
-
-    info("[INFO] - Dataset carregado com sucesso.", 3);
-
-    return c;
 }
 
 // MAIN
@@ -643,9 +655,23 @@ void run_interactive()
 {
     initscr();
 
-    char *path = malloc(sizeof(char) * 100);
     QUERY *q = query_info();
-    CATALOG *c = menu_dataset(path);
+    char *path = malloc(sizeof(char) * 100);
+    menu_dataset(path);
+    
+    WINDOW *info_win = info("[INFO] - Carregando dataset...", -1);
+    
+    GHashTable *drivers = read_drivers(path);
+    GHashTable *users = read_users(path);
+    STATS *stats = create_stats();
+    GHashTable *rides = read_rides(path, stats, drivers, users);
+    sort_stats(stats);
+
+    werase(info_win);
+    refresh();
+    wrefresh(info_win);
+
+    info("[INFO] - Dataset carregado com sucesso.", 3);
 
     int voltar_p = 1;
     while (voltar_p)
@@ -662,31 +688,31 @@ void run_interactive()
                 switch(query)
                 {
                     case 0:
-                        run_query(1, c, q);
+                        run_query(1, q, drivers, users, rides, stats);
                         break;
                     case 1:
-                        run_query(2, c, q);
+                        run_query(2, q, drivers, users, rides, stats);
                         break;
                     case 2:
-                        run_query(3, c, q);
+                        run_query(3, q, drivers, users, rides, stats);
                         break;
                     case 3:
-                        run_query(4, c, q);
+                        run_query(4, q, drivers, users, rides, stats);
                         break;
                     case 4:
-                        run_query(5, c, q);
+                        run_query(5, q, drivers, users, rides, stats);
                         break;
                     case 5:
-                        run_query(6, c, q);
+                        run_query(6, q, drivers, users, rides, stats);
                         break;
                     case 6:
-                        run_query(7, c, q);
+                        run_query(7, q, drivers, users, rides, stats);
                         break;
                     case 7:
-                        run_query(8, c, q);
+                        run_query(8, q, drivers, users, rides, stats);
                         break;
                     case 8:
-                        run_query(9, c, q);
+                        run_query(9, q, drivers, users, rides, stats);
                         break;
                     case 9:
                         voltar_p = 1;
@@ -698,26 +724,61 @@ void run_interactive()
         else if (sel == 1) // MUDAR DATASET
         {
             WINDOW *i = info("[INFO] - Destruindo catálogo de dados atual...", -1);
-            destroy_catalog(c);
+            
+            g_hash_table_destroy(drivers);
+            g_hash_table_destroy(users);
+            g_hash_table_destroy(rides);
+            destroy_stats(stats);
+            
             werase(i);
             refresh();
             wrefresh(i);
             info("[INFO] - Feito!", 3);
-            c = menu_dataset(path);
+
+            menu_dataset(path);
+
+            WINDOW *info_win = info("[INFO] - Carregando dataset...", -1);
+    
+            drivers = read_drivers(path);
+            users = read_users(path);
+            stats = create_stats();
+            rides = read_rides(path, stats, drivers, users);
+            sort_stats(stats);
+
+            werase(info_win);
+            refresh();
+            wrefresh(info_win);
+
+            info("[INFO] - Dataset carregado com sucesso.", 3);
         }
         else if (sel == 2) // SAIR
         {
             WINDOW *i = info("[INFO] - Destruindo catálogo de dados...", -1);
-            destroy_catalog(c);
+            
+            g_hash_table_destroy(drivers);
+            g_hash_table_destroy(users);
+            g_hash_table_destroy(rides);
+            destroy_stats(stats);
+            destroy_queries(q);
+
             werase(i);
             refresh();
             wrefresh(i);
             info("[INFO] - Feito!", 3);
+
+            free(path);
             endwin();
             return;
         }
     }
 
     endwin();
-    destroy_catalog(c);
+
+    g_hash_table_destroy(drivers);
+    g_hash_table_destroy(users);
+    g_hash_table_destroy(rides);
+    destroy_stats(stats);
+    destroy_queries(q);
+
+    free(path);
 }

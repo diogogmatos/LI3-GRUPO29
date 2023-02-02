@@ -4,7 +4,6 @@
 #include <glib.h>
 #include <ncurses.h>
 #include "../include/io.h"
-#include "../include/catalog.h"
 #include "../include/utils.h"
 #include "../include/interactive.h"
 

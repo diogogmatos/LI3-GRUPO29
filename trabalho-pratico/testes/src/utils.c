@@ -31,8 +31,10 @@ void test_results(char *input, char *test_path)
 
         printf("Teste %d - Query %d:", i, query);
         
-        produced_file = fopen(get_results_path(i), "r");
-        expected_file = fopen(get_tests_path(i, test_path), "r");
+        char *results_path = get_results_path(i);
+        char *tests_path = get_tests_path(i, test_path);
+        produced_file = fopen(results_path, "r");
+        expected_file = fopen(tests_path, "r");
 
         char *results_line = NULL;
         size_t results_len = 0;
@@ -63,5 +65,8 @@ void test_results(char *input, char *test_path)
             printf(" [OK]\n");
         else
             printf("\nArgumentos: %s\n", args);
+
+        free(results_path);
+        free(tests_path);
     }
 }

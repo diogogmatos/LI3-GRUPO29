@@ -5,7 +5,7 @@
 #include "../include/driver.h"
 #include "../include/ride.h"
 #include "../include/utils.h"
-#include "../include/catalog.h"
+#include "../include/stats.h"
 #include "../include/query5_stats.h"
 
 struct stat
@@ -60,7 +60,7 @@ void create_bydate_stat(RIDE *r, GHashTable *bydate_stats, GHashTable *drivers)
     free(id);
 }
 
-double create_query5_stat(char *date_a, char *date_b, CATALOG *c)
+double create_query5_stat(char *date_a, char *date_b, STATS *stats)
 {
     double m = 0, t = 0, r = 0;
 
@@ -69,7 +69,7 @@ double create_query5_stat(char *date_a, char *date_b, CATALOG *c)
     char *date;
     for (date = date_a; strcmp(date, date_b); increase_date(date))
     {
-        BYDATE_STAT *s = g_hash_table_lookup(get_catalog_bydate_stats(c), date);
+        BYDATE_STAT *s = g_hash_table_lookup(get_bydate_stats(stats), date);
 
         if (s != NULL)
         {

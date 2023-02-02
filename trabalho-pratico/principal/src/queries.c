@@ -7,7 +7,6 @@
 #include "../include/ride.h"
 #include "../include/io.h"
 #include "../include/queries.h"
-#include "../include/catalog.h"
 #include "../include/utils.h"
 #include "../include/user_stats.h"
 #include "../include/driver_stats.h"
@@ -17,6 +16,7 @@
 #include "../include/query7_stats.h"
 #include "../include/query8_stats.h"
 #include "../include/query9_stats.h"
+#include "../include/stats.h"
 
 // QUERY 1
 
@@ -26,13 +26,13 @@
  * criam a struct STAT com as estatísticas pedidas.
  * No fim da execução, liberta a memória alocada.
  */
-void query_1(int is_id, char *value, char *path, CATALOG *c)
+void query_1(int is_id, char *value, char *path, GHashTable *drivers, GHashTable *users, STATS *stats)
 {
     if (is_id != 0) // driver
     {
         char *id = value;
         int id_int = atoi(id);
-        DRIVER *d = g_hash_table_lookup(get_catalog_drivers(c), &id_int);
+        DRIVER *d = g_hash_table_lookup(drivers, &id_int);
 
         FILE *f = fopen(path, "w");
 
@@ -46,7 +46,7 @@ void query_1(int is_id, char *value, char *path, CATALOG *c)
 
         if (!strcmp(account_status, "active")) // se a conta for ativa executa normalmente
         {
-            DRIVER_STAT *s = g_hash_table_lookup(get_catalog_driver_stats(c), &id_int);
+            DRIVER_STAT *s = g_hash_table_lookup(get_driver_stats(stats), &id_int);
 
             char *name = get_driver_stat_driver_name(s);
             char *gender = get_driver_stat_gender(s);
@@ -68,7 +68,7 @@ void query_1(int is_id, char *value, char *path, CATALOG *c)
     else // user
     {
         char *username = value;
-        USER *u = g_hash_table_lookup(get_catalog_users(c), username);
+        USER *u = g_hash_table_lookup(users, username);
 
         FILE *f = fopen(path, "w");
 
@@ -82,7 +82,7 @@ void query_1(int is_id, char *value, char *path, CATALOG *c)
 
         if (!strcmp(account_status, "active"))
         {
-            USER_STAT *s = g_hash_table_lookup(get_catalog_user_stats(c), username);
+            USER_STAT *s = g_hash_table_lookup(get_user_stats(stats), username);
 
             char *name = get_user_stat_user_name(s);
             char *gender = get_user_stat_gender(s);
@@ -112,7 +112,7 @@ void query_1(int is_id, char *value, char *path, CATALOG *c)
  * as instruções dadas no enunciado, com ajuda da função `compare_avg_score()`.
  * No fim da execução, liberta a memória alocada (incluindo a lista e a tabela hash).
  */
-void query_2(int N, char *path, CATALOG *c)
+void query_2(int N, char *path, STATS *s)
 {
     FILE *f = fopen(path, "w");
 
@@ -122,7 +122,7 @@ void query_2(int N, char *path, CATALOG *c)
         return;
     }
 
-    GList *list = get_catalog_query2_stats(c);
+    GList *list = get_query2_stats(s);
 
     int acc;
     GList *iterator;
@@ -151,7 +151,7 @@ void query_2(int N, char *path, CATALOG *c)
  * as instruções dadas no enunciado, com ajuda da função `compare_tot_dist()`.
  * No fim da execução, liberta a memória alocada (incluindo a lista e a tabela hash).
  */
-void query_3(int N, char *path, CATALOG *c)
+void query_3(int N, char *path, STATS *s)
 {
     FILE *f = fopen(path, "w");
 
@@ -161,7 +161,7 @@ void query_3(int N, char *path, CATALOG *c)
         return;
     }
 
-    GList *list = get_catalog_query3_stats(c);
+    GList *list = get_query3_stats(s);
 
     int acc;
     GList *iterator;
@@ -182,9 +182,9 @@ void query_3(int N, char *path, CATALOG *c)
 
 // QUERY 4
 
-void query_4(char *city, char *path, CATALOG *c)
+void query_4(char *city, char *path, STATS *stats)
 {
-    CITY_STAT *s = g_hash_table_lookup(get_catalog_city_stats(c), city);
+    CITY_STAT *s = g_hash_table_lookup(get_city_stats(stats), city);
 
     FILE *f = fopen(path, "w");
 
@@ -203,9 +203,9 @@ void query_4(char *city, char *path, CATALOG *c)
 
 // QUERY 5
 
-void query_5(char *date_a, char *date_b, char *path, CATALOG *c)
+void query_5(char *date_a, char *date_b, char *path, STATS *s)
 {
-    double avg_cost = create_query5_stat(date_a, date_b, c);
+    double avg_cost = create_query5_stat(date_a, date_b, s);
 
     FILE *f = fopen(path, "w");
 
@@ -222,9 +222,9 @@ void query_5(char *date_a, char *date_b, char *path, CATALOG *c)
 
 // QUERY 6
 
-void query_6(char *city, char *date_a, char *date_b, char *path, CATALOG *c)
+void query_6(char *city, char *date_a, char *date_b, char *path, STATS *s)
 {
-    double avg_distance = create_query6_stat(city, date_a, date_b, c);
+    double avg_distance = create_query6_stat(city, date_a, date_b, s);
 
     FILE *f = fopen(path, "w");
 
@@ -241,9 +241,9 @@ void query_6(char *city, char *date_a, char *date_b, char *path, CATALOG *c)
 
 // QUERY 7
 
-void query_7(int N, char *city, char *path, CATALOG *c)
+void query_7(int N, char *city, char *path, GHashTable *drivers, STATS *s)
 {
-    GList *list = get_catalog_query7_stats(c);
+    GList *list = get_query7_stats(s);
 
     FILE *f = fopen(path, "w");
 
@@ -259,7 +259,7 @@ void query_7(int N, char *city, char *path, CATALOG *c)
         {
             char *id = strsep(&citydriver, "\0");
             int id_int = atoi(id);
-            char *driver_name = get_driver_stat_driver_name(g_hash_table_lookup(get_catalog_drivers(c), &id_int));
+            char *driver_name = get_driver_stat_driver_name(g_hash_table_lookup(drivers, &id_int));
             double avg_score = get_query7_stat_avg_score(iterator->data);
 
             fprintf(f, "%s;%s;%.3f\n", id, driver_name, avg_score);
@@ -277,9 +277,9 @@ void query_7(int N, char *city, char *path, CATALOG *c)
 
 // QUERY 8
 
-void query_8(char *gender, int X, char *path, CATALOG *c)
+void query_8(char *gender, int X, char *path, GHashTable *drivers, GHashTable *users, GHashTable *rides, STATS *s)
 {
-    GList *query8_stats = get_catalog_query8_stats(c);
+    GList *query8_stats = get_query8_stats(s);
 
     FILE *f = fopen(path, "w");
 
@@ -293,11 +293,11 @@ void query_8(char *gender, int X, char *path, CATALOG *c)
         if (!strcmp(gender_l, gender) && driver_acc_age >= X && user_acc_age >= X)
         {
             int ride = get_query8_stat_ride(iterator->data);
-            char *driver = get_ride_driver(g_hash_table_lookup(get_catalog_rides(c), &ride));
+            char *driver = get_ride_driver(g_hash_table_lookup(rides, &ride));
             int driver_int = atoi(driver);
-            char *driver_name = get_driver_name(g_hash_table_lookup(get_catalog_drivers(c), &driver_int));
-            char *user = get_ride_user(g_hash_table_lookup(get_catalog_rides(c), &ride));
-            char *user_name = get_user_name(g_hash_table_lookup(get_catalog_users(c), user));
+            char *driver_name = get_driver_name(g_hash_table_lookup(drivers, &driver_int));
+            char *user = get_ride_user(g_hash_table_lookup(rides, &ride));
+            char *user_name = get_user_name(g_hash_table_lookup(users, user));
 
             fprintf(f, "%s;%s;%s;%s\n", driver, driver_name, user, user_name);
 
@@ -356,9 +356,9 @@ gint compare_query9_rides(gconstpointer a, gconstpointer b)
     return r;
 }
 
-void query_9(char *date_a, char *date_b, char *path, CATALOG *c)
+void query_9(char *date_a, char *date_b, char *path, GHashTable *rides)
 {
-    GSList *query9_stats = create_query9_stats(date_a, date_b, c);
+    GSList *query9_stats = create_query9_stats(date_a, date_b, rides);
     query9_stats = g_slist_sort(query9_stats, compare_query9_rides);
 
     FILE *f = fopen(path, "w");
@@ -370,7 +370,7 @@ void query_9(char *date_a, char *date_b, char *path, CATALOG *c)
         int id_int = atoi(id);
         char *date = get_query9_stat_date(iterator->data);
         int distance = get_query9_stat_distance(iterator->data);
-        char *city = get_ride_city(g_hash_table_lookup(get_catalog_rides(c), &id_int));
+        char *city = get_ride_city(g_hash_table_lookup(rides, &id_int));
         double tip = get_query9_stat_tip(iterator->data);
 
         fprintf(f, "%s;%s;%d;%s;%.3f\n", id, date, distance, city, tip);

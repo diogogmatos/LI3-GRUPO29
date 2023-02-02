@@ -2,6 +2,7 @@
 #define ride_h
 
 #include <glib.h>
+#include "../include/stats.h"
 
 typedef struct ride RIDE;
 
@@ -26,6 +27,6 @@ void destroy_ride(void *v);
 
 // PARSING
 
-GHashTable *read_rides(char *dataset, GHashTable *user_stats, GHashTable *driver_stats, GHashTable *city_stats, GHashTable *bydate_stats, GHashTable *bycitydate_stats, GHashTable *query7_stats, GHashTable *query8_stats, GHashTable *drivers, GHashTable *users);
+GHashTable *read_rides(char *dataset, STATS *s, GHashTable *drivers, GHashTable *users);
 
 #endif
