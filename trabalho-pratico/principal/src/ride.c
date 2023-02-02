@@ -5,7 +5,6 @@
 
 #include <glib.h>
 #include "../include/utils.h"
-#include "../include/catalog.h"
 #include "../include/driver_stats.h"
 #include "../include/user_stats.h"
 #include "../include/city_stats.h"
@@ -15,6 +14,7 @@
 #include "../include/query7_stats.h"
 #include "../include/query8_stats.h"
 #include "../include/query9_stats.h"
+#include "../include/stats.h"
 
 /* Struct RIDE
  * Responsável por guardar os dados de uma viagem.
@@ -173,7 +173,7 @@ void destroy_ride(void *v)
  * Usada também para inicializar as funções `create_driver_stat()` e `create_user_stat()` de criação das hash tables de
  * estatísticas para os users e para os drivers, em cada linha.
  */
-GHashTable *read_rides(char *dataset, GHashTable *user_stats, GHashTable *driver_stats, GHashTable *city_stats, GHashTable *bydate_stats, GHashTable *bycitydate_stats, GHashTable *query7_stats, GHashTable *query8_stats, GHashTable *drivers, GHashTable *users)
+GHashTable *read_rides(char *dataset, STATS *stats, GHashTable *drivers, GHashTable *users)
 {
     char *path = get_dataset_path(dataset, "rides");
 
@@ -204,13 +204,13 @@ GHashTable *read_rides(char *dataset, GHashTable *user_stats, GHashTable *driver
 
             // CRIAÇÃO DE ESTATÍSTICAS
 
-            create_driver_stat(ride, driver_stats, drivers);
-            create_user_stat(ride, user_stats, drivers, users);
-            create_city_stat(ride, city_stats, drivers);
-            create_bydate_stat(ride, bydate_stats, drivers);
-            create_bycitydate_stat(ride, bycitydate_stats);
-            create_query7_stat(ride, query7_stats, drivers);
-            create_query8_stats(ride, query8_stats, drivers, users);
+            create_driver_stat(ride, get_driver_stats(stats), drivers);
+            create_user_stat(ride, get_user_stats(stats), drivers, users);
+            create_city_stat(ride, get_city_stats(stats), drivers);
+            create_bydate_stat(ride, get_bydate_stats(stats), drivers);
+            create_bycitydate_stat(ride, get_bycitydate_stats(stats));
+            create_query7_stat(ride, get_query7_stats_hash(stats), drivers);
+            create_query8_stats(ride, get_query8_stats_hash(stats), drivers, users);
         }
         else
             destroy_ride(ride);

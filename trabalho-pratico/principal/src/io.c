@@ -3,14 +3,17 @@
 #include <glib.h>
 #include "../include/io.h"
 #include "../include/queries.h"
-#include "../include/catalog.h"
 #include "../include/utils.h"
+#include "../include/driver.h"
+#include "../include/user.h"
+#include "../include/ride.h"
+#include "../include/stats.h"
 
 /* Função `handle_input()`
  * Responsável por receber um inteiro `query` com o nº da query a ser executada e uma string `input` com o input dado
  * para essa mesma query e chamar a função correta para lidar com a mesma.
  */
-void handle_input(int query, char *input, CATALOG *c, int i)
+void handle_input(int query, char *input, GHashTable *d, GHashTable *u, GHashTable *r, STATS *s, int i)
 {
     switch (query)
     {
@@ -21,7 +24,7 @@ void handle_input(int query, char *input, CATALOG *c, int i)
 
         char *path = get_results_path(i);
 
-        query_1(is_id, value, path, c);
+        query_1(is_id, value, path, d, u, s);
         printf("Output %d - Query %d - [OK]", i, query);
 
         free(path);
@@ -33,7 +36,7 @@ void handle_input(int query, char *input, CATALOG *c, int i)
         
         char *path = get_results_path(i);
 
-        query_2(N, path, c);
+        query_2(N, path, s);
         printf("Output %d - Query %d - [OK]", i, query);
 
         free(path);
@@ -45,7 +48,7 @@ void handle_input(int query, char *input, CATALOG *c, int i)
         
         char *path = get_results_path(i);
 
-        query_3(N, path, c);
+        query_3(N, path, s);
         printf("Output %d - Query %d - [OK]", i, query);
 
         free(path);
@@ -57,7 +60,7 @@ void handle_input(int query, char *input, CATALOG *c, int i)
         
         char *path = get_results_path(i);
 
-        query_4(city, path, c);
+        query_4(city, path, s);
         printf("Output %d - Query %d - [OK]", i, query);
 
         free(path);
@@ -70,7 +73,7 @@ void handle_input(int query, char *input, CATALOG *c, int i)
         
         char *path = get_results_path(i);
 
-        query_5(date_a, date_b, path, c);
+        query_5(date_a, date_b, path, s);
         printf("Output %d - Query %d - [OK]", i, query);
 
         free(path);
@@ -84,7 +87,7 @@ void handle_input(int query, char *input, CATALOG *c, int i)
         
         char *path = get_results_path(i);
 
-        query_6(city, date_a, date_b, path, c);
+        query_6(city, date_a, date_b, path, s);
         printf("Output %d - Query %d - [OK]", i, query);
 
         free(path);
@@ -97,7 +100,7 @@ void handle_input(int query, char *input, CATALOG *c, int i)
         
         char *path = get_results_path(i);
 
-        query_7(N, city, path, c);
+        query_7(N, city, path, d, s);
         printf("Output %d - Query %d - [OK]", i, query);
 
         free(path);
@@ -110,7 +113,7 @@ void handle_input(int query, char *input, CATALOG *c, int i)
         
         char *path = get_results_path(i);
 
-        query_8(gender, X, path, c);
+        query_8(gender, X, path, d, u, r, s);
         printf("Output %d - Query %d - [OK]", i, query);
 
         free(path);
@@ -123,7 +126,7 @@ void handle_input(int query, char *input, CATALOG *c, int i)
         
         char *path = get_results_path(i);
 
-        query_9(date_a, date_b, path, c);
+        query_9(date_a, date_b, path, r);
         printf("Output %d - Query %d - [OK]", i, query);
 
         free(path);
@@ -144,14 +147,39 @@ void handle_input(int query, char *input, CATALOG *c, int i)
 
 void run_queries(char *dataset, char *input)
 {
-    clock_t start, end;
+    clock_t start, end, s, e;
 
     start = clock();
     printf("\n");
-    CATALOG *c = create_catalog(dataset, 1);
+
+    s = clock();
+    GHashTable *drivers = read_drivers(dataset);
+    e = clock();
+
+    print_loading_time(s, e, "DRIVERS"); // Tempo de carregamento dos condutores
+
+    s = clock();
+    GHashTable *users = read_users(dataset);
+    e = clock();
+
+    print_loading_time(s, e, "USERS"); // Tempo de carregamento dos utilizadores
+
+    s = clock();
+    STATS *stats = create_stats(dataset);
+    GHashTable *rides = read_rides(dataset, stats, drivers, users);
+    e = clock();
+
+    print_loading_time(s, e, "RIDES"); // Tempo de carregamento das viagens
+
+    s = clock();
+    sort_stats(stats);
+    e = clock();
+
+    print_loading_time(s, e, "SORTING STATS"); // Tempo de ordenação de estatísticas
+
     end = clock();
 
-    print_loading_time(start, end, "TOTAL"); // Tempo de carregamento do catálogo
+    print_loading_time(start, end, "TOTAL"); // Tempo de carregamento total
     printf("\n");
 
     FILE *file = fopen(input, "r");
@@ -166,7 +194,7 @@ void run_queries(char *dataset, char *input)
         char *args = line + 2;
 
         start = clock();
-        handle_input(query, args, c, i);
+        handle_input(query, args, drivers, users, rides, stats, i);
         end = clock();
 
         print_query_time(start, end); // Tempo de execução da query
@@ -175,7 +203,11 @@ void run_queries(char *dataset, char *input)
     fclose(file);
 
     free(line);
-    destroy_catalog(c);
+    
+    g_hash_table_destroy(drivers);
+    g_hash_table_destroy(users);
+    g_hash_table_destroy(rides);
+    destroy_stats(stats);
 
     print_time_and_memory();
 }

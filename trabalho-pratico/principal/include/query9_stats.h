@@ -2,7 +2,7 @@
 #define query9_stats_h
 
 #include <glib.h>
-#include "catalog.h"
+#include "stats.h"
 
 typedef struct stat QUERY9_STAT;
 typedef struct aux QUERY9_AUX;
@@ -22,6 +22,6 @@ void destroy_query9_stat(void *v);
 
 // FUNÇÕES DE CRIAÇÃO DE ESTATÍSTICAS
 
-GSList *create_query9_stats(char *date_a, char *date_b, CATALOG *c);
+GSList *create_query9_stats(char *date_a, char *date_b, GHashTable *rides);
 
 #endif

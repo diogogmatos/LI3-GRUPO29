@@ -5,7 +5,6 @@
 #include "../include/driver.h"
 #include "../include/user.h"
 #include "../include/ride.h"
-#include "../include/catalog.h"
 #include "../include/utils.h"
 #include "../include/query8_stats.h"
 

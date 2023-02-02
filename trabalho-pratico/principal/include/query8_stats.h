@@ -2,7 +2,7 @@
 #define query8_stats_h
 
 #include <glib.h>
-#include "catalog.h"
+#include "stats.h"
 
 typedef struct stat QUERY8_STAT;
 
