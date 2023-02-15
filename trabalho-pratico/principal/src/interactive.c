@@ -554,9 +554,6 @@ void show_result(char *output)
         werase(win);
     }
     while (i != '\n');
-
-    free(path);
-    fclose(file);
 }
 
 void run_query(int query, QUERY *queries, GHashTable *d, GHashTable *u, GHashTable *r, STATS *s)
